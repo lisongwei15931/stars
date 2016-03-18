@@ -1,0 +1,271 @@
+[
+{
+   "fields": {
+      "track_stock": true,
+      "options": [],
+      "requires_shipping": true,
+      "name": "\u767d\u9152",
+      "slug": "bai-jiu"
+   },
+   "model": "catalogue.productclass",
+   "pk": 1
+},
+{
+   "fields": {
+      "description": "",
+      "numchild": 0,
+      "slug": "qiu-fu",
+      "depth": 1,
+      "path": "0001",
+      "image": "",
+      "name": "\u90b1\u5e9c"
+   },
+   "model": "catalogue.category",
+   "pk": 1
+},
+{
+   "fields": {
+      "description": "",
+      "numchild": 0,
+      "slug": "yu-zhi-wei",
+      "depth": 1,
+      "path": "0002",
+      "image": "",
+      "name": "\u57df\u4e4b\u4e3a"
+   },
+   "model": "catalogue.category",
+   "pk": 2
+},
+{
+   "fields": {
+      "description": "",
+      "numchild": 0,
+      "slug": "jiang-jun-yu",
+      "depth": 1,
+      "path": "0003",
+      "image": "",
+      "name": "\u5c06\u519b\u7389"
+   },
+   "model": "catalogue.category",
+   "pk": 3
+},
+{
+   "fields": {
+      "description": "",
+      "numchild": 0,
+      "slug": "di-huang",
+      "depth": 1,
+      "path": "0004",
+      "image": "",
+      "name": "\u5730\u7687"
+   },
+   "model": "catalogue.category",
+   "pk": 4
+},
+{
+   "fields": {
+      "description": "",
+      "numchild": 0,
+      "slug": "san-jiu-nong-xiang-xing",
+      "depth": 1,
+      "path": "0005",
+      "image": "",
+      "name": "\u6563\u9152\u6d53\u9999\u578b"
+   },
+   "model": "catalogue.category",
+   "pk": 5
+},
+{
+   "fields": {
+      "description": "",
+      "numchild": 0,
+      "slug": "san-jiu-jiang-xiang-xing",
+      "depth": 1,
+      "path": "0006",
+      "image": "",
+      "name": "\u6563\u9152\u9171\u9999\u578b"
+   },
+   "model": "catalogue.category",
+   "pk": 6
+},
+{
+   "fields": {
+      "required": false,
+      "product_class": 1,
+      "option_group": null,
+      "code": "place_of_origin",
+      "type": "text",
+      "name": "\u4ea7\u5730"
+   },
+   "model": "catalogue.productattribute",
+   "pk": 1
+},
+{
+   "fields": {
+      "required": false,
+      "product_class": 1,
+      "option_group": null,
+      "code": "degree",
+      "type": "text",
+      "name": "\u5ea6\u6570"
+   },
+   "model": "catalogue.productattribute",
+   "pk": 2
+},
+{
+   "fields": {
+      "required": false,
+      "product_class": 1,
+      "option_group": null,
+      "code": "capacity",
+      "type": "text",
+      "name": "\u5bb9\u91cf"
+   },
+   "model": "catalogue.productattribute",
+   "pk": 3
+},
+{
+   "fields": {
+      "required": false,
+      "product_class": 1,
+      "option_group": null,
+      "code": "raw_material",
+      "type": "text",
+      "name": "\u539f\u6599"
+   },
+   "model": "catalogue.productattribute",
+   "pk": 4
+},
+{
+   "fields": {
+      "required": false,
+      "product_class": 1,
+      "option_group": null,
+      "code": "flavor",
+      "type": "text",
+      "name": "\u9999\u578b"
+   },
+   "model": "catalogue.productattribute",
+   "pk": 5
+},
+{
+   "fields": {
+      "required": false,
+      "product_class": 1,
+      "option_group": null,
+      "code": "storage_conditions",
+      "type": "text",
+      "name": "\u50a8\u85cf\u6761\u4ef6"
+   },
+   "model": "catalogue.productattribute",
+   "pk": 6
+},
+{
+   "fields": {
+      "required": false,
+      "product_class": 1,
+      "option_group": null,
+      "code": "winery",
+      "type": "text",
+      "name": "\u9152\u5382"
+   },
+   "model": "catalogue.productattribute",
+   "pk": 7
+},
+{
+   "fields": {
+      "required": false,
+      "product_class": 1,
+      "option_group": null,
+      "code": "implementation_of_standards",
+      "type": "text",
+      "name": "\u6267\u884c\u6807\u51c6"
+   },
+   "model": "catalogue.productattribute",
+   "pk": 8
+},
+{
+   "fields": {
+      "required": false,
+      "product_class": 1,
+      "option_group": null,
+      "code": "license_number",
+      "type": "text",
+      "name": "\u8bb8\u53ef\u8bc1\u53f7"
+   },
+   "model": "catalogue.productattribute",
+   "pk": 9
+},
+{
+   "fields": {
+      "required": false,
+      "product_class": 1,
+      "option_group": null,
+      "code": "shelf_life",
+      "type": "text",
+      "name": "\u4fdd\u8d28\u671f"
+   },
+   "model": "catalogue.productattribute",
+   "pk": 10
+},
+{
+   "fields": {
+      "required": false,
+      "product_class": 1,
+      "option_group": null,
+      "code": "selection_reputation",
+      "type": "boolean",
+      "name": "\u53e3\u7891\u7504\u9009"
+   },
+   "model": "catalogue.productattribute",
+   "pk": 11
+},
+{
+   "fields": {
+      "required": false,
+      "product_class": 1,
+      "option_group": null,
+      "code": "new_listing",
+      "type": "boolean",
+      "name": "\u65b0\u54c1\u4e0a\u5e02"
+   },
+   "model": "catalogue.productattribute",
+   "pk": 12
+},
+{
+   "fields": {
+      "required": false,
+      "product_class": 1,
+      "option_group": null,
+      "code": "featured_hot",
+      "type": "boolean",
+      "name": "\u4e3b\u63a8\u70ed\u5356"
+   },
+   "model": "catalogue.productattribute",
+   "pk": 13
+},
+{
+   "fields": {
+      "required": false,
+      "product_class": 1,
+      "option_group": null,
+      "code": "hot_deals",
+      "type": "boolean",
+      "name": "\u706b\u70ed\u4fc3\u9500"
+   },
+   "model": "catalogue.productattribute",
+   "pk": 14
+},
+{
+   "fields": {
+      "required": false,
+      "product_class": 1,
+      "option_group": null,
+      "code": "advertising_long_image",
+      "type": "image",
+      "name": "\u5e7f\u544a\u957f\u56fe"
+   },
+   "model": "catalogue.productattribute",
+   "pk": 15
+}
+]
