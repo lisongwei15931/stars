@@ -1,0 +1,351 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <link rel="stylesheet" href="css/public.css" type="text/css">
+    <link rel="stylesheet" href="css/account.css" type="text/css">
+    <script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+    <title>蓝图百货--账户安全--收货地址</title>
+</head>
+<body class="account-body">
+    <!--顶层状态、登录条-->
+    <div class="login login1">
+        <div class="container zhanghu-top fix">
+            <div class="l login-left">
+                <a href="#">返回XX首页</a>
+            </div>
+            <ul class="r login-right">
+                <li>
+                    <a href="#">yuzhiwei</a>
+                    <a href="#">退出</a>
+                </li>
+                <li>
+                    <a href="#">我的账户<span class="jt"></span></a>
+                    <ul>
+                        <li><a href="#">我的账户<span class="jt"></span></a></li>
+                        <li><a href="#">账户资产</a></li>
+                        <li><a href="#">订单管理</a></li>
+                        <li><a href="#">账户设置</a></li>
+                    </ul>
+                </li>
+                <li><a href="#">我的订单</a></li>
+                <li><a href="#">充值</a></li>
+                <li><a href="#">我要开店</a></li>
+                <li>
+                    <a href="#">帮助中心<span class="jt"></span></a>
+                    <ul>
+                        <li><a href="#">帮助中心<span class="jt"></span></a></li>
+                        <li><a href="#">帮助中心</a></li>
+                        <li><a href="#">帮助中心</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <!--顶部 end-->
+    <!--登录-顶层logo条-->
+    <div class="account-topbar">
+        <div class="container fix">
+            <div class="account-topbar-left l">
+                <img src="images/logo.png"/>
+            </div>
+            <ul class="account-topbar-tit l">
+                <li><a>我的账户</a></li>
+                <li><a>我的订单</a></li>
+                <li><a>充值</a></li>
+                <li><a>我要开店</a></li>
+                <li><a>帮助中心</a></li>
+            </ul>
+        </div>
+    </div>
+    <!--账户安全body start-->
+    <div class="account-cont-body account-cont-body2 container">
+        <div class="account-cont-left account-cont-left2 l">
+            <div class="account-nav">
+                <h4>我的账户</h4>
+                <ul>
+                    <li><a>账户资产</a></li>
+                    <li><a>我的存货</a></li>
+                    <li><a>银行卡</a></li>
+                </ul>
+            </div>
+            <div class="account-nav">
+                <h4>交易信息</h4>
+                <ul>
+                    <li><a>交易记录</a></li>
+                    <li><a>当天成交</a></li>
+                    <li><a>当天未成交</a></li>
+                    <li><a>撤单查询</a></li>
+                    <li><a>提货明细</a></li>
+                </ul>
+            </div>
+            <div class="account-nav account-nav1">
+                <h4>账户设置</h4>
+                <ul>
+                    <li><a>个人信息</a></li>
+                    <li><a>账户安全</a></li>
+                    <li><a>实名认证</a></li>
+                    <li><a>我的关注</a></li>
+                    <li class="active"><a>收货地址</a></li>
+                    <li><a>自提点</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="account-cont-right l">
+            <div class="details details3">
+                <div class="title-acct title-acct2 fix">
+                    <span class="l">收货地址</span>
+                </div>
+                <div class="account-address">
+                    <span>新增收货地址</span>
+                </div>
+                <div id="consignee-con1" style="display: none;">
+                    <div class="shopcar-pupzz"></div>
+                    <div class="shopcar-pupbody">
+                        <div class="pupbody-top fix">
+                            <div class="pupbody-title l">新增收货人信息</div>
+                            <div class="pupbody-closebtn r">×</div>
+                        </div>
+                        <div class="pupbody-content pupbody-content1">
+                            <div class="input-group fix">
+                                <div class="input-group-left right l">
+                                    <span class="color-red">*</span>
+                                    收货人：
+                                </div>
+                                <div class="input-group-right l">
+                                    <input type="text"/>
+                                </div>
+                            </div>
+                            <div class="input-group fix">
+                                <div class="input-group-left right l">
+                                    <span class="color-red">*</span>
+                                    所在地区：
+                                </div>
+                                <select class="input-group-select l">
+                                    <option selected="selected">请选择</option>
+                                    <option value ="1">北京</option>
+                                    <option value="2">广东省</option>
+                                    <option value="3">河北</option>
+                                </select>
+                                <select class="input-group-select l">
+                                    <option selected="selected">请选择</option>
+                                    <option value ="01">北京</option>
+                                    <option value="02">深圳</option>
+                                    <option value="03">石家庄</option>
+                                </select>
+                                <select class="input-group-select l">
+                                    <option selected="selected">请选择</option>
+                                    <option value ="001">二环至三环</option>
+                                    <option value="002">三环至四环</option>
+                                    <option value="003">四环至五环</option>
+                                </select>
+                            </div>
+                            <div class="input-group fix">
+                                <div class="input-group-left right l">
+                                    <span class="color-red">*</span>
+                                    详细地址：
+                                </div>
+                                <div class="input-group-right l">
+                                    <input type="text" class="input-long"/>
+                                </div>
+                            </div>
+                            <div class="input-group fix">
+                                <div class="input-group-left right l">
+                                    <span class="color-red">*</span>
+                                    手机号码：
+                                </div>
+                                <div class="input-group-right l">
+                                    <input type="text" class="input-short"/>
+                                </div>
+                                <div class="input-group-left right l">
+                                    固定电话：
+                                </div>
+                                <div class="input-group-right l">
+                                    <input type="text" class="input-short"/>
+                                </div>
+                            </div>
+                            <div class="input-group fix">
+                                <div class="input-group-left right l">
+                                    邮箱：
+                                </div>
+                                <div class="input-group-right l">
+                                    <input type="text" class="input-short"/>
+                                    <span>用来接收订单提醒邮件，便于您及时了解订单状态</span>
+                                </div>
+                            </div>
+                            <div class="quasi">
+                                <input type="checkbox"/>
+                                <span>设为默认收货地址</span>
+                            </div>
+                        </div>
+                        <div class="pupbody-btn center">
+                            <a class="shopcar-btn">保存收货人信息</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="account-add-infor">
+                    <div class="add-tit">
+                        <span>张三</span>
+                        <span>北京市</span>
+                        <div class="defaultadd">
+                            默认地址
+                        </div>
+                    </div>
+                    <div class="add-content">
+                        <div class="add-row fix">
+                            <div class="leftarea l right">
+                                收货人：
+                            </div>
+                            <div class="rightarea l">
+                                张三
+                            </div>
+                        </div>
+                        <div class="add-row fix">
+                            <div class="leftarea l right">
+                                所在地区：
+                            </div>
+                            <div class="rightarea l">
+                                北京市 海淀区
+                            </div>
+                        </div>
+                        <div class="add-row fix">
+                            <div class="leftarea l right">
+                                详细地址：
+                            </div>
+                            <div class="rightarea l">
+                                北京市海淀区中关村立方庭2段2-103
+                            </div>
+                        </div>
+                        <div class="add-row fix" style="margin-bottom: 0;">
+                            <div class="leftarea l right">
+                                手机号码：
+                            </div>
+                            <div class="rightarea l">
+                                <div class="l">
+                                    130*****2141
+                                </div>
+                                <div class="r">
+                                    <a class="default" style="display: none;">设为默认</a>
+                                    <a>编辑</a>
+                                    <a>删除</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="account-add-infor">
+                    <div class="add-tit">
+                        <span>张三</span>
+                        <span>北京市</span>
+                        <div class="defaultadd" style="display: none;">
+                            默认地址
+                        </div>
+                    </div>
+                    <div class="add-content">
+                        <div class="add-row fix">
+                            <div class="leftarea l right">
+                                收货人：
+                            </div>
+                            <div class="rightarea l">
+                                张三
+                            </div>
+                        </div>
+                        <div class="add-row fix">
+                            <div class="leftarea l right">
+                                所在地区：
+                            </div>
+                            <div class="rightarea l">
+                                北京市 海淀区
+                            </div>
+                        </div>
+                        <div class="add-row fix">
+                            <div class="leftarea l right">
+                                详细地址：
+                            </div>
+                            <div class="rightarea l">
+                                北京市海淀区中关村立方庭2段2-103
+                            </div>
+                        </div>
+                        <div class="add-row fix" style="margin-bottom: 0;">
+                            <div class="leftarea l right">
+                                手机号码：
+                            </div>
+                            <div class="rightarea l">
+                                <div class="l">
+                                    130*****2141
+                                </div>
+                                <div class="r">
+                                    <a class="default">设为默认</a>
+                                    <a>编辑</a>
+                                    <a>删除</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!--账户安全body end-->
+    <!--footer start-->
+    <div class="footer">
+        <div class="container">
+            <ul class="footer-menu fix">
+                <li><a href="#">帮助中心</a><span>|</span></li>
+                <li><a href="#">新手指导</a><span>|</span></li>
+                <li><a href="#">视频教程</a><span>|</span></li>
+                <li><a href="#">常见问题</a><span>|</span></li>
+                <li><a href="#">视频教程</a><span>|</span></li>
+                <li><a href="#">意见建议</a><span>|</span></li>
+                <li><a href="#">问题反馈</a><span>|</span></li>
+                <li><a href="#">关于我们</a><span>|</span></li>
+                <li><a href="#">联系我们</a><span>|</span></li>
+                <li><a href="#">加入我们</a><span>|</span></li>
+            </ul>
+            <p>
+                <span>增值电信业务经营许可证：浙B2-20110446</span>
+                <span>网络文化经营许可证：浙网文[2015]0295-065号</span>
+                <span>互联网医疗保健信息服务审核同意书 浙卫网审【2014】6号</span>
+            </p>
+            <p>互联网药品信息服务资质证书编号：浙-（经营性）-2012-0005</p>
+            <p>© 2014-2015 YZW.COM 版权所有</p>
+            <div class="footer-web">
+                <span class="di-1"></span>
+                <span class="di-2"></span>
+                <span class="di-3"></span>
+                <span class="di-4"></span>
+                <span class="di-5"></span>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+
+        window.onload = function(){
+            $(".footer-menu").find("li").eq(-1).children("span").css("display","none");
+        };
+//        $(".default").click(function(){
+//            $("this").addClass("active");
+//
+//        });
+        $(document).ready(function(){
+            $(".account-address").click(function(){
+                $("#consignee-con1").css("display","block");
+                $(".pupbody-closebtn,.pupbody-btn>a").click(function(){
+                    $("#consignee-con1").css("display","none");
+                });
+                $(".pupbody-btn>a").click(function(){
+
+                });
+            });
+
+        });
+    </script>
+</body>
+</html>

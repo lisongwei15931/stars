@@ -1,0 +1,21 @@
+{% extends "customer/safety/account_no_left_nav_base.html" %}
+{% load staticfiles %}
+{% load compress %}
+
+{%  block title %}蓝图百货--账户设置--实名认证提交成功{%  endblock title %}
+{% block onbodyload %}
+    <!--账户安全--资金密码body start-->
+    <div class="account-item-body1 container">
+        <div class="account-item-con" id="content">
+            <div class="account-item-tit">
+               <a href="{% url 'customer:safety-center' %}">账户安全&nbsp;>&nbsp;</a>
+                <span>实名认证提交成功</span>
+            </div>
+            <div class="account-item-matter account-item-matter1">
+                <img src="{% static "images/sub-success.png" %}"/>
+                <span>实名认证提交成功,审核中.</span>
+            </div>
+        </div>
+    </div>
+    <!--账户安全--资金密码body end-->
+{% endblock %}

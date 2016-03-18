@@ -1,0 +1,46 @@
+{% extends "dashboard/layout.html" %}
+{% load i18n %}
+{% load sorting_tags %}
+{% load render_table from django_tables2 %}
+
+{% block body_class %}{{ block.super }} consultations{% endblock %}
+{% block title %}
+    库转交易 | {{ block.super }}
+{% endblock %}
+
+{% block breadcrumbs %}
+    <ul class="breadcrumb">
+        <li>
+            <a href="{% url 'dashboard:index' %}">{% trans "Dashboard" %}</a>
+            <span class="divider"></span>
+        </li>
+        <li class="active">库转交易</li>
+    </ul>
+{% endblock %}
+
+{% block header %}
+    <div class="page-header">
+        <h1>库转交易</h1>
+        <small><a href = '.?download=True'>导出表格</a></small>
+    </div>
+{% endblock header %}
+
+{% block dashboard_content %}
+    <div class="table-header">
+        <h3><i class="icon-search icon-large"></i> {% trans "Search" %}</h3>
+    </div>
+    <div class="well">
+        <form action="." method="get" class="form-inline">
+            {% include "dashboard/partials/form_fields_inline.html" with form=form %}
+            <button type="submit" name="search" class="btn btn-primary" data-loading-text="{% trans 'Searching...' %}">{% trans "Search" %}</button>
+            <a href="." class="btn btn-default">{% trans "Reset" %}</a>
+        </form>
+    </div>
+
+    <form action="." method="post">
+        {% csrf_token %}
+        {% render_table business_stockenter_deal_list %}
+    </form>
+{% endblock dashboard_content %}
+
+

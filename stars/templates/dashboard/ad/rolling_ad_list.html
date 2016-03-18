@@ -1,0 +1,43 @@
+{% extends 'dashboard/layout.html' %}
+{% load i18n %}
+{% load thumbnail %}
+{% load staticfiles %}
+{% load sorting_tags %}
+{% load render_table from django_tables2 %}
+
+{% block body_class %}{{ block.super }} catalogue{% endblock %}
+
+{% block title %}
+    {% trans "广告" %} | {{ block.super }}
+{% endblock %}
+
+{% block breadcrumbs %}
+    <ul class="breadcrumb">
+        <li>
+            <a href="{% url 'dashboard:index' %}">{% trans "Dashboard" %}</a>
+        </li>
+        <li class="active">{% trans "广告" %}</li>
+    </ul>
+{% endblock %}
+
+{% block header %}
+    <div class="page-header">
+        <a href="{% url 'dashboard:ad-rolling_ad-create' %}"
+           class="btn btn-primary btn-lg pull-right"><i class="icon-plus"></i> {% trans "Create" %}</a>
+        <h1>{% trans "广告" %}</h1>
+    </div>
+{% endblock header %}
+
+{% block dashboard_content %}
+
+    {% if ads %}
+        {% block ad_list %}
+            <form action="." method="post">
+                {% csrf_token %}
+                {% render_table ads %}
+            </form>
+        {% endblock ad_list %}
+
+    {% endif %}
+
+{% endblock dashboard_content %}

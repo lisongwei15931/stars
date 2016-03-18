@@ -1,0 +1,36 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="zh">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>自提点管理员登录</title>
+
+        <!-- Bootstrap core CSS -->
+        <link href="{% static "css/bootstrap.min.css" %}" rel="stylesheet">
+
+        <!-- Custom styles for this template -->
+        <link href="{% static "css/signin.css" %}" rel="stylesheet">
+    <style>
+        .errorlist{
+            color:red;
+        }
+    </style>
+    </head>
+
+    <body>
+        <div class="container">
+            <form class="form-signin" method='POST' role="form">
+                {% csrf_token %}
+                <h2 class="form-signin-heading">自提点管理登录</h2>
+                <hr />
+                <table class="table table-striped table-bordered">
+                    {{ form.as_table }}
+                </table>
+                <button class="btn btn-primary" type="submit">登录</button>
+            </form>
+        </div>
+    </body>
+</html>

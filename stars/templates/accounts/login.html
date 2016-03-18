@@ -1,0 +1,147 @@
+{% extends 'base_stars.html' %}
+{% load staticfiles %}
+
+{% block public_css %}
+    <link rel="stylesheet" href="{% static "css/login.css" %}" type="text/css">
+{% endblock %}
+{% block jquery %}
+    <script type="text/javascript" src="{% static "js/jquery-1.11.1.min.js" %}"></script>
+{% endblock %}
+{% block title %}蓝图百货—登录{% endblock %}
+
+{% block logo %}
+    <div class="register-topbar">
+        <div class="container fix">
+            <div class="register-topbar-left l">
+            <a href ="/">
+                <img src="{% static "images/logo1.png" %}"/>
+            </a>
+            </div>
+            <div class="register-topbar-right r">
+                欢迎登录
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="container login-content-body">
+        <div class="login-ad l">
+            <a href="#"><img src="{% static "images/login-ad.jpg" %}"/></a>
+        </div>
+        <div class="login-form r">
+            <form method="post" action="." class="login-f">
+                {% csrf_token %}
+                <div class="login-f-title">
+                    登录蓝图百货
+                </div>
+                <div class="login-f-box-r">
+                    {{ form.username }}
+                    <img src="{% static "images/user-img.png" %}"/>
+                </div>
+                <div class="login-f-box-r">
+                    {{ form.password }}
+                    <img src="{% static "images/password-img.png" %}"/>
+                </div>
+                <div class="login-notice">{{ error }}</div>
+                
+                <div class="login-f-check fix">
+                    <div class="check-box l">
+                        <input type="checkbox" />
+                        <span>记住密码</span>
+                    </div>
+                    <div class="r">
+                        <a href="{% url 'accounts:forgetpw' %}"><span class="color-blue">忘记密码?</span></a>
+                    </div>
+                </div>
+                <input class="login-f-btn center" type="submit" value="登录"/>
+                <div class="login-f-txt center">
+                    <span>蓝图百货您身边的投资伙伴，欢迎您使用</span>
+                    <a href="{% url "accounts:register" %}"><span class="color-blue">立即注册</span></a>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block footer %}
+    <div class="register-footer">
+        <div class="container center">
+            <div class="nav fix">
+                <span><a href="#">帮助中心</a><small>|</small></span>
+                <span><a href="#">新手指导</a><small>|</small></span>
+                <span><a href="#">视频教程</a><small>|</small></span>
+                <span><a href="#">常见问题</a><small>|</small></span>
+                <span><a href="#">意见建议</a><small>|</small></span>
+                <span><a href="#">问题反馈</a><small>|</small></span>
+                <span><a href="#">关于我们</a><small>|</small></span>
+                <span><a href="#">联系我们</a><small>|</small></span>
+                <span><a href="#">加入我们</a><small>|</small></span>
+            </div>
+            <div class="copyright">
+                © 2014-2015 YZW.COM 版权所有
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block footer_script %}
+    <script type="text/javascript">
+        window.onload = function(){
+            $(".footer-menu").find("li").eq(-1).children("span").css("display","none");
+        };
+        $(document).ready(function() {
+            var wh = $(window).height();
+            var dd = wh - 861 + 16;
+            if(wh > 861){
+                $(".footer").css("margin-top",dd + "px");
+            }
+        });
+        $(window).resize(function(){
+            var wh = $(window).height();
+            var dd = wh - 861 + 16;
+            if(wh > 861){
+                $(".footer").css("margin-top",dd + "px");
+            } else {
+                $(".footer").css("margin-top","10px");
+            }
+        });
+        //得到焦点触发事件
+        function OnfocusFun(element,elementvalue)
+        {
+            if(element.value==elementvalue)
+            {
+                element.value="";
+                element.style.color="#343434";
+            }
+        }
+        //离开输入框触发事件
+        function OnBlurFun(element,elementvalue)
+        {
+            if(element.value=="" || element.value.replace(/\s/g,"")=="")
+            {
+                element.value=elementvalue;
+                element.style.color="#999";
+            }
+        }
+        //得到焦点触发事件
+        function OnfocusFun1(element,elementvalue)
+        {
+            if(element.value==elementvalue)
+            {
+                element.value="";
+                element.type="password";
+                element.style.color="#343434";
+            }
+        }
+        //离开输入框触发事件
+        function OnBlurFun1(element,elementvalue)
+        {
+            if(element.value=="" || element.value.replace(/\s/g,"")=="")
+            {
+                element.value=elementvalue;
+                element.type="text";
+                element.style.color="#999";
+            }
+        }
+    </script>
+{% endblock %}

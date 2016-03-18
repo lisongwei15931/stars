@@ -1,0 +1,152 @@
+{% extends "customer/safety/account_no_left_nav_base.html" %}
+{% load staticfiles %}
+{% load compress %}
+{% block custom_css %}<link rel="stylesheet" href="{% static "css/account2.css" %}" type="text/css">{% endblock %}
+{% block custom_js %}
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=b2Oy0FxhxxotX9o1YC7UXVLU"></script>
+{% endblock %}
+{%  block title %}蓝图百货--更新自提点{%  endblock title %}
+
+{% block onbodyload %}
+    <div class="contentVisit" style="min-height:650px; padding-bottom:20px;">
+        <div class="account-item-con" id="content1">
+            <div class="account-item-tit">
+                <a href="{% url 'customer:user_pickup' %}">提货地址&nbsp;>&nbsp;</a>
+                {% if addr_add %}
+                    <span>新增提货地址</span>
+                {% else %}
+                    <span>编辑提货地址</span>
+                {% endif %}
+            </div>
+            <div class="checkKf" id="content">
+            {% include 'customer/userpickup/userpickup_addr_content.html' %} 
+            </div>  
+            {% if addr_add %}
+            <form id='pickup_addr_data' method="post" action='.' style="display:none">
+            {% csrf_token %}
+            <input id="pickup_address_id" name="pickup_addr" type="text">
+            <input id="id_is_default" name="is_default" type="checkbox">
+            </form> 
+            {% else %}
+            <form id='pickup_addr_data' method="post" action='' style="display:none">
+            {% csrf_token %}
+            <input id="pickup_address_id" name="pickup_addr" type="text">
+            <input id="id_is_default" name="is_default" type="checkbox">
+            </form> 
+            {% endif %}      
+    </div>
+    </div>
+{% endblock %}
+
+{% block footer_extra_script %}
+    <script src="{% static "js/map.js" %}"></script>
+    <script type="text/javascript">
+        function change_province(province) {
+            var province_id = $(province).val();
+            $.ajax({
+                dataType: "json",
+                url: "{% url 'customer:get_pickupaddr' %}",
+                data: {'province_id': province_id},
+                success: function (result) {
+                    $('#content').html(result.content_html);
+                    init_page();
+                },
+            });
+        }
+        function change_city(city) {
+            var province_id = $(province).val();
+            var city_id = $(city).val();
+            $.ajax({
+                dataType: "json",
+                url: "{% url 'customer:get_pickupaddr' %}",
+                data: {'province_id': province_id, 'city_id': city_id},
+                success: function (result) {
+                    $('#content').html(result.content_html);
+                    init_page();
+                },
+            });
+        }
+        function add_addr() {
+            var pickup_addr_id = $('#addr li.curr').attr('id');
+            if ($("#id_default")[0].checked == true){
+            	$("#id_is_default").attr('checked','true');
+            }
+            
+            $('#pickup_address_id').val(pickup_addr_id);
+            $('#pickup_addr_data').submit();
+        }
+        function set_map() {
+            // map
+            var current_pickup_addr = $('#addr li.curr');
+            var lng_lat = current_pickup_addr.attr('lng_lat').split('|');
+            var current_lng = lng_lat[0];
+            var current_lat = lng_lat[1];
+            var point = current_pickup_addr.attr('lng_lat');
+            var map = new BMap.Map("dituContent");
+            map.centerAndZoom(new BMap.Point(current_lng, current_lat),15);
+            map.enableScrollWheelZoom(true);
+            //点击查看地图
+            //标注点数组
+            var markerArr = [{title:"自提点",content:"上门路<br/><br/>010",point:point,isOpen:0,icon:{w:23,h:25,l:46,t:21,x:9,lb:12}}];
+            toLocation(map, current_lng, current_lat, markerArr);
+        }
+        
+        
+        function init_page() {
+            $(".addr li").click(function(){
+                $(this).addClass("curr").siblings().removeClass("curr");
+                set_map();
+                });
+            $(".addr li").each(function(){
+                var index=$(this).index();
+                if(index<4){
+                $(this).show();
+                }else{
+                $(this).hide();
+                }
+                });
+            $(".more-addr").click(function(){
+                $(".addr li").show();
+                $(this).hide();
+                $(".addr").css("overflow-y","scroll");
+            });
+            $('#province').change(function(){
+                change_province(this);
+            })
+            $('#city').change(function(){
+                change_city(this);
+            })
+            $('#add_addr').click(function(){
+                add_addr();
+            })
+            set_map();
+        } ;
+
+        
+        
+  /*       function check()
+        {
+        	var id_def = document.getElementById("id_default");
+        if  (id_def.checked == true){
+        	id_def.checked=false;
+        } else {
+        	id_def.checked=true;
+        }
+        }; */
+        
+        
+        $(function(){
+            init_page();
+            
+/*             $("#id_default").click(function(){
+            	if($(this).attr('checked')){
+            	$(this).attr('checked','');
+            	}else {
+                $(this).attr('checked','true');
+            	}
+            }); */
+
+        })
+    </script>
+{% endblock %}
+

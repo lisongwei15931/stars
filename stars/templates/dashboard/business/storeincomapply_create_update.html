@@ -1,0 +1,64 @@
+{% extends 'dashboard/layout.html' %}
+{% load i18n %}
+{% load staticfiles %}
+
+{% block body_class %}{{ block.super }} create-page partner{% endblock %}
+
+{% block title %}
+    商家入库申请 | {{ block.super }}
+{% endblock %}
+
+{% block breadcrumbs %}
+    <ul class="breadcrumb">
+        <li>
+            <a href="{% url 'dashboard:index' %}">{% trans "Dashboard" %}</a>
+        </li>
+        <li>
+            <a href="{% url 'dashboard:storeincome-list' %}">{% trans "交易商发货入库申请" %}</a>
+        </li>
+        <li class="active"></li>
+    </ul>
+{% endblock %}
+
+
+{% block dashboard_content %}
+    <div class="table-header">
+        <h2>商家入库申请</h2>
+    </div>
+    {% if status = '0'%}
+    <div class="well">
+        {% include 'dashboard/partials/form.html' with includes_files=1 class='wysiwyg' %} 
+    </div>
+    {% else %}
+    {% if status|length = 0 %}
+    <div class="well">
+        {% include 'dashboard/partials/form.html' %} 
+    </div>
+    {% else %}
+    <div class="well">
+        <span>自提点已经接收该申请,无效编辑！</span>
+    </div>
+    {% endif %}
+    {% endif %}
+    <script type="text/javascript" src="{% static "js/jquery-1.11.1.min.js" %}"></script>
+    <script>
+    $(function(){
+    	$("input#id_isp").val("{{isp}}");
+    	$("#id_pickup_addr").empty();
+    	$("#id_pickup_addr").append('<option value="" selected="selected">---------</option>');
+     	$("#id_product").change(function(){
+    		var p_id = $(this).val();
+    		p_id = parseInt(p_id);
+    		$("#select2-chosen-2").text("---------");
+    		$("#id_pickup_addr").empty();
+    		$.get("{% url 'dashboard:get-pickupaddr' %}",{'product':p_id},function(ret){
+    			
+    			for(var r in ret){
+    	    		var option = $("<option>").val(ret[r]["id"]).text(ret[r]["name"]);
+    	    		$("#id_pickup_addr").append(option);
+    			};
+    		});
+    	});  
+    });
+    </script>
+{% endblock dashboard_content %}

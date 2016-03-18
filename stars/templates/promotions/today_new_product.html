@@ -1,0 +1,323 @@
+﻿{% extends "base_stars.html" %}
+{% load i18n %}
+{% load staticfiles %}
+{% load currency_filters %}
+{% load purchase_info_tags %}
+{% block public_css %}
+    <link rel="stylesheet" href="{% static "css/public.css" %}" type="text/css">
+    <link rel="stylesheet" href="{% static "css/brand.css" %}" type="text/css">
+{% endblock %}
+
+{% block content %}
+<div class="container fix">
+            <div class="shopclass l" id="shopclass">
+                <ul>
+                    <li>
+                        <h3><a href="#">全部商品分类</a></h3>
+                        <ul>
+                        {% for c in category_list %}
+                            <li class="shopclass-item">
+                                <a class="first-lei" href = "{% url 'catalogue:allproducts' %}?category={{c.name}} ">{{c.name}}</a>
+                                <ul>
+                                {% for cc in c.get_children %}
+                                    <li>
+                                        
+                                        <div class="menu-row fix">
+                                            <div class="menu-left l"><a href = "{% url 'catalogue:allproducts' %}?category={{cc.name}} " >{{cc.name}}</a></div>
+                                            <ul class="menu-ul l fix">
+                                            {% for ccc in cc.get_children %}
+                                                <li><a href="{% url 'catalogue:allproducts' %}?category={{ccc.name}} ">{{ccc.name}}</a><span><img src="{% static 'images/shuxian.png' %}"></span></li>
+                                            {% endfor %}
+                                            </ul>
+                                        </div>
+                                    </li>
+                                 {% endfor %}
+                                    <img src="{%static 'images/ad1-nav.jpg' %}" class="menu-img">
+                                </ul>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+    <ul class="banner-top l">
+        <li>
+            <a href="{% url 'promotions:brandgather_product' %}">品牌汇</a>
+        </li>
+        <li>
+            <a href="{% url 'promotions:today_new_view' %}">新品汇</a>
+        </li>
+        <li>
+            <a href="{% url 'tradingcenter:trading_center_index' %}">交易大厅</a>
+        </li>
+        <li style="float:left;background-image: none;font-size:16px;border-right:none">
+            <a href="{% url 'helper:helper_index' %}" style="text-decoration: none;">蓝图学院</a>
+        </li>
+        <li class="last-child"> 
+               <div class="open fix">
+                <div class="l">
+                    {% if open_or_close %}
+                    <img src="{% static 'images/open.png' %}"/>
+                    {% else %}
+                    <img src="{%static 'images/close.png' %}"/>
+		            {% endif %}
+                </div>
+                <marquee class="l"scrolldelay="150" direction="left">{{open_close_msg}}</marquee>
+              </div>
+        </li>
+    </ul>
+</div>
+
+        <div class="container brandWrap">
+            <div class="brandLeft">
+                <div class="brandTitle">
+                    <h2>今日新品</h2>
+                    <div class="line"></div>
+                </div>
+                <ul class="brandList">
+                    <li>
+                        <dl>
+                            <dt>
+                                <a href="#"><img src="{%static 'images/ad-1.jpg'%} " width="520" height="200"></a>
+                            </dt>
+                            <dd>
+                                <p><a href="#">草原神冷榨亚麻籽油</a></p>
+                                <p class="red">￥16.62</p>
+                                <del class="gray">￥45.00</del>
+                                <div class="shopCart">
+                                    <div class="addCart">
+                                        <button type="submit" value="加入购物车">加入购物车</button>
+                                    </div>
+                                    <div class="lookDetail">
+                                        <a href="#">查看</a>
+                                    </div>
+                                </div>
+                            </dd>
+                        </dl>
+                    </li>
+                    <li>
+                        <dl>
+                            <dt>
+                                <a href="#"><img src="{%static 'images/ad-2.jpg'%}" width="520" height="200"></a>
+                            </dt>
+                            <dd>
+                                <p><a href="#">草原神冷榨亚麻籽油</a></p>
+                                <p class="red">￥16.62</p>
+                                <del class="gray">￥45.00</del>
+                                <div class="shopCart">
+                                    <div class="addCart">
+                                        <button type="submit" value="加入购物车">加入购物车</button>
+                                    </div>
+                                    <div class="lookDetail">
+                                        <a href="#">查看</a>
+                                    </div>
+                                </div>
+                            </dd>
+                        </dl>
+                    </li>
+                    <li>
+                        <dl>
+                            <dt>
+                                <a href="#"><img src="{%static 'images/ad-3.jpg'%}" width="520" height="200"></a>
+                            </dt>
+                            <dd>
+                                <p><a href="#">草原神冷榨亚麻籽油</a></p>
+                                <p class="red">￥16.62</p>
+                                <del class="gray">￥45.00</del>
+                                <div class="shopCart">
+                                    <div class="addCart">
+                                        <button type="submit" value="加入购物车">加入购物车</button>
+                                    </div>
+                                    <div class="lookDetail">
+                                        <a href="#">查看</a>
+                                    </div>
+                                </div>
+                            </dd>
+                        </dl>
+                    </li>
+                </ul>
+                <div class="brandTitle">
+                    <h2>其他新品</h2>
+                    <div class="line"></div>
+                </div>
+                <ul class="brandList">
+                    <li>
+                        <dl>
+                            <dt>
+                                <a href="#"><img src="{%static 'images/ad-1.jpg'%}" width="520" height="200"></a>
+                            </dt>
+                            <dd>
+                                <p><a href="#">草原神冷榨亚麻籽油</a></p>
+                                <p class="red">￥16.62</p>
+                                <del class="gray">￥45.00</del>
+                                <div class="shopCart">
+                                    <div class="addCart">
+                                        <button type="submit" value="加入购物车">加入购物车</button>
+                                    </div>
+                                    <div class="lookDetail">
+                                        <a href="#">查看</a>
+                                    </div>
+                                </div>
+                            </dd>
+                        </dl>
+                    </li>
+                    <li>
+                        <dl>
+                            <dt>
+                                <a href="#"><img src="{%static 'images/ad-2.jpg'%}" width="520" height="200"></a>
+                            </dt>
+                            <dd>
+                                <p><a href="#">草原神冷榨亚麻籽油</a></p>
+                                <p class="red">￥16.62</p>
+                                <del class="gray">￥45.00</del>
+                                <div class="shopCart">
+                                    <div class="addCart">
+                                        <button type="submit" value="加入购物车">加入购物车</button>
+                                    </div>
+                                    <div class="lookDetail">
+                                        <a href="#">查看</a>
+                                    </div>
+                                </div>
+                            </dd>
+                        </dl>
+                    </li>
+                    <li>
+                        <dl>
+                            <dt>
+                                <a href="#"><img src="{%static 'images/ad-3.jpg'%}" width="520" height="200"></a>
+                            </dt>
+                            <dd>
+                                <p><a href="#">草原神冷榨亚麻籽油</a></p>
+                                <p class="red">￥16.62</p>
+                                <del class="gray">￥45.00</del>
+                                <div class="shopCart">
+                                    <div class="addCart">
+                                        <button type="submit" value="加入购物车">加入购物车</button>
+                                    </div>
+                                    <div class="lookDetail">
+                                        <a href="#">查看</a>
+                                    </div>
+                                </div>
+                            </dd>
+                        </dl>
+                    </li>
+                </ul>
+            </div>
+            <div class="brandRight">
+                <div class="adScroll">
+                    <ul class="Scroll-img">
+                        <li><a href="#"><img src="{%static 'images/ad-new1.jpg'%}" width="440" height="320"></a></li>
+                        <li><a href="#"><img src="{%static 'images/ad-2.jpg'%}" width="440" height="320"></a></li>
+                        <li><a href="#"><img src="{%static 'images/ad-3.jpg'%}" width="440" height="320"></a></li>
+                    </ul>
+                    <ul class="Scroll-dot">
+                        <li class="curr"><a href="#"></a></li>
+                        <li><a href="#"></a></li>
+                        <li><a href="#"></a></li>
+                    </ul>
+                </div>
+                <div class="adNoscroll"><a href="#"><img src="{%static 'images/ad-new1.jpg'%}" width="440" height="320"></a></div>
+          </div>
+        </div>
+
+        <script type="text/javascript">
+        //得到焦点触发事件
+        function OnfocusFun(element,elementvalue)
+        {
+            if(element.value==elementvalue)
+            {
+                element.value="";
+                element.style.color="#343434";
+            }
+        }
+        //离开输入框触发事件
+        function OnBlurFun(element,elementvalue)
+        {
+            if(element.value=="" || element.value.replace(/\s/g,"")=="")
+            {
+                element.value=elementvalue;
+                element.style.color="#999";
+            }
+        }
+        window.onload = function(){
+            $(".keywords").find("li").eq(-1).children("span").css("display","none");
+            $(".footer-menu").find("li").eq(-1).children("span").css("display","none");
+            $(".product-nav-ul").find("li").eq(-1).children("span").css("display","none");
+        };
+
+    </script>
+
+    <script type="text/javascript">
+        $(function(){
+            //购物车
+            $("#shopcar-li").hover(function () {
+                $(".shopcar-products",this).show();
+
+                $("#shopcar-li>a").css({
+                    "background-color": "#fff",
+                    "box-shadow": "0 0 3px #666",
+                    "color": "#c00000"
+                });
+                $("#border-type").show();
+            }, function () {
+                $(".shopcar-products").hide();
+                $("#shopcar-li>a").css({
+                    "background-color": "#ededed",
+                    "box-shadow": "none",
+                    "color": "#333"
+                });
+                $("#border-type").hide();
+            });
+            //我的收益
+            $("#shouyi-li").hover(function () {
+                $(".shopcar-products",this).show();
+
+                $("#shouyi-li>a").css({
+                    "background-color": "#fff",
+                    "box-shadow": "0 0 3px #666",
+                    "color": "#c00000"
+                });
+                $("#border-type1").show();
+            }, function () {
+                $(".shopcar-products").hide();
+                $("#shouyi-li>a").css({
+                    "background-color": "#ededed",
+                    "box-shadow": "none",
+                    "color": "#333"
+                });
+                $("#border-type1").hide();
+            });
+            //全部商品分类
+            $(".shopclass-item").hover(function () {
+                        $(this).next().css("display", "block");
+                        $(".shopclass-item").css("background-color", "#c00000");
+                        $(this).css({"background-color": "#fafafa", "color": "#333"});
+                        $(".first-lei", this).css("color", "#333");
+                    },
+                    function () {
+                        $(".shopclass-item>a").css("color", "#fff");
+                        $(this).css({"background-color": "#c00000", "color": "#fff"});
+                    });
+            //滚动广告
+            $(".Scroll-dot li").mouseover(function(){
+                $(this).addClass("curr").siblings().removeClass("curr");
+                var index=$(this).index();
+                scrollIndex=index+1;
+                $(".Scroll-img li").eq(index).fadeIn().siblings().fadeOut();
+            });
+        });
+            var scrollIndex=1;
+            function scrollImage(){
+                $(".Scroll-dot li").eq(scrollIndex++).mouseover();
+                if(scrollIndex>$(".Scroll-dot li").length-1){scrollIndex=0;}
+            }
+                myIntertval=setInterval("scrollImage()",3500);
+            $(".Scroll-img li").mouseover(function(){
+                if(null!=myIntertval)clearInterval(myIntertval);
+            }).mouseout(function(){
+                myIntertval=setInterval("scrollImage()",3500);
+            });
+        
+ 
+    </script>
+    {% endblock %}

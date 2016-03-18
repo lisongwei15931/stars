@@ -1,0 +1,31 @@
+{% extends "customer/account_base.html" %}
+{% load public_tags %}
+{% load staticfiles %}
+{% load compress %}
+
+
+{%  block title %}蓝图百货--农行解约--成功{%  endblock title %}
+
+{% block oncontentload %}
+    {{ block.super }}
+        <div class="account-cont-right account-cont-rightarea l">
+            <h4>
+                <span>解除签约</span>
+            </h4>
+            <div class="account-sign">
+                <div class="sign-type fix">
+                    <div class="sign-type-img l">
+                        <img src="{% static "images/sign-true.png" %}"/>
+                    </div>
+                    <div class="sign-type-txt sign-type-txt1 l">
+                        解约成功
+                    </div>
+                </div>
+                <div class="sign-recharge" style="margin-left: -60px;margin-top: 40px;">
+                    返回&nbsp;&nbsp;<a href="{% url 'customer:assets' %}" style="color: #0088cc;">我的资产</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--农行签约body end-->
+  {% endblock oncontentload %}

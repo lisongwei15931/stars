@@ -1,0 +1,402 @@
+{% load i18n compress %}
+{% load staticfiles %}
+{% load thumbnail %}
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <link rel="shortcut icon" href="{% static "images/web_logo.ico" %}" />
+    <link rel="stylesheet" href="{% static "css/public.css" %}" type="text/css">
+    <link rel="stylesheet" href="{% static "css/account.css" %}" type="text/css">
+    {% block custom_css %}{% endblock %}
+
+    <script type="text/javascript" src="{% static "js/jquery-1.11.1.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "datePicker/WdatePicker.js" %}"></script>
+    <script type="text/javascript">
+        var current_frame_id = "assets"
+        function resfresh_active_link() {
+            {% if frame_id %}
+                current_frame_id = "{{ frame_id }}"
+            {% endif %}
+            var ds = document.getElementById("account_nav");
+            var lis = ds.getElementsByTagName("li");
+            for (var i = 0; i < lis.length; i++) {
+                if (lis[i].id == current_frame_id) {
+                    lis[i].setAttribute("class", "active")
+                } else {
+                    lis[i].setAttribute("class", "")
+                }
+            }
+        }
+     
+       $(document).ready(function(){
+    	     // 删除购物车
+           $(".del_basket").click(function(){
+           	if (confirm("确定要删除该商品吗？")){
+           	var line_id = $(this).attr("id").split("del_")[1];
+           	$.ajax({
+           		type:"GET",
+           		url :'/basket/delete-line/'+line_id,
+           		//data :{"pk":line_id},
+           		async:false,  
+           		success: function(){
+           			$(".shopcar-products-content[id="+line_id+"]").remove();
+           			location.reload();
+           		}
+           		
+           	});
+           	
+           	}else {}
+            });   	   
+       })
+    </script>
+    {% block custom_js %}{% endblock %}
+    <title>{%  block title %}蓝图百货--我的账户{%  endblock title %}</title>
+</head>
+<body class="account-body">
+    <!--顶层状态、登录条-->
+    {% block ontopnavload %}
+        <div class="login ">
+
+        <div class="container zhanghu-top fix">
+            <div class="l login-left">
+                <a href="/">返回首页</a>
+            </div>
+            <ul class="r login-right">
+                <li >
+                    <a href="#">{{ request.user.username}}</a>
+                    <a href="{% url "accounts:logout" %}">退出</a>
+                </li>
+                <li class ="first-menu">
+                    <a href="{% url 'customer:summary' %}">我的账户<span class="jt"></span></a>
+                    <ul>
+                        <li><a href="{% url 'customer:assets' %}">账户资产</a></li>
+                        <li><a href="{% url 'customer:stock' %}">我的存货</a></li>
+                        <li><a href="{% url 'customer:trading_information' %}">交易记录</a></li>
+                        <li><a href="{% url 'customer:pickup_detail' %}">提货明细</a></li>
+                    </ul>
+                </li>
+                <li><a href="{% url 'customer:assets' %}">充值</a></li>
+                <li><a href="{% url 'tradingcenter:trading_center_index' %}">交易大厅</a></li>
+                <li><a href="{% url 'dashboard:business-login' %}">商家中心</a></li>
+                <li><a href="{% url 'dashboard:pickup-login' %}">自提点</a></li>
+                
+                <li class ="first-menu">
+                    <a href="{% url 'helper:helper_index' %}">帮助中心<span class="jt"></span></a>
+                    <ul>
+                        <li><a href="{% url 'helper:helper_index' %}">新手指导</a></li>
+                        <li><a href="{% url 'helper:helper_index' %}">常见问题</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+    {% endblock ontopnavload %}
+    <!--顶部 end-->
+    <!--登录-顶层logo条-->
+    {% block ontopbarload %}
+        <div class="account-topbar">
+            <div class="container fix">
+                <div class="account-topbar-left l fix">
+                    <a href="/" class="l"><img src="{% static "images/logo2.png" %}"/></a>
+                    
+                    <div class="search-box search-box1 l">
+                    <form method="get" action="{% url 'catalogue:allproducts' %}" class="form-horizontal">
+                    <div class="input-t">
+                        <input type="text" name="q" value="输入商品名、货号、商品关键字" onfocus="OnfocusFun(this,'输入商品名、货号、商品关键字')" onblur="OnBlurFun(this,'输入商品名、货号、商品关键字')" style='color:#999'/>
+                        <span class="search-img"></span>
+                     </div>
+                     <div class="input-s">
+                        <input type="submit" value="搜索" />
+                     </div>
+                    </form>
+                    </div>
+                </div>
+               <ul class="account-topbar-right r fix">
+               <li class="shopcar-menu" id="shopcar-li">
+                  {% if request.basket.num_items < 1000 %}
+                    <a href="{% url 'basket:summary' %}">
+                        <span class="shopcar-img"></span>
+                        购物车&nbsp;<span class="shopcar-num">{{request.basket.num_items}}</span>
+                        <span class="arrow"></span>
+                    </a>
+                   {% else %}
+                   <a href="{% url 'basket:summary' %}">
+                        <span class="shopcar-img"></span>
+                                                       购物车
+                        <span class="arrow"></span>
+                    </a>
+                    <div class="good-num">
+                        <span>{{request.basket.num_items}}</span>
+                    </div>
+                    {% endif %}
+                    <div class="border-type" style = "display :none"></div>
+                    <div class="shopcar-products" style="display: none;">
+                         {% if request.basket.num_lines %}
+                        <div class="shopcar-products-tit">
+                            <h3>最新加入的商品</h3>
+                        </div>
+                        
+                        <div class="shopcar-products-con-body">
+                        {% for line in request.basket.all_lines %}
+                        <div class="shopcar-products-content fix" id={{line.id}}>
+                            <div class="leftarea l right">
+                            {% with image=line.product.primary_image %}
+                            {% thumbnail image.original "60x60" upscale=False as thumb %}
+                                <a href="{{ line.product.get_absolute_url }}"><img class="thumbnail" src="{{ thumb.url }}" alt="{{ line.product.get_title }}"></a>
+                            {% endthumbnail %}
+                            {% endwith %}
+                            </div>
+                            <div class="rightarea l fix">
+                                <div class="infor-name l">
+                                    <a href="{{ line.product.get_absolute_url }}">{{ line.description }}</a>
+                                </div>
+                                <div class="information-con l right">
+                                <div class="infor-price right">
+                                    <!-- <img src="{% static 'images/renmingbi1.png' %}"/> -->
+                                    <span class="color-lred"> ￥{{ line.buy_price|floatformat:2}}</span>
+                                    <img src="{% static 'images/chenghao.png' %}" class="chenghao"/>
+                                    <span>{{ line.quantity }}</span><span class="total-price" style="display:none">{{line.total_price|floatformat:2}}</span>
+                                </div>
+                                 
+                                <div class="infor-del right">
+                                    <!--<span><a href = "{% url 'basket:delete_line' pk=line.id %}">删除</a></span> -->
+                                    <span class = "del_basket" id = 'del_{{line.id}}'>删除</span> 
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        </div>
+                        
+                        <div class="shopcar-products-bottom fix ">
+                            <div class="bottom-total fix">
+                                <div class="bottom-total-item l">
+                     {% if request.basket.num_items > 10000 %}
+                                                             共约<span class="color-red">
+                                       {% widthratio request.basket.num_items  10000 1%}
+                    </span>万件商品&nbsp;&nbsp;
+                                       {% else %}
+                                                           共<span class="color-red">
+                                       {{request.basket.num_items}}
+                    </span>件商品&nbsp;&nbsp;
+                                       {% endif %}
+                                {% if request.basket.is_tax_known %}
+                                         共计&nbsp;￥<span class="color-red" id = "total-price"> &nbsp;</span>
+                                {% else %}
+                                        共计&nbsp;￥<span class="color-red" id = "total-price"> &nbsp;</span>              
+                                 {% endif %}
+                                </div>
+                                <div class="bottom-total-btn center r">
+                                    <a href="{% url 'basket:summary' %}">去结算</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="shopcar-products-tit">
+                            <h3>{% trans "Your basket is empty." %}</h3>
+                        </div>
+                    {% endif %}
+                    </div>
+                </li>
+             </ul>
+        
+            </div>
+        </div>
+    {% endblock ontopbarload %}
+        {% block onbodyload %}
+            <!--账户资产body start-->
+            <div class="account-cont-body container fix">
+                {% block onleftnavload %}
+                    <div class="account-cont-left l" id="account_nav">
+                        <div class="account-nav">
+                            <h4>我的账户</h4>
+                            <ul>
+                                <li id="assets"><a href="{% url 'customer:assets' %}">账户资产</a></li>
+                                <li id="stock"><a  href="{% url 'customer:stock' %}">我的存货</a></li>
+                                <li id="bank_card">
+                                    <a href="{% url 'customer:assets-bank_card_list' %}">银行卡</a>
+                                </li>
+                                <li id="ab_sign_in_out">
+                                    <a href="{% url 'customer:finance-ab-sign_in_out_home' %}">农行签约</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="account-nav">
+                            <h4>交易信息</h4>
+                            <ul>
+                                <li id="order_manage"><a href="{% url 'customer:order_manage' %}">订单管理</a></li>
+                                <li id="trading_information"><a href="{% url 'customer:trading_information' %}">交易记录</a></li>
+                                <li id="today_trading"><a href="{% url 'customer:today_trading' %}">当天成交</a></li>
+                                <li id="today_untrading"><a href="{% url 'customer:today_untrading' %}">当天未成交</a></li>
+                                <li id="cancel_order"><a href="{% url 'customer:cancel_order' %}">当天撤单</a></li>
+                                <li id="pickup_detail"><a href="{% url 'customer:pickup_detail' %}">提货明细</a></li>
+                            </ul>
+                        </div>
+                        <div class="account-nav account-nav1">
+                            <h4>账户设置</h4>
+                            <ul>
+                                <li id="user_info"><a href="{% url 'customer:user_info' %}">个人信息</a></li>
+                                <li id="safety"><a href="{% url 'customer:safety-center' %}">账户安全</a></li>
+{#                                <li id="real_name_auth"><a href="{% url 'customer:safety-real_name_auth' %}">实名认证</a></li>#}
+                                <li id="myfav"><a href="{% url 'customer:myfav-list' %}">我的关注</a></li>
+                                <li id="receiving_address"><a href="{% url 'customer:receiving_address' %}">收货地址</a></li>
+                                <li id="user_pickup"><a href = "{% url 'customer:user_pickup' %}">自提点</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                {% endblock onleftnavload %}
+        {#                 Block for body onload functions #}
+        {#            <script type="text/javascript">#}
+        {#                $(function() {#}
+        {#                    {% block onbodyload %}{% endblock %}#}
+        {#                });#}
+        {#            </script>#}
+                {% block oncontentload %}
+                    <script type="text/javascript">
+
+        {#                var current_frame_id = "account_assets"#}
+
+                        $(document).ready(resfresh_active_link)
+
+                    </script>
+                {% endblock oncontentload%}
+        {#    		<input id="btn1" type="button"  value="打开1.html">#}
+
+        {#						<script type="text/javascript">#}
+        {#						#}
+        {#						$(document).ready(function() {#}
+        {#						#}
+        {#						$("#btn1").click(function() {#}
+        {#						#}
+        {#						$("#inner_page").load("{% static "assets/account_assets.html" %}");#}
+        {#						#}
+        {#						});#}
+        {#						#}
+        {#						});#}
+        {##}
+        {#						</script> #}
+        {#                <div id="inner_page" class="account-cont-right l">#}
+        {##}
+        {#				</div>#}
+
+              <!--  <iframe id="moonpiazza" src="frame.html" name="moonpiazza"
+                    width="50%" height="50%"
+                    onload="this.style.height=moonpiazza.document.body.scrollHeight+10" scrolling="no">
+
+                                <a href="frame.html">你的浏览器不支持iframe页面嵌套，请点击这里访问页面内容。</a>
+
+                        </iframe>  -->
+            </div>
+        <!--账户资产body end-->
+    {% endblock onbodyload %}
+    <!--footer start-->
+    {% block onfooterload %}
+        {% include "base_footbar.html" %}
+        <div class="fix-to-top">
+            <div class="to-top" style="display: none;">
+                <a><img src="{% static "images/top.png" %}"/></a>
+            </div>
+            <div class="kefu" style="display: none;">
+                <a><img src="{% static "images/kefu.png" %}"/></a>
+            </div>
+        </div>
+    {% endblock %}
+    {% block index_script %}
+        <script type="text/javascript">
+
+          //得到焦点触发事件
+        function OnfocusFun(element,elementvalue)
+        {
+            if(element.value==elementvalue)
+            {
+                element.value="";
+                element.style.color="#343434";
+            }
+        }
+        //离开输入框触发事件
+        function OnBlurFun(element,elementvalue)
+        {
+            if(element.value=="" || element.value.replace(/\s/g,"")=="")
+            {
+                element.value=elementvalue;
+                element.style.color="#999";
+            }
+        }
+$(function(){
+            //购物车
+            $("#shopcar-li").hover(function () {
+                $(".shopcar-products",this).show();
+
+                $("#shopcar-li>a").css({
+                    "background-color": "#fff",
+                    "box-shadow": "0 0 3px #666",
+                    "color": "#c00000"
+                });
+                var totalprices = $(".total-price") ;
+                var totalprice = 0.00;
+                totalprices.each(function(){
+                	totalprice += $(this).html()*1; 	
+                });
+                if (totalprice > 1000000){
+                	totalprice = totalprice.toExponential(2);
+                }else{
+                	totalprice = totalprice.toFixed(2);
+                };
+                
+                $(".bottom-total-item #total-price").html(totalprice);
+                $(".border-type").show();
+            }, function () {
+                $(".shopcar-products").hide();
+                $("#shopcar-li>a").css({
+                    "box-shadow": "none",
+                    "color": "#333"
+                });
+                $(".border-type").hide();
+            });
+            window.onload = function(){
+                $(".footer-menu").find("li").eq(-1).children("span").css("display","none");
+            };
+            //改变页码
+            $(".page-public>.num").click(function(){
+                $(this).addClass("active");
+                $(this).siblings().removeClass("active");
+            });
+
+            //收支明细/冻结资金切换
+            $("#income-statement").click(function(){
+                $("#income-statement").addClass("active");
+                $("#frozen-fund").removeClass("active");
+                $(".frozen-fund").css("display","none");
+                $(".income-statement").css("display","block");
+            });
+            $("#frozen-fund").click(function(){
+                $("#frozen-fund").addClass("active");
+                $("#income-statement").removeClass("active");
+                $(".income-statement").css("display","none");
+                $(".frozen-fund").css("display","block");
+            });
+        });
+
+            //fix 滚动
+            $(window).scroll(function(){
+                var curHeight=$(document).scrollTop();
+                if(curHeight>=200){
+                    $(".to-top").show();
+                }else{
+                    $(".to-top").hide();
+                }
+            });
+            $(".to-top").click(function(){
+                $(window).scrollTop(0);
+            });
+        </script>
+    {% endblock %}
+    {% block footer_extra_script %}
+    {% endblock %}
+</body>
+</html>

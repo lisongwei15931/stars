@@ -1,0 +1,151 @@
+{% extends "customer/account_base.html" %}
+{% load public_tags %}
+{% load staticfiles %}
+{% load compress %}
+
+
+{%  block title %}蓝图百货--农行签约--解除{%  endblock title %}
+
+{% block oncontentload %}
+    {{ block.super }}
+    <div class="account-cont-right account-cont-rightarea l fix">
+        <h4>
+            <span>解除签约</span>
+        </h4>
+        <form class="account-sign-form account-sign-form1 fix" action="{% url 'customer:finance-ab-rescind_contract' %}" method="post">
+            {% csrf_token %}
+            <ul class="unbundling unbundling2" style="float: none;">
+                <li class="fix">
+                    <div class="unbundling-left">
+                        签约银行：
+                    </div>
+                    <div class="unbundling-right">
+                        <div class="sign-term">中国农业银行</div>
+                    </div>
+                </li>
+                <li class="fix">
+                    <div class="unbundling-left">
+                        银行户名：
+                    </div>
+                    <div class="unbundling-right">
+                        <div class="sign-term">{{ client_name|default_if_none:'' }}</div>
+                    </div>
+                </li>
+                <li class="fix">
+                    <div class="unbundling-left">
+                        银行卡号：
+                    </div>
+                    <div class="unbundling-right">
+                        <div class="sign-term">{{ bank_account|default_if_none:'' }}</div>
+                    </div>
+                </li>
+                <li class="fix">
+                    <div class="unbundling-left">
+                        手机：
+                    </div>
+                    <div class="unbundling-right">
+                        <div class="sign-term">{{ mobile|default_if_none:'' }}</div>
+                    </div>
+                </li>
+                <li class="fix">
+                    <div class="unbundling-left">
+                        验证码：
+                    </div>
+                    <div class="unbundling-right fix">
+                        <div class="sign-term l">
+                            <input name='vcode' id='vcode' value="{{ vcode|default_if_none:'' }}" type="text"/>
+                        </div>
+                        <div class="get-code l">
+                            <span class="send send1" id="J_getCode">获取验证码</span>
+                            <div class="send send1 send-cover" id="J_getCode_Cover" >获取验证码</div>
+                        </div>
+                    </div>
+{#<div id="vcode_err_msg_div_id" class="marked-words marked-words4">#}
+{#                        {% if vcode_err_msg %}{{ vcode_err_msg }}{% endif %}#}
+{#                    </div>#}
+
+                </li>
+                <li>
+                    <div id="vcode_err_msg_div_id" class="marked-words marked-words4">
+                        {% if vcode_err_msg %}{{ vcode_err_msg }}{% endif %}
+                    </div>
+                </li>
+            </ul>
+            <div class="sign-btn sign-btn1">
+                <input type="submit" value="执行解约"/>
+                <a href="{% url 'customer:finance-ab-sign_in_out_home' %}">取消</a>
+            </div>
+        </form>
+    </div>
+</div>
+<!--农行签约body end-->
+ {% endblock oncontentload %}
+
+{% block footer_extra_script %}
+  <script type="text/javascript">
+        var period=10;
+        function time() {
+
+            if (wait <= 0) {
+                wait = period;
+                $("#J_getCode_Cover").css("display","block");
+                //document.getElementById("J_getCode").removeAttribute("disabled");
+                $("#J_getCode").css("background-color","#0a8fc7");
+                document.getElementById("J_getCode").innerHTML="重新发送";
+                document.getElementById("J_getCode_Cover").innerHTML="重新发送";
+            } else {
+                $("#J_getCode_Cover").css("display","none");
+                //document.getElementById("J_getCode").setAttribute("disabled", true);
+                $("#J_getCode").css("background-color","#bfbfbf");
+                document.getElementById("J_getCode").innerHTML= wait + "S";
+                wait--;
+                setTimeout(function() {
+                            time()
+                        },
+                        1000)
+            }
+        }
+
+        $('#J_getCode_Cover').on("click", function () {
+            var params = {};
+
+            $.ajax({
+                dataType: "json",
+                url: "{% url "customer:finance-ab-rescind_contract_vcode" %}",
+                data: params,
+                success: function (data) {
+                    if (data.msg)
+                    {
+                        alert(data.msg);
+                    }
+                    else {
+                        alert('短信发送成功');
+                    }
+                },
+                error: function (error) {
+                    alert('短信发送失败');
+                }
+            });
+
+            wait = period;
+            if (wait <= 0) {
+                wait = period;
+                $("#J_getCode_Cover").css("display","block");
+                //document.getElementById("J_getCode").removeAttribute("disabled");
+                $("#J_getCode").css("background-color","#0a8fc7");
+                document.getElementById("J_getCode").innerHTML="重新发送";
+                document.getElementById("J_getCode_Cover").innerHTML="重新发送";
+            } else {
+                $("#J_getCode_Cover").css("display","none");
+                //document.getElementById("J_getCode").setAttribute("disabled", true);
+                $("#J_getCode").css("background-color","#bfbfbf");
+                document.getElementById("J_getCode").innerHTML= "等待（" + wait + "）";
+                wait--;
+                setTimeout(function() {
+                            time()
+                        },
+                        1000)
+            }
+        })
+    </script>
+{% endblock %}

@@ -1,0 +1,321 @@
+{% extends "customer/account_base.html" %}
+{% load public_tags %}
+{% load staticfiles %}
+{% load compress %}
+
+
+{%  block title %}蓝图百货--农行签约{%  endblock title %}
+
+{% block oncontentload %}
+    {{ block.super }}
+        <div class="account-cont-right account-cont-rightarea l">
+            <h4>农行签约</h4>
+            <div class="account-sign">
+                <div class="register-body-top fix">
+                    <div class="box box1 l center">
+                        <span class="line line-yellow"></span>
+                        <span class="txt color-s">签约信息</span>
+                        <img src="{% static "images/register-oval1h.png" %}" class="img"/>
+                    </div>
+                    <div class="box box1 l center">
+                        <span class="line"></span>
+                        <span class="txt">完成签约</span>
+                        <img src="{% static "images/register-oval3.png" %}" class="img"/>
+                    </div>
+                </div>
+                <form class="account-sign-form account-sign-form1 fix" action="{% url 'customer:finance-ab-sign_in_contract' %}" method="post">
+                    {% csrf_token %}
+                    <div class="steptwo fix">
+                        <label class="fix">
+                            <div class="account-sign-form-left l right">
+                                <span class="color-red">*</span>
+                                <span class="text">用户名</span>
+                            </div>
+                            <div class="account-sign-form-right l left">
+                                <input type="text" class="input-field" value="{{ user_name }}" readonly="readonly"/>
+                            </div>
+                        </label>
+                        <label class="fix">
+                            <div class="account-sign-form-left l right">
+                                <span class="text">国籍</span>
+                            </div>
+                            <div class="account-sign-form-right l left">
+                                <select class="account-sign-select">
+                                    <option>CHN - 中国</option>
+                                    <!--<option>1 - 本行账户</option>-->
+                                    <!--<option>2 - 本行账户</option>-->
+                                    <!--<option>3 - 本行账户</option>-->
+                                    <!--<option>4 - 本行账户</option>-->
+                                </select>
+                            </div>
+                        </label>
+                        <label class="fix">
+                            <div class="account-sign-form-left l right">
+                                <span class="color-red">*</span>
+                                <span class="text">用户ID</span>
+                            </div>
+                            <div class="account-sign-form-right l left">
+                                <input type="text" class="input-field" value="{{ inst_fund_acc }}" readonly="readonly"/>
+                            </div>
+                        </label>
+                        <label class="fix">
+                            <div class="account-sign-form-left l right">
+                                <span class="text">传真</span>
+                            </div>
+                            <div class="account-sign-form-right l left">
+                                <input name='fax_no' value='{{ fax_no|default_if_none:"" }}' type="text" class="input-field"/>
+                                <div class="sign-notice">
+                                </div>
+                            </div>
+                        </label>
+                        <label class="fix">
+                            <div class="account-sign-form-left l right">
+                                <span class="color-red">*</span>
+                                <span class="text">银行</span>
+                            </div>
+                            <div class="account-sign-form-right l left">
+                                <input type="text" class="input-field" value="中国农业银行" readonly="readonly"/>
+                            </div>
+                        </label>
+                        <label class="fix">
+                            <div class="account-sign-form-left l right">
+                                <span class="text">电话号码</span>
+                            </div>
+                            <div class="account-sign-form-right l left">
+                                <input name='tel_no' value='{{ tel_no|default_if_none:""}}' type="text" class="input-field"/>
+                                <div class="sign-notice">
+                                </div>
+                            </div>
+                        </label>
+                        <label class="fix">
+                            <div class="account-sign-form-left l right">
+                                <span class="color-red">*</span>
+                                <span class="text">户名</span>
+                            </div>
+                            <div class="account-sign-form-right l left">
+                                <input name='bank_account_name' value='{{ bank_account_name|default_if_none:""}}'
+                                       type="text" class="input-field" {% if is_real_name_authed %}readonly="readonly"{% endif %} />
+                                <div class="sign-notice">
+                                    {{ bank_account_name_msg|default_if_none:""}}
+                                </div>
+                            </div>
+                        </label>
+                        <label class="fix">
+                            <div class="account-sign-form-left l right">
+                                <span class="text">手机</span>
+                            </div>
+                            <div class="account-sign-form-right l left">
+                                <input name='mobile' value='{{ mobile|default_if_none:""}}' type="text" class="input-field"/>
+                                <div class="sign-notice">
+                                </div>
+                            </div>
+                        </label>
+                        <label class="fix">
+                            <div class="account-sign-form-left l right">
+                                <span class="color-red">*</span>
+                                <span class="text">银行卡号</span>
+                            </div>
+                            <div class="account-sign-form-right l left">
+                                <input name='bank_account_no' value='{{ bank_account_no|default_if_none:""}}' type="text" class="input-field"/>
+                                <div class="sign-notice">
+                                    {{ bank_account_no_msg|default_if_none:""}}
+                                </div>
+                            </div>
+                        </label>
+                        <label class="fix">
+                            <div class="account-sign-form-left l right">
+                                <span class="text">电子邮件</span>
+                            </div>
+                            <div class="account-sign-form-right l left">
+                                <input name='email' value='{{ email|default_if_none:""}}' type="text" class="input-field"/>
+                                <div class="sign-notice">
+                                </div>
+                            </div>
+                        </label>
+                        <label class="fix">
+                            <div class="account-sign-form-left l right">
+                                <span class="color-red">*</span>
+                                <span class="text">客户类型</span>
+                            </div>
+                            <input hidden name="account_type" id="account_type"
+                                   value="{% if account_type != None %}{{ account_type}}{% else %}{{cert_type|default:'0'}}{% endif %}" />
+                            <div class="account-sign-form-right l left">
+                                <select name='account_type_sel' id=='account_type_sel'
+                                        class="account-sign-select" onchange="change_account_type(this)"
+                                {% if is_real_name_authed %} disabled {% endif %}
+                                >
+{#                                    {% if False %}#}
+                                        {% if is_real_name_authed  %}
+
+                                            {% if cert_type == 0 or cert_type == None or cert_type == ''%}
+                                                <option id=0>0 - 个人</option>
+                                            {% else %}
+                                                <option id=1>1 - 对公账户</option>
+                                            {% endif %}
+                                        {% else %}
+                                            <option id=0 {% if account_type != '0' %} selected {% endif %}>0 - 个人</option>
+                                            <option id=1 {% if account_type == '1' %} selected {% endif %}>1 - 对公账户</option>
+                                        {% endif %}
+{#                                    {% else %}#}
+{##}
+{#                                            <option id=0>0 - 个人</option>#}
+{#                                            <option id=1>1 - 对公账户</option>#}
+{#                                    {% endif %}#}
+                                </select>
+                            </div>
+                        </label>
+                        <label class="fix">
+                            <div class="account-sign-form-left l right">
+                                <span class="text">客户地址</span>
+                            </div>
+                            <div class="account-sign-form-right l left">
+                                <input name='address' value='{{ address|default_if_none:""}}' type="text" class="input-field"/>
+                                <div class="sign-notice">
+                                </div>
+                            </div>
+                        </label>
+                        <label class="fix">
+                            <div class="account-sign-form-left l right">
+                                <span class="color-red">*</span>
+                                <span id='pwd_lable' class="text">银行密码</span>
+                            </div>
+                            <div class="account-sign-form-right l left">
+                                <input type="password" style="display:none">
+                                <input id='bank_account_pwd' name='bank_account_pwd' value='{{ bank_account_pwd|default_if_none:""}}'
+                                       type="password" autocomplete=off class="input-field"/>
+                                <div class="sign-notice">
+                                    {{ bank_account_pwd_msg|default_if_none:""}}
+                                </div>
+                            </div>
+                        </label>
+
+                        <label class="fix">
+                            <div class="account-sign-form-left l right">
+                                <span class="text">邮政编码</span>
+                            </div>
+                            <div class="account-sign-form-right l left">
+                                <input name='post_code' value='{{ post_code|default_if_none:""}}' type="text" class="input-field"/>
+                                <div class="sign-notice">
+                                </div>
+                            </div>
+                        </label>
+
+                       <label class="fix">
+                            <div class="account-sign-form-left l right">
+                                <span class="color-red">*</span>
+                                <span class="text">币种</span>
+                            </div>
+                            <div class="account-sign-form-right l left">
+                                <select class="account-sign-select">
+                                    <option>0 - 人民币</option>
+                                    <!--<option>1 - 美元</option>-->
+                                    <!--<option>2 - 港币</option>-->
+                                    <!--<option>3 - 英镑</option>-->
+                                </select>
+                            </div>
+                        </label>
+                        <label class="fix">
+                            <div class="account-sign-form-left l right">
+                                <span class="text">开户银行</span>
+                            </div>
+                            <div class="account-sign-form-right l left">
+                                <input type="text" class="input-field" value="中国农业银行" readonly="readonly"/>
+                            </div>
+                        </label>
+                        <label class="fix">
+                            <div class="account-sign-form-left l right">
+                                <span class="color-red">*</span>
+                                <span class="text">证件类型</span>
+                            </div>
+                            <div class="account-sign-form-right l left">
+                                <select id='cert_type' name='cert_type' class="account-sign-select"
+                                {% if is_real_name_authed %}disabled{% endif %}
+                                >
+
+{#                                    {% if False %}#}
+                                    {% if is_real_name_authed %}
+                                        {% if cert_type == 0 or cert_type == None or cert_type == ''%}
+                                            <option id='0' >0 - 身份证</option>
+                                        {% else %}
+                                            <option id="1">1 - 组织机构代码</option>
+                                        {% endif %}
+                                    {% else %}
+                                        {% if account_type != '1' %}
+                                            <option id='0' >0 - 身份证</option>
+                                        {% else %}
+                                            <option id='1' >1 - 组织机构代码</option>
+                                        {% endif %}
+                                    {% endif %}
+                                </select>
+                            </div>
+                        </label>
+                        <label class="fix">
+                            <div class="account-sign-form-left l right">
+                                <span class="text">备注</span>
+                            </div>
+                            <div class="account-sign-form-right l left">
+                                <textarea name="comment">{{ comment }}</textarea>
+                            </div>
+                        </label>
+
+                        <label class="fix">
+                            <div class="account-sign-form-left l right">
+                                <span class="color-red">*</span>
+                                <span class="text">证件号</span>
+                            </div>
+                            <div class="account-sign-form-right l left">
+                                <input id='cert_id' name='cert_id' value='{{ cert_id }}' type="text" class="input-field"
+                                {% if is_real_name_authed %}readonly="readonly"{% endif %}/>
+                                <div class="sign-notice">
+                                    {{ cert_id_msg|default_if_none:""}}
+                                </div>
+                            </div>
+                        </label>
+
+                    </div>
+                    <div class="sign-btn fix">
+                        <input type="submit" value="执行签约"/>
+                    </div>
+                </form>
+            </div>
+        </div>
+    <!--农行签约body end-->
+ {% endblock oncontentload %}
+
+{% block footer_extra_script %}
+    <script type="text/javascript">
+        function change_account_type(obj){
+            var opt = obj.selectedIndex;
+            var cert_type_obj = document.getElementById("cert_type");
+            if(!cert_type_obj.disable) {
+                var cert_type_id = '0';
+                var cert_type_inst = '1';
+                var opt_id = cert_type_id;
+                var cert_type_opt_text = '0 - 身份证';
+                if (opt == 1) {
+
+                    opt_id = cert_type_inst;
+                    cert_type_opt_text = '1 - 组织机构代码';
+                }
+                cert_type_obj.options[0].id = opt_id;
+                cert_type_obj.options[0].text = cert_type_opt_text;
+{#                for (var i = 0; i < cert_type_obj.options.length; ++i) {#}
+{#                    if (cert_type_obj.options[i].id == opt_id) {#}
+{#                        cert_type_obj.selectedIndex = i;#}
+{#                    }#}
+{#                }#}
+
+                document.getElementById("cert_id").value='';
+            }
+
+            if(opt == 0) {
+                document.getElementById("account_type").value=0;
+                $("#pwd_lable").html("银行密码");
+            } else {
+                document.getElementById("account_type").value=1;
+                $("#pwd_lable").html("出入金密码");
+            }
+            document.getElementById("bank_account_pwd").value='';
+        }
+    </script>
+{% endblock %}

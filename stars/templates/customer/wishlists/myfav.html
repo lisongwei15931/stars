@@ -1,0 +1,207 @@
+{% extends "customer/account_base.html" %}
+{% load staticfiles %}
+{% load compress %}
+{% load thumbnail %}
+{% load i18n %}
+{% load widget_tweaks %}
+{% load currency_filters %}
+{% load purchase_info_tags %}
+
+{%  block title %}蓝图百货--我的关注{%  endblock title %}
+
+{% block oncontentload %}
+    {{ block.super }}
+    <!--我的关注body start-->
+
+    <div class="account-cont-right account-cont-right1 l">
+        <div class="details details_myfav">
+                <div class="title-acct title-acct2 fix">
+                    <span class="l">我的关注</span>
+                </div>
+                <form class="stacked" action="/" id="myfav_list_form" name="myfav_list_form" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" id="event_flag" name="event_flag" value="333" />
+                    <input type="hidden" id="params" name="params" value="" />
+                </form>
+                <div class="guanzhu">
+                    <table>
+                        <thead>
+                            <tr>
+                                <td><input type="checkbox" onclick="select_all(event)" />全选</td>
+                                <td>商品名称</td>
+                                <td>关注时间</td>
+                                <td>当前价格</td>
+                                <td>操作</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for line in myfav %}
+                                {% with product=line.product %}
+                                    <tr>
+                                    <td><input type="checkbox" value="{{ product.pk }}"/></td>
+                                    <td>
+                                        <div class="guanzhu-goods fix">
+                                            {% if product %}
+                                                    {% with image=product.primary_image %}
+                                                        {% thumbnail image.original "100x100" upscale=False as thumb %}
+                                                            <a class="l" href="{{ product.get_absolute_url }}">
+                                                                <img  src="{{ thumb.url }}" alt="{{ product.get_title }}" />
+                                                            </a>
+                                                        {% endthumbnail %}
+                                                    {% endwith %}
+                                            {% endif %}
+                                            <div class="l">
+                                                {% if product %}
+                                                    <a href="{{ line.product.get_absolute_url }}">{{ line.get_title }}</a>
+                                                {% else %}
+                                                    <em>{{ line.get_title }} ({% trans 'Not available anymore' %})</em>
+                                                {% endif %}
+
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <p>{{ line.date_created|date:"Y-m-d" }} </p>
+                                        <p>{{ line.date_created|time:"H:i" }}</p>
+                                    </td>
+                                    <td>
+                                        {{ product.buy_price }}
+                                    </td>
+                                    <td>
+    {#                                    <p><a href="" name="{{ product.id }}" class="add_to_basket">加入购物车</a></p>#}
+                                        <p>
+                                        <form id="add_to_basket_{{ product.id }}_form" name="add_to_basket_{{ product.id }}_form" action="{% url 'basket:add' pk=product.id  %}" method="post" class="add-to-basket">
+                                                {% csrf_token %}
+                                                <input id="id_quantity" name="quantity"  type="hidden" value="1" />
+    {#                                            <input type="submit">#}
+                                                <a class="add_to_basket" id="add_to_basket_{{ product.id }}">
+                                                    加入购物车
+                                                </a>
+
+                                            </form>
+                                        </p>
+                                        <p><a  href="{% url 'customer:myfav-remove-product'  product_pk=product.pk %}">取消关注</a></p>
+                                    </td>
+                                </tr>
+
+                                {% endwith %}
+                            {% endfor %}
+                         </tbody>
+                    </table>
+
+                    <div class="guanzhu-bottom">
+                        <input type="checkbox" name="for_all" onclick="select_all(event)"/>全选
+{#                        <a class="add_to_basket">加入购物车</a>#}
+                        <a class="remove_from_fav">取消关注</a>
+{#                        <div class="center refer">#}
+{#                            <input type="submit" onclick="return checkpasswd()" value="提交"/>#}
+{#                        </div>#}
+                    </div>
+                </div>
+
+
+{#                <div class="page-public page-public1 center l">#}
+{#                    <a class="txt">首页</a>#}
+{#                    <a class="txt">上一页</a>#}
+{#                    <a class="num" style="display: none;" id="firstpage">1</a>#}
+{#                    <a class="num">2</a>#}
+{#                    <a class="num active">3</a>#}
+{#                    <a class="num">4</a>#}
+{#                    <a class="num">5</a>#}
+{#                    <a class="num">6</a>#}
+{#                    <span>……</span>#}
+{#                    <a class="num">21</a>#}
+{#                    <a class="txt">下一页</a>#}
+{#                    <a class="txt">尾页</a>共<span>21</span>页#}
+{#                    <span>到第<input type="text" value="9"/>页</span>#}
+{#                    <a class="txt">确认</a>#}
+{#                </div>#}
+            </div>
+    </div>
+
+    <!--我的关注body end-->
+
+    <script type="text/javascript">
+
+        window.onload = function(){
+            $(".footer-menu").find("li").eq(-1).children("span").css("display","none");
+        };
+
+    </script>
+    <script type="text/javascript" defer>
+        function add_to_basket() {
+            var form_id = this.id + '_form';
+{#            var form_id = "add_to_basket_47_form";#}
+
+{#            $('#add_to_basket_10_form').submit();#}
+            var form1 = document.getElementById(form_id);
+            if(form1 != null) {
+                form1.submit();
+                return;
+            }
+            var forms = document.getElementsByTagName("*");
+            alert(forms.length);
+            for(var i=0;i < forms.length;i++)
+            {
+                var t = forms[i].id;
+              if(t == form_id){
+                  forms[i].submit();
+              }
+            }
+{#            if (form1 == null){#}
+{#                alert(form_id);#}
+{#            } else {#}
+{#                form1.submit();#}
+{#            }#}
+        }
+        $('.add_to_basket').click(add_to_basket);
+
+        function select_all(event){ //全选
+            var inputs = document.getElementsByTagName("input");
+            for(var i=0;i<inputs.length;i++)
+            {
+              if(inputs[i].getAttribute("type") == "checkbox")
+              {
+                src = event.srcElement ? event.srcElement : event.target
+                inputs[i].checked = src.checked;
+
+              }
+            }
+        }
+        function func1(event) {
+            var flag = false;
+            var inputs = document.getElementsByTagName("input");
+            var params111 = [];
+            for(var i=0;i<inputs.length;i++)
+            {
+              if(inputs[i].getAttribute("type") == "checkbox" && inputs[i].checked
+                      && inputs[i].value!='on' && inputs[i].value!='off'  && inputs[i].value!="")
+              {
+                  flag = true;
+                  var o =new Object();
+                  o.id = inputs[i].value;
+                  params111.push(o);
+              }
+            }
+            if (!flag) {
+                return;
+            }
+
+            document.getElementById('event_flag').value = event;
+            if(event==1){
+                myfav_list_form.action = "{% url 'customer:myfav-remove-product-list'%}"
+            }
+            var form_id = 'myfav_list_form';
+            var data1 = JSON.stringify(params111);
+            document.getElementById('params').value = data1;
+
+            $('#'+form_id).submit();
+        }
+        $('.remove_from_fav').click(function() {
+{#            alert(document.getElementById('event_flag').value);#}
+            func1(1);
+
+        })
+
+    </script>
+{% endblock %}

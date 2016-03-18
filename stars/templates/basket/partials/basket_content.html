@@ -1,0 +1,135 @@
+{% load staticfiles %}
+{% load thumbnail %}
+{% load currency_filters %}
+{% load purchase_info_tags %}
+{% load widget_tweaks %}
+{% load public_tags %}
+        {% if basket.num_lines %}
+            <div class="container shopcar-tit fix">
+                <div class="shopcar-check shopcar-check1">
+                    <!--
+                        <div class="check-input l">
+                            <input type="checkbox" onclick="DoCheck()" name="allChecked"/>
+                            <span>全选</span>
+                        </div>
+                    -->
+                    <div class="information information1 l">
+                        商品名称
+                    </div>
+                    <div class="current-price l">
+                    	<!-- 现价 -->
+                    </div>
+                    <div class="qty l center" style="margin-left: 110px;">
+                        数量
+                    </div>
+                    <div class="bid-rate l center" style="margin-left: 20px;">
+                        买入价
+                    </div>
+                    <div class="sum l center" style="margin-left: 10px;">
+                        小计
+                    </div>
+                    <div class="handle l" style="margin-left: 20px;">
+                        操作
+                    </div>
+                </div>
+            </div>
+
+            <div class="container shopcar-item fix">
+                <form action="." method="post" class="basket_summary" id="basket_formset">
+                    {% csrf_token %}
+                    {{ formset.management_form }}
+
+                    {% for form in formset %}
+                        {% with line=form.instance product=form.instance.product %}
+                            {% purchase_info_for_line request line as session %}
+                            <div class="shopcar-check fix">
+                                <!--
+                                <div class="check-input l">
+                                    <input type="checkbox" name="choose" onchange="unAllCheck(this)" class="choose"/>
+                                </div>
+                                -->
+                                <div class="information information1 l">
+                                    {{ form.id }}
+                                    {% with image=product.primary_image %}
+                                        {% thumbnail image.original "100x100" crop="center" as thumb %}
+                                            <a href="{{ product.get_absolute_url }}" class="l">
+                                                <img class="thumbnail" src="{{ thumb.url }}" alt="{{ product.get_title }}"/>
+                                            </a>
+                                        {% endthumbnail %}
+                                    {% endwith %}
+                                    <a href="{{ product.get_absolute_url }}" class="information-name l">
+                                        <span>{{ line.description }}</span>
+                                        <!--
+                                        <span>{{ session.availability.message }}</span>
+                                        <span class="stock" id="id_form-{{ forloop.counter0 }}-quantity-stock" style="display:none">{{ session.availability.num_available }}</span>-->
+                                    </a>
+                                </div>
+                                <div class="current-price current-price1 l">
+                                    <!--  ￥{{ product.buy_price|floatformat:2 }} -->
+                                </div>
+                                <div class="qty qty-box l center" id="quantity_{{ line.id }}">
+                                    <img src="{% static "images/num-h.png" %}" class="trim-l l"/>
+                                    {% render_field form.quantity class+="l center product_quantity" %}
+                                    <img src="{% static "images/num+h.png" %}" class="trim-r l"/>
+                                    <span style="display:none" id = "max_num_{{line.id}}">{{product|max_num:request.user}}</span>
+                                    <input style="display:none" type="text" id="unit_quote_{{ line.id }}" value="{{ product.quote }}" />
+                                    <samp>可获进货权<span id="quote_{{ line.id }}" class="color-red">{{ line.quote }}</span></samp>
+                                </div>
+                                <div class="bid-rate bid-rate1 l center" style="border:none" id="buyprice_{{ line.id }}">
+                                   <!--  <img src="{% static "images/num-h.png" %}" class="trim-l l"/>
+                                    {% render_field form.buy_price class+="l center product_buy_price" %}
+                                    <img src="{% static "images/num+h.png" %}" class="trim-r l"/>
+                                    <span style="display:none">{{product.price_range.0}}-{{product.price_range.1}}</span>
+                                     -->
+                                     <p class="product_buy_price">{{ product.buy_price|floatformat:2 }}</p>
+                                </div>
+                                <div class="sum sum1 l center">
+                                    <span>￥</span>
+                                    <span class="product_total_price" id="id_form-{{ forloop.counter0 }}-quantity-price-total">
+                                        {{ line.total_price|floatformat:2 }}
+                                    </span>
+                                </div>
+                                <div class="handle handle1 l">
+                                    <div class="del">
+                                        <a href="{% url 'basket:delete_line' pk=line.id %}">删除</a>
+                                    </div>
+                                    <div>
+                                        <a href="{% url 'basket:move_to_myfav' pk=line.id %}">
+                                            移到我的关注
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endwith %}
+                    {% endfor %}
+                </form>
+            </div>
+
+            <div class="container shopcar-total fix">
+                <div class="shopcar-check shopcar-check1">
+                    <div class="shopcar-total-left l">
+                        <a href="{% url 'basket:clean_basket' %}">清空购物车</a>
+                        <a href="/">返回继续购物</a>
+                    </div>
+                    <div class="shopcar-total-right r">
+                        <div class="l">
+                            <div class="shopcar-num-check">
+                                已选择<span class="color-red" id="quantity-total">{{ total_quantity }}</span>件商品
+                            </div>
+                            <div class="shopcar-total-money">
+                                总价（不含运费包装费）:<span class="color-red">￥</span><span class="color-red" id="price-total">{{ total_price|floatformat:2 }}</span>
+                            </div>
+                        </div>
+                        <a href="{% url 'basket:order_confirm' %}" ><div id="order_clearing" class="shopcar-buy r">
+                            立即结算
+                        </div></a>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="container shopcar-tit fix">
+                <div class="shopcar-check shopcar-check1">
+                    <h3>购物车里还没有商品，请先选购商品。</h3>
+                </div>
+            </div>
+        {% endif %}

@@ -1,0 +1,82 @@
+{% extends "dashboard/layout.html" %}
+{% load currency_filters %}
+{% load sorting_tags %}
+{% load i18n %}
+{% load widget_tweaks %}
+
+{% block body_class %}{{ block.super }} consultations{% endblock %}
+{% block title %}
+    入库办理 | {{ block.super }}
+{% endblock %}
+
+{% block breadcrumbs %}
+    <ul class="breadcrumb" xmlns="http://www.w3.org/1999/html">
+        <li>
+            <a href="{% url 'dashboard:index' %}">{% trans "Dashboard" %}</a>
+            <span class="divider"></span>
+        </li>
+        <li class="active">入库办理</li>
+    </ul>
+{% endblock %}
+
+{% block header %}
+    <div class="page-header">
+        <h1>入库办理</h1>
+    </div>
+{% endblock header %}
+
+{% block dashboard_content %}
+    <form action="." class="form-stacked" method="post">
+        {% csrf_token %}
+        <div class="tab-pane" id="sales_attributes">
+            <table class="table table-striped table-bordered" id="table-bordered">
+                <caption>
+                    入库办理
+                </caption>
+                {% for field in form %}
+                <tr>
+                    <td>
+                        {% include "partials/form_field.html" %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <div class="form-actions">
+            <button class="btn btn-primary btn-large" type="submit">{% trans "Save" %}</button> {% trans "or" %}
+            <a href="{% url 'dashboard:store-income-apply-list' %}">{% trans "cancel" %}</a>
+        </div>
+    </form>
+{% endblock dashboard_content %}
+
+{% block extrascripts %}
+    {{ block.super }}
+    <script type="text/javascript">
+        (function($){
+        $.fn.datetimepicker.dates['en'] = {
+                days: ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"],
+                daysShort: ["周日", "周一", "周二", "周三", "周四", "周五", "周六", "周日"],
+                daysMin:  ["日", "一", "二", "三", "四", "五", "六", "日"],
+                months: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+                monthsShort: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+                today: "今日",
+                suffix: [],
+                meridiem: ["上午", "下午"]
+        };
+        }(jQuery));
+        $(document).ready(date_picker());
+        function date_picker() {
+            $('#id_warehouse_rental_start_time').datetimepicker({
+                format: 'yyyy-mm-dd',
+                autoclose: true,
+                minView: 2
+            }).datetimepicker('setStartDate', '{{ today|date:"Y-m-d" }}');
+            $('#id_producttion_date').datetimepicker({
+                format: 'yyyy-mm-dd',
+                autoclose: true,
+                minView: 2
+            })
+        }
+    </script>
+{% endblock %}

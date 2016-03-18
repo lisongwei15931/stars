@@ -1,0 +1,67 @@
+{% extends 'base_stars.html' %}
+{% load staticfiles %}
+{% load thumbnail %}
+{% load i18n %}
+{% load currency_filters %}
+{% load purchase_info_tags %}
+{% load widget_tweaks %}
+
+{% block public_css %}
+    {{block.super}}
+    <link rel="stylesheet" href="{% static "css/shopcar.css" %}" type="text/css">
+    <link rel="stylesheet" href="{% static "css/public.css" %}" type="text/css">
+    <style type="text/css">
+    .top {
+        height: 31px;
+    }
+    </style>
+{% endblock %}
+{% block jquery %}
+    <script type="text/javascript" src="{% static "js/jquery-1.11.1.min.js" %}"></script>
+    {{block.super}}
+{% endblock %}
+{% block title %}蓝图百货购物车-订单失败{% endblock %}
+
+{% block logo %}{% endblock %}
+{% block content %}
+    <!--登录-顶层logo条-->
+    <div class="register-topbar fix">
+        <div class="container fix">
+            <div class="register-topbar-left l">
+                <a href ="{% url 'promotions:home' %}"><img src="{% static "images/logo1.png" %}"/></a>
+            </div>
+            <div class="register-topbar-right r">
+                订单失败
+            </div>
+        </div>
+    </div>
+    <!--购物车 content-body start-->
+    <div class="container shopcar-balance fix">
+        <div class="shopcar-balance-tit">
+            订单失败
+        </div>
+        <div class="shopcar-balance-conbody shopcar-balance-conbody1">
+            <div class="row" style="border-bottom: none;">
+                <div class="row-con-body">
+                    <div class="row-content1 left">
+                        <p class="order-form">
+                            <span><img src="{% static "images/sub-false.png" %}"/></span>
+                            {% if basket_err_msg %}
+                            {{basket_err_msg}}
+                            {% else %}
+                            <span>您的订单提交失败！</span>
+                            <span>{{err_msg}}</span>
+                            {% endif %}
+                        </p>
+                        <p>
+                            <a href="" class="bgred shopcar-view center">订单管理</a>
+                            <a href="/" class="bgred center">返回首页</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block footer_script %}
+{% endblock %}

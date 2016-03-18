@@ -1,0 +1,508 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-10-09 20:09+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: stars/apps/ad/abstract_models.py:19
+msgid "标题"
+msgstr ""
+
+#: stars/apps/ad/abstract_models.py:20 stars/apps/dashboard/ad/tables.py:19
+msgid "链接地址"
+msgstr ""
+
+#: stars/apps/ad/abstract_models.py:21
+msgid "广告位置"
+msgstr ""
+
+#: stars/apps/ad/abstract_models.py:22 stars/apps/dashboard/ad/tables.py:15
+msgid "Image"
+msgstr ""
+
+#: stars/apps/ad/abstract_models.py:23 stars/apps/dashboard/ad/tables.py:23
+msgid "Description"
+msgstr ""
+
+#: stars/apps/ad/abstract_models.py:24
+msgid "顺序号"
+msgstr ""
+
+#: stars/apps/ad/abstract_models.py:25
+msgid "启用"
+msgstr ""
+
+#: stars/apps/ad/abstract_models.py:32
+msgid "Rolling advertisement"
+msgstr ""
+
+#: stars/apps/basket/views.py:217
+msgid "You can't save an item for later if you're not logged in!"
+msgstr ""
+
+#: stars/apps/basket/views.py:281
+msgid ""
+"Your basket couldn't be updated. Please correct any validation errors below."
+msgstr ""
+
+#: stars/apps/basket/views.py:369
+#, python-format
+msgid "The '%(code)s' voucher has expired"
+msgstr ""
+
+#: stars/apps/basket/views.py:398
+msgid "Your basket does not qualify for a voucher discount"
+msgstr ""
+
+#: stars/apps/basket/views.py:403
+#, python-format
+msgid "Voucher '%(code)s' added to basket"
+msgstr ""
+
+#: stars/apps/basket/views.py:413
+#, python-format
+msgid "You have already added the '%(code)s' voucher to your basket"
+msgstr ""
+
+#: stars/apps/basket/views.py:421
+#, python-format
+msgid "No voucher found with code '%(code)s'"
+msgstr ""
+
+#: stars/apps/basket/views.py:428
+msgid "Please enter a voucher code"
+msgstr ""
+
+#: stars/apps/basket/views.py:449
+#, python-format
+msgid "No voucher found with id '%d'"
+msgstr ""
+
+#: stars/apps/basket/views.py:455
+#, python-format
+msgid "Voucher '%s' removed from basket"
+msgstr ""
+
+#: stars/apps/catalogue/models.py:38
+#, python-format
+msgid "%(obj)s has no attribute named '%(attr)s'"
+msgstr ""
+
+#: stars/apps/dashboard/ad/config.py:8
+msgid "Ad dashboard"
+msgstr ""
+
+#: stars/apps/dashboard/ad/tables.py:30
+msgid "顺序"
+msgstr ""
+
+#: stars/apps/dashboard/ad/tables.py:34
+msgid "开启"
+msgstr ""
+
+#: stars/apps/dashboard/ad/tables.py:38
+#: stars/templates/dashboard/ad/rolling_ad_row_actions.html:6
+msgid "Actions"
+msgstr ""
+
+#: stars/apps/dashboard/ad/views.py:76
+msgid "Add a new ad "
+msgstr ""
+
+#: stars/apps/dashboard/ad/views.py:79
+#, python-format
+msgid "轮播广告 '%s' 创建"
+msgstr ""
+
+#: stars/apps/dashboard/ad/views.py:91
+msgid "edit a  ad "
+msgstr ""
+
+#: stars/apps/dashboard/ad/views.py:100
+#, python-format
+msgid "Delete ad '%s'"
+msgstr ""
+
+#: stars/apps/dashboard/ad/views.py:103
+msgid "Ad deleted successfully"
+msgstr ""
+
+#: stars/settings.py:45 stars/settings.py:131
+#: stars/templates/dashboard/ad/rolling_ad_detail.html:17
+#: stars/templates/dashboard/ad/rolling_ad_list.html:11
+#: stars/templates/dashboard/ad/rolling_ad_list.html:19
+#: stars/templates/dashboard/ad/rolling_ad_list.html:27
+#: stars/templates/dashboard/ad/rolling_ad_update_create.html:16
+msgid "广告"
+msgstr ""
+
+#: stars/settings.py:54
+msgid "平台管理"
+msgstr ""
+
+#: stars/settings.py:59 stars/settings.py:63
+msgid "商品"
+msgstr ""
+
+#: stars/settings.py:67
+msgid "Product Types"
+msgstr "商品类别"
+
+#: stars/settings.py:71
+#: stars/templates/dashboard/catalogue/product_update.html:78
+msgid "Categories"
+msgstr ""
+
+#: stars/settings.py:75
+msgid "Ranges"
+msgstr ""
+
+#: stars/settings.py:79
+msgid "Low stock alerts"
+msgstr ""
+
+#: stars/settings.py:83
+msgid "Partners"
+msgstr ""
+
+#: stars/settings.py:89
+msgid "订单 & 统计"
+msgstr ""
+
+#: stars/settings.py:93
+msgid "Orders"
+msgstr ""
+
+#: stars/settings.py:97
+msgid "Statistics"
+msgstr ""
+
+#: stars/settings.py:103 stars/settings.py:107
+msgid "用户"
+msgstr ""
+
+#: stars/settings.py:113
+msgid "Content"
+msgstr ""
+
+#: stars/settings.py:117
+msgid "Content blocks"
+msgstr ""
+
+#: stars/settings.py:121
+msgid "Content blocks by page"
+msgstr ""
+
+#: stars/settings.py:125
+msgid "Pages"
+msgstr ""
+
+#: stars/templates/catalogue/customdetail.html:61
+msgid "Home"
+msgstr ""
+
+#: stars/templates/catalogue/customdetail.html:169
+#: stars/templates/catalogue/customdetail.html:203
+msgid "Recommended items"
+msgstr ""
+
+#: stars/templates/catalogue/customdetail.html:213
+#: stars/templates/catalogue/customdetail.html:247
+msgid "Products you recently viewed"
+msgstr ""
+
+#: stars/templates/catalogue/partials/custom_add_to_basket_form.html:12
+msgid "Add to basket"
+msgstr ""
+
+#: stars/templates/catalogue/partials/custom_add_to_basket_form.html:12
+#: stars/templates/dashboard/catalogue/product_update.html:252
+msgid "Adding..."
+msgstr ""
+
+#: stars/templates/dashboard/ad/rolling_ad_delete.html:9
+#: stars/templates/dashboard/ad/rolling_ad_detail.html:14
+#: stars/templates/dashboard/ad/rolling_ad_list.html:17
+#: stars/templates/dashboard/ad/rolling_ad_update_create.html:13
+#: stars/templates/dashboard/catalogue/product_list.html:17
+#: stars/templates/dashboard/catalogue/product_update.html:22
+#: stars/templates/dashboard/layout.html:32
+#: stars/templates/dashboard/layout.html:114
+msgid "Dashboard"
+msgstr "平台管理"
+
+#: stars/templates/dashboard/ad/rolling_ad_delete.html:12
+msgid "ad"
+msgstr "广告"
+
+#: stars/templates/dashboard/ad/rolling_ad_delete.html:14
+msgid "删除该广告?"
+msgstr ""
+
+#: stars/templates/dashboard/ad/rolling_ad_delete.html:24
+msgid "Delete failed."
+msgstr ""
+
+#: stars/templates/dashboard/ad/rolling_ad_delete.html:27
+msgid "Delete ad"
+msgstr ""
+
+#: stars/templates/dashboard/ad/rolling_ad_delete.html:33
+#, python-format
+msgid "Delete ad <strong>%(name)s</strong> - are you sure?"
+msgstr ""
+
+#: stars/templates/dashboard/ad/rolling_ad_delete.html:36
+msgid "Deleting..."
+msgstr ""
+
+#: stars/templates/dashboard/ad/rolling_ad_delete.html:36
+#: stars/templates/dashboard/ad/rolling_ad_row_actions.html:17
+#: stars/templates/dashboard/catalogue/product_update.html:274
+msgid "Delete"
+msgstr ""
+
+#: stars/templates/dashboard/ad/rolling_ad_delete.html:37
+#: stars/templates/dashboard/catalogue/product_update.html:328
+msgid "or"
+msgstr ""
+
+#: stars/templates/dashboard/ad/rolling_ad_delete.html:37
+msgid "cancel"
+msgstr ""
+
+#: stars/templates/dashboard/ad/rolling_ad_detail.html:8
+#: stars/templates/dashboard/ad/rolling_ad_update_create.html:7
+msgid "rolling ad"
+msgstr ""
+
+#: stars/templates/dashboard/ad/rolling_ad_list.html:26
+msgid "Create"
+msgstr ""
+
+#: stars/templates/dashboard/ad/rolling_ad_row_actions.html:11
+#: stars/templates/dashboard/catalogue/product_update.html:271
+msgid "Edit"
+msgstr ""
+
+#: stars/templates/dashboard/catalogue/product_list.html:11
+#: stars/templates/dashboard/catalogue/product_list.html:19
+#: stars/templates/dashboard/catalogue/product_list.html:25
+#: stars/templates/dashboard/catalogue/product_update.html:11
+#: stars/templates/dashboard/catalogue/product_update.html:25
+msgid "Products"
+msgstr "商品"
+
+#: stars/templates/dashboard/catalogue/product_list.html:37
+msgid "Submitting..."
+msgstr ""
+
+#: stars/templates/dashboard/catalogue/product_list.html:37
+#, fuzzy
+#| msgid "Products"
+msgid "New Product"
+msgstr "商品"
+
+#: stars/templates/dashboard/catalogue/product_list.html:44
+#: stars/templates/promotions/search_form.html:3
+msgid "Search Products"
+msgstr "搜索商品"
+
+#: stars/templates/dashboard/catalogue/product_list.html:60
+#: stars/templates/promotions/search_form.html:8
+msgid "Searching..."
+msgstr ""
+
+#: stars/templates/dashboard/catalogue/product_list.html:60
+#: stars/templates/promotions/search_form.html:8
+msgid "Search"
+msgstr ""
+
+#: stars/templates/dashboard/catalogue/product_list.html:73
+msgid "No products found."
+msgstr ""
+
+#: stars/templates/dashboard/catalogue/product_update.html:49
+#, python-format
+msgid ""
+"\n"
+"                            You are currently editing a product variant of\n"
+"                            <a href=\"%(parent_url)s\">%(title)s</a>.\n"
+"                        "
+msgstr ""
+
+#: stars/templates/dashboard/catalogue/product_update.html:64
+msgid "Sections"
+msgstr ""
+
+#: stars/templates/dashboard/catalogue/product_update.html:76
+#: stars/templates/dashboard/catalogue/product_update.html:106
+msgid "Product details"
+msgstr "商品详情"
+
+#: stars/templates/dashboard/catalogue/product_update.html:81
+#: stars/templates/dashboard/catalogue/product_update.html:149
+#: stars/templates/dashboard/catalogue/product_update.html:260
+msgid "Attributes"
+msgstr ""
+
+#: stars/templates/dashboard/catalogue/product_update.html:84
+msgid "Images"
+msgstr ""
+
+#: stars/templates/dashboard/catalogue/product_update.html:87
+#: stars/templates/dashboard/catalogue/product_update.html:191
+msgid "Stock and pricing"
+msgstr ""
+
+#: stars/templates/dashboard/catalogue/product_update.html:90
+#: stars/templates/dashboard/catalogue/product_update.html:251
+msgid "Variants"
+msgstr ""
+
+#: stars/templates/dashboard/catalogue/product_update.html:93
+msgid "Upselling"
+msgstr ""
+
+#: stars/templates/dashboard/catalogue/product_update.html:129
+msgid "Category"
+msgstr ""
+
+#: stars/templates/dashboard/catalogue/product_update.html:151
+msgid "Product Type:"
+msgstr "商品类别"
+
+#: stars/templates/dashboard/catalogue/product_update.html:172
+msgid "Upload, change or remove images"
+msgstr ""
+
+#: stars/templates/dashboard/catalogue/product_update.html:196
+msgid "Partner"
+msgstr ""
+
+#: stars/templates/dashboard/catalogue/product_update.html:197
+msgid "SKU"
+msgstr ""
+
+#: stars/templates/dashboard/catalogue/product_update.html:199
+msgid "Num in stock"
+msgstr ""
+
+#: stars/templates/dashboard/catalogue/product_update.html:200
+msgid "Num allocated"
+msgstr ""
+
+#: stars/templates/dashboard/catalogue/product_update.html:201
+msgid "Low stock threshold"
+msgstr ""
+
+#: stars/templates/dashboard/catalogue/product_update.html:203
+msgid "Currency"
+msgstr ""
+
+#: stars/templates/dashboard/catalogue/product_update.html:204
+msgid "Cost price"
+msgstr ""
+
+#: stars/templates/dashboard/catalogue/product_update.html:205
+msgid "Price (excl tax)"
+msgstr ""
+
+#: stars/templates/dashboard/catalogue/product_update.html:206
+msgid "Retail price"
+msgstr ""
+
+#: stars/templates/dashboard/catalogue/product_update.html:207
+msgid "Delete?"
+msgstr ""
+
+#: stars/templates/dashboard/catalogue/product_update.html:254
+msgid "Add variant"
+msgstr ""
+
+#: stars/templates/dashboard/catalogue/product_update.html:259
+msgid "Title"
+msgstr ""
+
+#: stars/templates/dashboard/catalogue/product_update.html:261
+msgid "Stock records"
+msgstr ""
+
+#: stars/templates/dashboard/catalogue/product_update.html:283
+msgid "This product does not have any variants."
+msgstr ""
+
+#: stars/templates/dashboard/catalogue/product_update.html:285
+msgid "One can't add variants to this product at this point."
+msgstr ""
+
+#: stars/templates/dashboard/catalogue/product_update.html:287
+msgid "This is likely because this product still has stock records."
+msgstr ""
+
+#: stars/templates/dashboard/catalogue/product_update.html:303
+msgid "Recommended products"
+msgstr ""
+
+#: stars/templates/dashboard/catalogue/product_update.html:326
+msgid "Cancel"
+msgstr ""
+
+#: stars/templates/dashboard/catalogue/product_update.html:330
+#: stars/templates/dashboard/catalogue/product_update.html:334
+#: stars/templates/dashboard/catalogue/product_update.html:337
+msgid "Saving..."
+msgstr ""
+
+#: stars/templates/dashboard/catalogue/product_update.html:331
+msgid "Save and add another variant"
+msgstr ""
+
+#: stars/templates/dashboard/catalogue/product_update.html:335
+msgid "Save and continue editing"
+msgstr ""
+
+#: stars/templates/dashboard/catalogue/product_update.html:338
+msgid "Save"
+msgstr ""
+
+#: stars/templates/dashboard/catalogue/product_update.html:342
+msgid "View on site"
+msgstr ""
+
+#: stars/templates/dashboard/layout.html:53
+msgid "Welcome"
+msgstr ""
+
+#: stars/templates/dashboard/layout.html:54
+msgid "Return to site"
+msgstr ""
+
+#: stars/templates/dashboard/layout.html:55
+msgid "Account"
+msgstr ""
+
+#: stars/templates/dashboard/layout.html:56
+msgid "Log out"
+msgstr ""
+
+#: stars/templates/promotions/home.html:68
+#: stars/templates/promotions/home.html:104
+#: stars/templates/promotions/home.html:144
+#: stars/templates/promotions/home.html:185
+msgid "Free"
+msgstr ""

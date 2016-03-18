@@ -1,0 +1,222 @@
+{% extends "customer/account_base.html" %}
+{% load staticfiles %}
+{% load compress %}
+
+{%  block title %}蓝图百货--账户资产{%  endblock title %}
+
+{% block oncontentload %}
+    {{ block.super }}
+    <form action="{% url 'customer:assets-add_bank_card' %}" method="post">
+        {% csrf_token %}
+        <!--银行卡 body start-->
+        <div class="account-item-body1 container">
+            <div class="account-item-con" id="content">
+                <div class="account-item-tit">
+                    <a href="{% url 'customer:assets-bank_card_list' %}">银行卡&nbsp;>&nbsp;</a>
+                    <span>添加银行卡</span>
+                </div>
+                <div class="account-item-matter">
+{#                    <div class="input-group fix">#}
+{#                        <div class="input-group-left right l">#}
+{#                            真实姓名：#}
+{#                        </div>#}
+{#                        <div class="input-group-right l">#}
+{#                            <input type="text" onfocus="OnfocusFun(this,'')" onblur="OnBlurFun(this,'')" class="l"/>#}
+{#                            <div class="marked-words l">#}
+{#                                不能为空不能为空不能为空不能为空不能为空不能为空#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <div class="input-group fix">#}
+{#                        <div class="input-group-left right l">#}
+{#                            身份证号码：#}
+{#                        </div>#}
+{#                        <div class="input-group-right l">#}
+{#                            <input type="text" onfocus="OnfocusFun(this,'')" onblur="OnBlurFun(this,'')" class="l"/>#}
+{#                            <div class="marked-words l">#}
+{#                                不能为空不能为空不能为空不能为空不能为空不能为空#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+                    <div class="input-group fix">
+                        <div class="input-group-left right l">
+                            选择银行：
+                        </div>
+                        <div class="input-group-right l">
+                            <select value="{{ form.bank_name.value }}" name="bank_name" class="choosebank l">
+{#                                <option>#}
+{#                                    请选择银行#}
+{#                                </option>#}
+                                {% for ele in bank_choices %}
+                                    <option>{{ ele }}</option>
+                                {% endfor %}
+                            </select>
+
+                            {% if form.bank_name.errors %}
+                                <div class="marked-words l">
+                                    {{ form.bank_name.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="input-group fix">
+                        <div class="input-group-left right l">
+                            银行卡卡号：
+                        </div>
+                        <div class="input-group-right l">
+                            <input name="bank_account" value="{{ form.bank_account.value }}" type="text" onfocus="OnfocusFun(this,'')" onblur="OnBlurFun(this,'')" class="l"/>
+{#                            {{ form.bank_account }}#}
+                            {% if form.bank_account.errors %}
+                                <div class="marked-words l">
+                                    {{  form.bank_account.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="input-group fix">
+                        <div class="input-group-left right l">
+                            手机号码：
+                        </div>
+                        <div class="input-group-right l">
+                            <input name="tel" value="{{ form.tel.value }}" type="text" onfocus="OnfocusFun(this,'')" onblur="OnBlurFun(this,'')" class="l"/>
+
+                            {% if form.tel.errors %}
+                                    <div class="marked-words l">
+                                        {{  form.tel.errors }}
+                                    </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="attention">
+                        请填写您在银行预留的手机号码，以验证银行卡是否属于您本人
+                    </div>
+                    <div class="input-group fix">
+                        <div class="input-group-left right l">
+                            校验码：
+                        </div>
+                        <div class="input-group-right l">
+                                <input value="{{ vcode }}" name="vcode" type="text"  onfocus="OnfocusFun(this,'')" onblur="OnBlurFun(this,'')"/>
+                                <div class="get-code">
+                                    <span class="send" id="J_getCode">获取验证码</span>
+                                    <div class="send send-cover" id="J_getCode_Cover" onclick="time()">获取验证码</div>
+                                </div>
+                            </div>
+{#                            <div class="marked-words  l">#}
+{#                                不能为空#}
+{#                            </div>#}
+                            {% if vcode_err_msg %}
+                                <div class="marked-words l">
+                                    {{ vcode_err_msg }}
+                                </div>
+                            {% endif %}
+                         </div>
+
+                    </div>
+                    <div class="center refer">
+                        <input type="submit" value="提交"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--银行卡 body end-->
+    </form>
+
+    <script type="text/javascript">
+
+        window.onload = function(){
+            $(".footer-menu").find("li").eq(-1).children("span").css("display","none");
+        };
+        //得到焦点触发事件
+        function OnfocusFun(element,elementvalue)
+        {
+            if(element.value==elementvalue)
+            {
+                element.value="";
+                element.style.color="#343434";
+            }
+        }
+        //离开输入框触发事件
+        function OnBlurFun(element,elementvalue)
+        {
+            if(element.value=="" || element.value.replace(/\s/g,"")=="")
+            {
+                element.value=elementvalue;
+                element.style.color="#999";
+            }
+        }
+        //得到焦点触发事件
+        function OnfocusFun1(element,elementvalue)
+        {
+            if(element.value==elementvalue)
+            {
+                element.value="";
+                element.type="password";
+                element.style.color="#343434";
+            }
+        }
+        //离开输入框触发事件
+        function OnBlurFun1(element,elementvalue)
+        {
+            if(element.value=="" || element.value.replace(/\s/g,"")=="")
+            {
+                element.value=elementvalue;
+                element.type="text";
+                element.style.color="#999";
+            }
+        }
+
+        var wait=6;
+        function time() {
+
+            if (wait <= 0) {
+                wait = 6;
+                $("#J_getCode_Cover").css("display","block");
+                //document.getElementById("J_getCode").removeAttribute("disabled");
+                $("#J_getCode").css("background-color","#0a8fc7");
+                document.getElementById("J_getCode").innerHTML="重新发送";
+                document.getElementById("J_getCode_Cover").innerHTML="重新发送";
+            } else {
+                $("#J_getCode_Cover").css("display","none");
+                //document.getElementById("J_getCode").setAttribute("disabled", true);
+                $("#J_getCode").css("background-color","#bfbfbf");
+                document.getElementById("J_getCode").innerHTML= wait + "S";
+                wait--;
+                setTimeout(function() {
+                            time()
+                        },
+                        1000)
+            }
+        }
+
+        //改变页码
+        $(".page-public>.num").click(function(){
+            $(this).addClass("active");
+            $(this).siblings().removeClass("active");
+        });
+        //支付记录查看
+        $(".title-acct>.l>.jilu").click(function(){
+            $(this).addClass("active");
+            $(this).siblings().removeClass("active");
+        });
+
+    </script>
+    <script type="text/javascript">
+
+        //窗口高度自适应
+        $(document).ready(function() {
+            var wh = $(window).height();
+            var dh = $(document).height();
+            if(wh == dh){
+                $("#content").css({"height": wh-804+374+"px"});
+            } else {
+            }
+        });
+        $(window).resize(function(){
+            var wh = $(window).height();
+            var dh = $(document).height();
+            if(wh == dh){
+                $("#content").css({"height": wh-804+374+"px"});
+            }
+        });
+    </script>
+{% endblock oncontentload %}

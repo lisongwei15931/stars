@@ -1,0 +1,42 @@
+{% extends "customer/account_base.html" %}
+{% load public_tags %}
+{% load staticfiles %}
+{% load compress %}
+
+
+{%  block title %}蓝图百货--农行解约--失败{%  endblock title %}
+
+{% block oncontentload %}
+    {{ block.super }}
+       <div class="account-cont-right account-cont-rightarea l">
+            <h4>
+                <span>解除签约</span>
+            </h4>
+            <div class="account-sign">
+                <div class="sign-type fix">
+                    <div class="sign-type-img l">
+                        <img src="{% static "images/sign-false.png" %}"/>
+                    </div>
+                    <div class="sign-type-txt sign-type-txt1 l">
+                        解约失败
+                    </div>
+                     <div class="sign-btn l">
+                        <input type="button" value="重新解约" onclick="window.history.go(-1);"/>
+{#                        <a href="{% url 'customer:finance-ab-sign_in_contract' %}" >重新签约</a>#}
+                    </div>
+                </div>
+                <div class="sign-matter fix">
+                    <div class="sign-matter-tit l">
+                        问题：
+                    </div>
+                    <div class="sign-matter-txt l">
+                        {% for ele in msgs %}
+                            <p>{{ forloop.counter }}、{{ ele }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--农行签约body end-->
+{% endblock oncontentload %}

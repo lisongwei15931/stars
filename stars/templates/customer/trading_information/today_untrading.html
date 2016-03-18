@@ -1,0 +1,364 @@
+{% extends "customer/account_base.html" %}
+{% load staticfiles %}
+{% load compress %}
+
+{% block title %}蓝图百货--{{page_title}}{% endblock title %}
+{% block custom_css %}
+<link rel="stylesheet" href="{% static "css/account2.css" %}" type="text/css">
+{% endblock %}
+{% block oncontentload %}
+    {{ block.super }}
+        <div class="account-cont-right l">
+            <div class="details">
+                <div class="title-acct title-acct2 fix">
+                    <span class="l">{{page_title}}</span>
+                </div>
+                <ul class="accTitle">
+                    <li style="width:180px;">关键字：<input type="text" class="keyWords" id="keyWords" placeholder="商品编号或名称"/></li>
+                    <li style="width:235px;">
+                        <p style="float:left; height:23px; line-height:23px;">成交方式：</p>
+                        <div id="barWrap">
+                            <input type="button" value="" class="bargin">
+                            <ul class="bargin_box">
+                                <li><input type="checkbox" class='commission_type_checkbox' {% if is_buy %}checked="checked"{% endif %} style="vertical-align:middle; margin-right:5px;" value="1"/>购买</li>
+                                <li><input type="checkbox" class='commission_type_checkbox' {% if is_deal %}checked="checked"{% endif %} style="vertical-align:middle; margin-right:5px"  value="2"/>进货</li>
+                                <li><input type="checkbox" class='commission_type_checkbox' {% if is_sale %}checked="checked"{% endif %} style="vertical-align:middle; margin-right:5px"  value="3"/>出售</li>
+                            </ul>
+                        </div>
+                        <input type="submit" onclick="javascript:trading_search();return false;" value="搜索" style="width:42px; height:23px; line-height:21px; text-align:center; background-color:#c00000; border:0; color:#fff; cursor:pointer; margin-left:5px;"/>    
+                        
+                    </li>
+                    <li style="width:200px;float:right">排序：&nbsp;<a href="#" {% if order == 'upc' %}onclick="javascript:change_sort('-upc');return false;" class="current down"{% elif order == '-upc' %}onclick="javascript:change_sort('upc');return false;" class="current up"{% else %}onclick="javascript:change_sort('upc');return false;" class="current 0"{% endif %} >商品代码</a>&nbsp;<a href="#" {% if order == 'commission_datetime' %}onclick="javascript:change_sort('-commission_datetime');return false;" class="current down"{% elif order == '-commission_datetime' %}onclick="javascript:change_sort('commission_datetime');return false;" class="current up"{% else %}onclick="javascript:change_sort('commission_datetime');return false;" class="current 0"{% endif %} >委托时间</a></li>
+                </ul>
+                <div style="text-align:right; color:#999; margin-bottom:10px;">每页20条&nbsp;共<span style="color:#c00000;">{{ commission_list.paginator.count }}</span>条信息</div>
+                <table class="myBox" cellpadding="0"  cellspacing="0">
+                    <tr style="background-color:#eee;">
+                        <th width="50"><input type="checkbox" class='check_all' id="selectAll" style=" vertical-align:middle; margin-right:3px;"/>选择</th>
+                        <th width="65">委托编号</th>
+                        <th width="70">委托日期</th>
+                        <th width="70">委托时间</th>
+                        <th width="50">商品代码</th>
+                        <th width="100">商品名称</th>
+                        <th width="60">成交方式</th>
+                        <th width="55">委托价格</th>
+                        <th width="70">委托数量</th>
+                        <th width="60">成交数量</th>
+                        <th width="60">预扣贷款</th>
+                        <th width="60">预扣手续费</th>
+                        <th width="60">状态</th>
+                        <th width="">操作</th>
+                    </tr>
+                    {% for commission in commission_list %}
+                    <tr>
+                        <td class="firstTd" style="text-align: center;"><input type="checkbox"{% if commission.c_type == '出售'%}class='commission_sale_checkbox'{% else %}class='commission_buy_checkbox'{% endif %}value='{{commission.id}}' style=" vertical-align:middle;"/></td>
+                        <td>{{ commission.commission_no }}</td>
+                        <td>{{ commission.commission_datetime|date:'Ymd' }}</td>
+                        <td>{{ commission.commission_datetime|date:'H:i:s' }}</td>
+                        <td>{{ commission.upc }}</td>
+                        <td>{{ commission.product_name }}</td>
+                        <td>{{ commission.c_type }}</td>
+                        <td>{{ commission.price|floatformat:2 }}</td>
+                        <td>{{ commission.quantity|default:"-"}}</td>
+                        <td>{{ commission.complete_quantity }}</td>
+                        <td>{{ commission.freezing_money|floatformat:2 }}</td>
+                        <td>{{ commission.freezing_fee|floatformat:2|default:"-" }}</td>
+                        <td>{{ commission.status|default:"-" }}</td>
+                        <td class="lastTd"><a class="cancel" href="javascript:single_cancel_confirm('{{commission.id}}','{{commission.type}}')">撤单</a></td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <td></td>
+                        <td>合计</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>{{complete_num}}</td>
+                        <td>{{freezing_money_num|floatformat:2}}</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </table>
+                <div class="selectAll2"><span class="firstSpan"><input type="checkbox" class='check_all' id="seAll" style="vertical-align:middle; margin-right:3px;"/>全选</span><a href="javascript:multiple_cancel_confirm()"><span>撤单</span></a></div>
+                <!--遮罩弹窗 star-->
+                <div id="fullbg"></div>
+                <div id="dialog" style="border:1px solid #EEE">
+                    <h1>提示</h1>
+                    <p>您确定要撤销此单吗？</p>
+                    <p><a href="javascript:single_cancel()" id="confirm">确认</a>&nbsp;&nbsp;<a href="javascript:void(0)" id="cancel-remove">取消</a></p>
+                </div>
+                <div id="dialog2" style="border:1px solid #EEE">
+                    <h1>提示</h1>
+                    <p>您确定要撤销这些单吗？</p>
+                    <p><a href="javascript:multiple_cancel()" id="confirm2">确认</a>&nbsp;&nbsp;<a href="javascript:void(0)" id="cancel-remove2">取消</a></p>
+                </div>
+                <!--遮罩弹窗 end-->
+                <!--翻页-->
+                <div class="page-public center" id="pageList">
+                    <a onclick="javascript:change_page(1);return false;" href="#" class="txt" id="first">首页</a>
+                    {% if commission_list.has_previous %}
+                    <a class="txt" onclick="javascript:change_page({{ commission_list.previous_page_number }});return false;" href="#" id="prev">上一页</a>
+                    {% else %}
+                    <a class="disable_txt">上一页</a>
+                    {% endif %}
+                    {% if commission_list.paginator.num_pages <= 8 %}
+	                    {% for page_number in commission_list.paginator.page_range %}
+		                    {% ifequal page_number  commission_list.number %}
+		                      <a class="num active" onclick="javascript:change_page({{ page_number }});return false;" href="#">{{ page_number }}</a>
+		                    {% else %}
+		                      <a class="num" onclick="javascript:change_page({{ page_number }});return false;" href="#">{{ page_number }}</a>
+		                    {% endifequal %}
+	                    {% endfor %}
+                    {% elif commission_list.paginator.num_pages > 8 %}
+                        {% if commission_list.number > 3 %}
+                            <a class="num" onclick="javascript:change_page(1);return false;" href="#">1</a>...
+                        {% endif %}
+	                    {% for page_number in commission_list.paginator.page_range %}
+		                    {% if commission_list.number|add:-3 < page_number and commission_list.number|add:+3 > page_number %}
+		                        {% ifequal page_number  commission_list.number %}
+			                      <a class="num active" onclick="javascript:change_page({{ page_number }});return false;" href="#">{{ page_number }}</a>
+			                    {% else %}
+			                      <a class="num" onclick="javascript:change_page({{ page_number }});return false;" href="#">{{ page_number }}</a>
+			                    {% endifequal %}
+		                    {% endif %}
+	                    {% endfor %}
+	                    {% if commission_list.number < commission_list.paginator.num_pages|add:-2 %}
+                           ... <a class="num" onclick="javascript:change_page({{ commission_list.paginator.num_pages }});return false;" href="#">{{ commission_list.paginator.num_pages }}</a>
+                        {% endif %}
+                    {% endif %}
+                    {% if commission_list.has_next %}
+                    <a class="txt" onclick="javascript:change_page({{ commission_list.next_page_number }});return false;" href="#" id="next">下一页</a>
+                    {% else %}
+                    <a class="disable_txt">下一页</a>
+                    {% endif %}
+                    <a class="txt" id="last" onclick="javascript:change_page('-1');return false;" href="#">尾页</a>共<span>{{ commission_list.paginator.num_pages }}</span>页
+                    到第<input type="text" id='page_num' value="{{ commission_list.number }}" style="vertical-align:top; *vertical-align:middle; height:30px; line-height:30px;"/>页
+                    <a class="txt" onclick="javascript:change_page();return false;" href="#">确认</a>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+
+
+{% block footer_extra_script %}
+    <script type="text/javascript">
+        //跳转页
+        function change_page(page){
+        	var url = window.location.href;
+            if(!page){
+                page = $('#page_num').val();
+            }
+            var new_url = changeURLArg(url,'page',page);
+            window.location.href = new_url;
+        }
+        //排序方法未完成
+        function change_order(order){
+        	var url = window.location.href;    
+            if (url.indexOf('?') > -1){
+              url += '&keyWords='+keyWords+'&starttime='+starttime+'&endtime='+endtime+'&type='+type
+            }else{
+              url += '?order=';
+            }
+        	window.location.href += "&order=34";
+        }
+        //改变排序
+        function change_sort(order){
+        	var url = window.location.href;
+        	var new_url = changeURLArg(url,'order',order);
+        	window.location.href = new_url;
+        }
+        //搜索
+        function trading_search(){
+        	var keyWords = $('#keyWords').val();
+        	var type = ''
+        	$("[type='checkbox'][class='commission_type_checkbox']:checked").each(function(){
+        		if($(this).val()==1){
+        			type += '&buy=1';
+        		}else if($(this).val()==2){
+        			type += '&deal=1';
+        		}else if($(this).val()==3){
+                    type += '&sale=1';
+                }
+        	})
+        	window.location.href = '?keyWords='+keyWords+type;
+        }
+        //单独撤单确认
+        function single_cancel_confirm(id,type){
+        	single_cancel_id = id;
+        	single_cancel_type = type;
+            $("#dialog").show();
+        }
+        //单独撤单
+        function single_cancel(){
+        	var cancel_list = [{"id":single_cancel_id,"type":single_cancel_type}];
+            cancel_list = JSON.stringify(cancel_list);
+            var data = {csrfmiddlewaretoken:'{{ csrf_token }}',cancel_list:cancel_list};
+            $.ajax({
+                cache: true,
+                type: "POST",
+                url:"{% url 'customer:cancel_commission' %}",
+                data:data,
+                error: function(e) {
+                	alert(e.responseText);
+                },
+                success: function(data) {
+                    window.location.reload()
+                }
+            });
+        }
+        //多个撤单确认
+        function multiple_cancel_confirm(){
+            $("#dialog2").show();
+        }
+        //多个撤单
+        function multiple_cancel(){
+        	var cancel_list = [];
+        	$("[type='checkbox'][class='commission_sale_checkbox']:checked").each(function(){
+	        	var cancel_commission = {"id":$(this).val(),"type":'sale'};
+	        	cancel_list.push(cancel_commission);
+        	})
+        	$("[type='checkbox'][class='commission_buy_checkbox']:checked").each(function(){
+        		var cancel_commission = {"id":$(this).val(),"type":'buy'};
+        		cancel_list.push(cancel_commission);
+            })
+            cancel_list = JSON.stringify(cancel_list);
+            var data = {csrfmiddlewaretoken:'{{ csrf_token }}',cancel_list:cancel_list};
+            $.ajax({
+                cache: true,
+                type: "POST",
+                url:"{% url 'customer:cancel_commission' %}",
+                data:data,
+                error: function(e) {
+                	alert(e.responseText);
+                },
+                success: function(data) {
+                    window.location.reload()
+                }
+            });
+        }
+        //撤单
+        function cancel_commission(id,type){
+        	console.log(id && type)
+        	if(id && type){
+        		var cancel_list = {"id":id,"type":type};
+        		cancel_list = JSON.stringify(cancel_list);
+        		var data = {csrfmiddlewaretoken:'{{ csrf_token }}',cancel_list:cancel_list};
+        		$.ajax({
+                    cache: true,
+                    type: "POST",
+                    url:"{% url 'customer:cancel_commission' %}",
+                    data:data,// 你的formid
+                    error: function(request) {
+                        alert("撤单失败");
+                    },
+                    success: function(data) {
+                    	window.location.reload()
+                    }
+                });
+        	}
+        }
+        $(function(){
+        	update_checkbox();
+        	var single_cancel_id = '';
+        	var single_cancel_type = '';
+        	$(".bargin").click(function(){
+                $(".bargin_box").show();
+            });
+            //排序
+            $(".accTitle li a").click(function(){
+                $(this).addClass("current").siblings().removeClass("current");
+            });
+            //全选
+            $(".check_all").click(function(){
+                if($(this).prop("checked")){//如果选中
+	                $(".myBox tr td input").prop("checked",true)
+	                $(".check_all").prop("checked",true)
+                }else{// 如果取消
+	                $(".myBox tr td input").prop("checked",false)
+	                $(".check_all").prop("checked",false)
+                }
+            });
+            //选中改变值，将选中的值添加给button按钮进行显示
+            $(".bargin_box input").click(function(){
+            	update_checkbox();
+            });
+            //显示灰色 jQuery 遮罩层
+            //$(".cancel").click(function(){
+            //    $("#fullbg").height($("body").height());
+            //    $("#fullbg").width($("body").width);
+             //   $("#fullbg").show();
+            //    $("#dialog").show();
+            //}); 
+            
+            $("#confirm,#cancel-remove").click(function(){
+                $("#fullbg").hide();
+                $("#dialog").hide();
+            });
+            $("#confirm2,#cancel-remove2").click(function(){
+                $("#fullbg").hide();
+                $("#dialog2").hide();
+            });
+            
+            document.onclick = function (event)  
+            {     
+                var e = event || window.event;  
+                var elem = e.srcElement||e.target;  
+                      
+                while(elem)  
+                {   
+                    if(elem.id == "barWrap")  
+                    {  
+                            return;  
+                    }  
+                    elem = elem.parentNode;       
+                }  
+                //隐藏div的方法  
+                $(".bargin_box").hide(); 
+            } 
+        })
+        function update_checkbox(){
+        	var val="";//用于记录选中的值
+            var isAll=true;//默认是全选中
+            $(".bargin_box li input").each(function(){//便利每一个checkbox
+                if($(this).prop("checked")){
+                    val=val+$(this).parent("li").text()+",";//拼接所有的值
+                }else{
+                    isAll=false;//如果有任何一个checkbox没有选中，那么就不是全部
+                }
+                });
+                if(val.length>0) val=val.substring(0,val.length-1);//如果有选择的值，去掉最后一个逗号
+                if(isAll){
+                    $(".bargin").val("全部");
+                    }else{
+                        $(".bargin").val(val);}
+        }
+        /*
+        * url 目标url
+        * arg 需要替换的参数名称
+        * arg_val 替换后的参数的值
+        * return url 参数替换后的url
+        */
+        function changeURLArg(url,arg,arg_val){
+            var pattern=arg+'=([^&]*)';
+            console.log(pattern);
+            var replaceText=arg+'='+arg_val;
+            if(url.match(pattern)){
+                var tmp='/('+ arg+'=)([^&]*)/gi';
+                tmp=url.replace(eval(tmp),replaceText);
+                return tmp;
+            }else{
+                if(url.match('[\?]')){
+                    return url+'&'+replaceText;
+                }else{
+                    return url+'?'+replaceText;
+                }
+            }
+            return url+'\n'+arg+'\n'+arg_val;
+        }
+    </script>
+{% endblock %}

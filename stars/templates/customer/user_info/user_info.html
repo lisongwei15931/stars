@@ -1,0 +1,296 @@
+{% extends "customer/account_base.html" %}
+{% load staticfiles %}
+{% load compress %}
+
+{%  block title %}蓝图百货-个人信息{%  endblock title %}
+
+{% block oncontentload %}
+    {{ block.super }}
+          <div class="account-cont-right l fix">
+            <div class="personal-info fix">
+                <div class="fix" style=" border-bottom:1px solid #eee; padding-bottom:20px;">
+                    <a class="avata center l">
+                        <img src="{% static "images/avatarbg.png" %}" class="avata-img"/>
+                        <img src="{% static "images/banner-01.jpg" %}"/>
+                    </a>
+                    <div class="txt l">
+                        <p>账户：{{ user.username }}
+                             {% if user.is_verified %}
+                                <a class="certified"><img src="{% static "images/certified.png" %}"/></a>
+                            {% else %}
+                                <a class="uncertified"><img src="{% static "images/uncertified.png" %}"/></a>
+                            {% endif %}
+                        </p>
+                        <P class="fund">
+                            <span>ID：{{user.userprofile.uid}}</span>
+                        </P>
+                    </div>
+                </div>
+                <form class="personal-list" action="{% url 'customer:user_info' %}" method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="row-left l right">
+{#                            <span class="color-red">*</span>#}
+                            昵称：
+                        </div>
+                        <div class="row-right l">
+                            <input type="text" name='nickname' value="{{ user_info.nickname | default:'' }}" onfocus="OnfocusFun(this,'')" onblur="OnBlurFun(this,'')"/>
+{#                            <div class="marked-words" style="position: relative;top: 8px;left: 0;">#}
+{#                                不能为空不能为空不能为空不能为空不能为空不能为空#}
+{#                            </div>#}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="row-left l right">
+{#                            <span class="color-red">*</span>#}
+                            性别：
+                        </div>
+                        <div class="row-right l" style="height: 30px;line-height: 30px;position: relative;top: 0px;">
+                            <labe style="margin-right: 22px;margin-left: 10px;">
+                            {% if user_info.sex == 1 %}
+                                <input type="radio" name="sex" value="male"  checked/>
+                            {% else %}
+                                <input type="radio" name="sex" value="male" />
+                            {% endif %}
+                                男
+                            </labe>
+                            <labe style="margin-right: 22px;">
+                                {% if user_info.sex == 2 %}
+                                    <input type="radio" name="sex" value="female"  checked/>
+                                {% else %}
+                                    <input type="radio" name="sex" value="female" />
+                                {% endif %}
+                                女
+{#                                <input type="radio" name="sex" value="female" {% if user_info.sex == 3 %} checked{% endif %}/>女#}
+                            </labe>
+                            <labe style="margin-right: 22px;">
+                                {% if user_info.sex != 1 and user_info.sex != 2 %}
+                                    <input type="radio" name="sex" value="hid"  checked/>
+                                {% else %}
+                                    <input type="radio" name="sex" value="hid" />
+                                {% endif %}
+                            保密
+{#                                <input type="radio" name="sex" value="hid"  {% if user_info.sex != 2 and user_info.sex != 3 %} checked{% endif %}checked/>保密#}
+                            </labe>
+{#                            <div class="marked-words" style="position: relative;top: -20px;left: 10px;">#}
+{#                                不能为空不能为空不能为空不能为空不能为空不能为空#}
+{#                            </div>#}
+                        </div>
+                    </div>
+                    <div class="row">
+{#                        <div class="row-left l right">#}
+{#                            生日：#}
+{#                        </div>#}
+                        <div class="row-left l right">
+                                生日：
+                        </div>
+                        <div class="row-right l" style="position: relative;">
+                                <input type="text" id="birthday" name="birthday" class="time" {% if user_info.birthday  %}value={{ user_info.birthday }}{% endif %} onClick="WdatePicker()"/>
+                        </div>
+                    </div>
+                    <div class="row row1">
+                        <div class="row-left l right">
+                            兴趣爱好：
+                        </div>
+                        <div class="row-right l">
+                            <textarea name="interest"
+                                      style="width:350px;height:80px;color: #333;font-size: 14px;outline: none; border:1px solid #DEDEDE;"
+                                      cols="10" rows="5">{{ user_info.interest | default:''}}</textarea>
+{#                            <div class="marked-words" style="position: relative;top: 8px;left: 0;">#}
+{#                                不能为空不能为空不能为空不能为空不能为空不能为空#}
+{#                            </div>#}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="row-left l right">
+{#                            <span class="color-red">*</span>#}
+                            真实姓名：
+                        </div>
+                        <div class="row-right l" style="position: relative;top: 0px;">
+                            {% if user_info.real_name %}
+                                <span style="position: relative;top: 10px;">{{ user_info.real_name }}</span>
+                            {% else %}
+                                <input type="text" name='real_name' readonly="readonly"  />
+                            {% endif %}
+{#                            <div class="marked-words" style="position: relative;top: 8px;left: 0;">#}
+{#                                不能为空不能为空不能为空不能为空不能为空不能为空#}
+{#                            </div>#}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="row-left l right">
+                            手机：
+                        </div>
+                        <div class="row-right l" >
+                            <span style="position: relative;top: 10px;">{{ user_info.mobile_phone }}</span>
+{#                            <a style="color: #0088cc;margin-left: 15px;">修改</a>#}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="row-left l right">
+                            邮箱：
+                        </div>
+                        <div class="row-right l">
+                            <div class="row-right l" >
+
+                                {% if user_info.email %}
+{#                                    <span style="margin-left: -10px;">{{ user_info.email }}</span>#}
+                                     <span style="position: relative;top: 10px; margin-left: -10px;">{{ user_info.email }}</span>
+                                {% else %}
+                                    <span style="margin-left: -10px; height:32px; line-height:32px;"><input type="text" value="" readonly="readonly"/></span>
+{#                                    <input type="text" readonly="readonly"  />#}
+                                {% endif %}
+{#                                <a style="color: #0088cc;margin-left: 15px;">修改</a>#}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="row-left l right">
+                            所在地：
+{#                            {{ user_info.province_id }}-{{ user_info.city_id }}--{{ user_info.district_id }}#}
+                        </div>
+                        <div class="row-right l">
+                            <select style="margin-right: 20px;" id="id_province" name="province_id" >
+                                {% if not user_info.province_id %}
+                                <option></option>
+                                {% endif %}
+                                {% for p in region.provinces %}
+                                    <option value="{{ p.id }}" {% if user_info.province_id and p.id == user_info.province_id %}selected = "selected" {% endif %}>
+                                        {{ p.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <select style="margin-right: 20px;" id="id_city" name="city_id" >
+                                <option></option>
+                                {% for c in region.cities %}
+                                    <option value="{{ c.id }}" {% if user_info.city_id and c.id == user_info.city_id %}selected = "selected" {% endif %}>
+                                        {{ c.name }}
+                                    </option>
+                                {% endfor %}
+
+                            </select>
+                            <select style="margin-right: 20px;" id="id_district" name="district_id">
+                                <option></option>
+                                {% for d in region.districts %}
+                                    {% if forloop.first %}
+                                        <option value="{{ user_info.region }}" selected = "selected" >
+                                            {{  user_info.region }}{{  user_info.region }}
+                                        </option>
+                                    {% endif %}
+                                    <option value="{{ d.id }}" {% if user_info.district_id and d.id == user_info.district_id %}selected = "selected" {% endif %}>
+                                       {{ d.name }}
+                                    </option>
+                                {% endfor %}
+
+                            </select>
+                            <div class="marked-words" style="position: relative;top: 8px;left: 0;">
+                                {% if region_err_msg %}
+                                        {{ region_err_msg }}
+                                {% endif %}
+                            </div>
+                            <input type="text" name="address" value="{{ user_info.address }}" onfocus="OnfocusFun(this,'')" onblur="OnBlurFun(this,'')"
+                                   style="width: 330px;margin-top: 20px;"/>
+
+                            <div class="refer center" style="margin-top: 30px;margin-left: -300px;">
+                                <input type="submit" value="提交" style="color: #333;font-size: 14px;"/>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    <!--账户资产body end-->
+
+    <script type="text/javascript">
+
+        window.onload = function(){
+            $(".footer-menu").find("li").eq(-1).children("span").css("display","none");
+        };
+
+        //得到焦点触发事件
+        function OnfocusFun(element,elementvalue)
+        {
+            if(element.value==elementvalue)
+            {
+                element.value="";
+                element.style.color="#343434";
+            }
+        }
+        //离开输入框触发事件
+        function OnBlurFun(element,elementvalue)
+        {
+            if(element.value=="" || element.value.replace(/\s/g,"")=="")
+            {
+                element.value=elementvalue;
+                element.style.color="#999";
+            }
+        }
+    $('#id_province').change(function () {
+            var province_id = $('#id_province').val();
+            $.ajax({
+                type: "GET",
+                data: {'province_id': province_id},
+                url: "{% url 'customer:get_location' %}",
+                success: function (data) {
+                    // city
+                    $('#id_city option[selected]').html('');
+
+                    var city_options = $('#id_city option');
+                    var id_city = $('#id_city')
+                    var citys = data.citys;
+
+                    city_options.remove();
+                    id_city.append('<option value=""></option>');
+                    for (var i = 0; i < citys.length; i++) {
+                        var current_city = citys[i];
+{#                        if (i == 0) {#}
+{#                            id_city.append('<option selected="selected" value=' + current_city.id + '>' + current_city.name + '</option>');#}
+{#                        }#}
+                        id_city.append('<option value=' + current_city.id + '>' + current_city.name + '</option>');
+                    }
+                    // district
+                    $('#id_city option[selected]').html('');
+
+                    var district_options = $('#id_district option');
+                    var id_district = $('#id_district')
+                    var districts = data.districts;
+
+                    district_options.remove();
+                    id_district.append('<option value=""></option>');
+                    for (var i = 0; i < districts.length; i++) {
+                        var current_district = districts[i];
+                        id_district.append('<option value=' + current_district.id + '>' + current_district.name + '</option>');
+                    }
+                    $('#id_city').change();
+                }
+            })
+        });
+        $('#id_city').change(function () {
+            var city_id = $('#id_city').val();
+            $.ajax({
+                type: "GET",
+                data: {'city_id': city_id},
+                url: "{% url 'customer:get_location' %}",
+                success: function (data) {
+                    $('#id_city option[selected]').html('');
+
+                    var district_options = $('#id_district option');
+                    var id_district = $('#id_district')
+                    var districts = data.districts;
+
+                    district_options.remove();
+                    id_district.append('<option value=""></option>');
+                    for (var i = 0; i < districts.length; i++) {
+                        var current_district = districts[i];
+                        id_district.append('<option value=' + current_district.id + '>' + current_district.name + '</option>');
+                    }
+                }
+            })
+        });
+
+
+
+    </script>
+{% endblock %}

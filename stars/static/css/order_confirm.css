@@ -1,0 +1,371 @@
+@charset "utf-8";
+/* CSS Document */
+.container .firmOrder{padding-left:27px;}
+.firmMain{width:1200px; overflow:hidden; margin:20px auto 0; font-family:"宋体"; color:#666;}
+.firmMain h2{font-size:14px;}
+.firmCont{margin-top:10px; border:1px solid #eee; margin-bottom:60px;}
+.firmCont .content{width:1130px; margin:0 auto 60px;}
+/*订单确认 货运*/
+.row{border-bottom:1px solid #dedede;}
+.row .row-tit{
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 35px;
+    padding-top: 35px;
+}
+.row-tit .l{font-weight:bold;}
+.row-tit a.row-tit-r{
+    font-size: 12px;
+    color: #0088cc;
+}
+.row-tit a.row-tit-r:hover{
+    color: #c00000;
+    text-decoration: underline;
+}
+.row .row-con-body{
+    margin-top: 10px;
+    padding-bottom: 30px;
+    color: #666;
+}
+.row-content .row-name-addr{
+	width:135px;
+    
+   /* padding: 8px 0 8px 24px;*/
+    margin-right: 20px;
+    position: relative;
+    top: -8px;
+    cursor: pointer;
+}
+.row-content .row-name-addr span{width:105px;display:block; padding:8px 0px; text-align:center; border: #dedede solid 1px;}
+.row-content div.active{
+    background: url("../images/true.png") right center no-repeat;
+}
+.row-content div.active span{border: #c00 solid 1px;}
+.row-content .row-name-addr .true{
+    display: inline-block;
+    padding: 8px;
+    background-color: #c00000;
+    position: relative;
+    left: 15px;
+}
+.row-content .row-addr a{
+    color: #0088cc;
+    margin-left: 15px;
+}
+.row-content .row-addr1{
+    margin-right: 20px;
+}
+.row-content .row-addr1 a{
+    color: #333;
+}
+.row-content .row-addr a:hover,.ziti-infor p a.revise:hover{
+    color: #c00000;
+    text-decoration: underline;
+}
+
+
+.row-con-body .row-content1{
+    width: 33.3333%;
+    padding: 55px 0 70px;
+    margin: 0 auto;
+    font-size: 14px;
+}
+.row-content1 p{
+    padding-bottom: 15px;
+    font-size: 14px;
+}
+.row-content1 p span{
+    margin-right: 30px;
+}
+.row-content1 p .bghui{
+    margin-left: 25px;
+    color: #666;
+    background: #f4f4f4;
+    padding: 10px 20px;
+    border: #e2e2e2 solid 1px;
+    border-radius: 3px;
+}
+.row-content1 p .bgred{
+    margin-left: 50px;
+    margin-top: 80px;
+    color: #fff;
+    background: #c00000;
+    padding: 15px 0;
+    width: 120px;
+    border: #e2e2e2 solid 1px;
+    border-radius: 3px;
+}
+.row-content1 p .shopcar-view{
+    margin-left: 0;
+    margin-right: -40px;
+    background: #f4f4f4;
+    color: #666;
+}
+.row-content1 .order-form>span>img{
+    position: relative;
+    top: 10px;
+    left: 30px;
+}
+.row-addr .row-addr-infor,.row-addr .row-addr-a{
+    display: inline-block;
+}
+.row-addr .row-addr-infor span{
+    margin-right: 15px;
+}
+.row-con-body .row-moreaddr{
+    display: inline-block;
+    background: url("../images/addr-more.jpg") right center no-repeat;
+    padding-right: 12px;
+    cursor: pointer;
+}
+.row-con-body .row-moreaddr1{
+    margin-top: 10px;
+}
+.row-con-body .blue{ color:#08c; padding:0 5px; cursor:pointer;}
+.shopcar-balance-conbody .row{
+    border-bottom: #dedede solid 1px;
+}
+
+/*遮罩样式*/
+.shopcar-pupzz{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=60);
+    filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=60);
+    opacity: .4;
+    z-index: 998;
+}
+.shopcar-pupbody{
+    position:absolute;
+    height: 500px;
+    width: 720px;
+    top: 15%;
+    left: 50%;
+	/*margin-top:-215px;*/
+    margin-left: -337px;
+    background-color: #fff;
+    z-index: 999;
+	display:none;
+}
+.shopcar-pupbody .pupbody-top{
+    height: 48px;
+    background-color: #eee;
+}
+.shopcar-pupbody .pupbody-top .pupbody-title{
+    padding-left: 20px;
+    font-size: 14px;
+	font-weight:bold;
+    color: #000;
+    line-height: 48px;
+}
+.shopcar-pupbody .pupbody-top .pupbody-closebtn{
+    padding: 10px;
+    font-size: 24px;
+    cursor: pointer;
+}
+.shopcar-pupbody .pupbody-content{
+    height: 582px;
+    padding: 15px 30px;
+    line-height: 160%;
+    font-size: 14px;
+    color: #666;
+    overflow-y: auto;
+}
+.shopcar-pupbody .pupbody-content1{
+    height: 350px;
+    padding: 35px 0px 0 30px;
+}
+.shopcar-pupbody .pupbody-content p{
+    margin-bottom: 20px;
+}
+.shopcar-pupbody .pupbody-btn a.shopcar-btn{
+    display: inline-block;
+    margin-bottom: 30px;
+    padding: 12px 25px;
+    color: #333;
+	font-weight:bold;
+    font-size: 14px;
+    background-color: #f5f5f5;
+    border: 1px solid #e2e2e2;
+    border-radius: 3px;
+}
+.shopcar-pupbody .pupbody-btn-no a.shopcar-btn{
+    display: inline-block;
+    margin-bottom: 30px;
+    padding: 12px 25px;
+    color: #333;
+    font-weight:bold;
+    font-size: 14px;
+    background-color: #f5f5f5;
+    border: 1px solid #e2e2e2;
+    border-radius: 3px;
+}
+.shopcar-pupbody .pupbody-btn a.delete{
+    margin-left: 30px;
+    padding: 0;
+    color: #666;
+    font-size: 14px;
+}
+.shopcar-pupbody .pupbody-btn-no a.delete{
+    margin-left: 30px;
+    padding: 0;
+    color: #666;
+    font-size: 14px;
+}
+.input-group{
+    position: relative;
+    z-index: 5;
+    display: block;
+    color: #666;
+    font-weight: 500;
+    font-size: 16px;
+    padding: 5px 0;
+    height: 41px;
+}
+.input-group .input-group-left{
+    width: 120px;
+    line-height: 30px;
+}
+
+.input-group .input-group-right input{
+    width: 218px;
+    height: 20px;
+    padding: 5px 0 5px 6px;
+    border: 1px solid #dedede;
+    *float: left;
+    *line-height: 38px;
+    *height: 38px;
+    *padding: 0 0 0 6px;
+    *margin-right: 5px;
+}
+.input-group .input-group-right .input-short{
+    width: 149px;
+}
+.input-group .input-group-right .input-long{
+    width: 380px;
+}
+.input-group .input-group-right .color-red{
+    display: inline-block;
+    margin-left: 2px;
+}
+.input-group select.input-group-select{
+    padding: 5px 0;
+    outline-color: #dedede;
+    margin-right: 15px;
+	border:1px solid #dedede;
+}
+.input-group select.input-group-select:hover{
+    outline: none;
+}
+.input-group select.input-group-right option{
+    padding: 10px 0 10px 6px;
+
+}
+.quasi{
+    margin-left: 120px;
+}
+/*商品确认弹框*/
+.firmGoods{padding:25px; font-size:14px; height:190px;}
+.firmGoods p{line-height:30px;}
+.firmGoods p.carefull{ text-indent:2em;}
+.firmGoods p span.red{ color:#f00; font-weight:bold; padding:0 5px;}
+.shopcar-pupbody .pupbody-btn a#care{color:#c00;}
+.shopcar-pupbody .pupbody-btn-no a#care{color:#c00;}
+/*重选自提点*/
+#ziti{height:700px;width:1120px; margin-left:-560px; top:8%;}
+
+/*重新选择自提点弹框*/
+.checkKf{width:1140px; overflow:hidden;}
+.checkKfleft{width:545px; overflow:hidden; padding-top:30px; font-size:14px; float:left;}
+.checkKfleft table td{font-size:14px; padding-bottom:25px;}
+.checkKfleft table .firstTd{width:140px; text-align:right;}
+.checkKfleft table select{width:100px; padding:5px 0;}
+ul.addr{min-height:360px; max-height:470px; box-shadow:0 0 1px 1px #eee;}
+ul.addr li{width:360px;overflow:hidden; margin-bottom:15px;}
+ul.addr li .addrList{width:358px; height:82px; border:1px solid #eee; margin-bottom:5px; cursor:pointer;}
+ul.addr li h2{height:28px; line-height:28px; background-color:#eee; font-size:14px; padding-left:8px;}
+ul.addr li h2 span{color:#fff; background-color:#c00000; display:inline-block;padding:1px 4px; height:15px; text-align:center; line-height:15px;}
+ul.addr li.curr .addrList{width:356px; height:80px; border:2px solid #c00000;}
+ul.addr li.curr .default{display:block;}
+.addr-detail{padding:2px 5px;}
+.addr-detail p{color:#999; font-family:"宋体"; font-size:12px; line-height:16px;}
+p.more-addr{color:#0088cc; font-size:12px; padding-left:15px; background:url(../images/addr-more.jpg) no-repeat 45px center; cursor:pointer;}
+.btn-keep{margin:20px 0 0px 80px;}
+.btn-keep input{width:148px; height:38px; line-height:30px; text-align:center; font-size:14px; color:#333; font-weight:bold; background-color:#f3f3f3; border:1px solid #e2e2e2; border-radius:3px; margin-right:20px; cursor:pointer;}
+.btn-keep #cancel{color:#0088cc;}
+.checkKfright{float:left; margin:80px 0 0 20px;}
+.default{font-size:12px; color:#999; padding-left:10px; display:none;}
+.default input{ vertical-align:middle; margin-right:5px;}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*选择货运还是自提*/
+ul.checkStyle{height:50px; margin-top:38px;}
+ul.checkStyle li.current{
+    border: #dedede solid 1px;
+    padding: 8px 23px;
+    margin-right: 10px;
+    position: relative;
+    cursor: pointer;
+}
+ul.checkStyle li.active{
+    border: #c00000 solid 1px;
+    padding-right: 51px;
+    background: url("../images/true.png") right center no-repeat;
+}
+ul.checkStyle li.care{padding: 8px 0px; color:#999;}
+/*自提点*/
+.ziti{ overflow:hidden;  margin:10px 0 30px;}
+.ziti .content2{border:1px solid #eee;width:480px;height:160px;}
+.ziti h2{height:36px; line-height:36px; background-color:#eee;position:relative; padding-left:15px; color:#333;}
+.ziti h2 span{display:block; position:absolute; top:0; right:10px; color:#08c; font-size:12px; font-weight:normal; cursor:pointer;}
+.firstGray{width:85px; height:24px; text-align:right; vertical-align:middle; color:#999;}
+p.onMap{color:#0088cc; padding:0 5px; float:right; cursor:pointer; position:relative; top:-17px; right:10px;}
+.ziti-btn{width:140px; height:40px; text-align:center; line-height:40px;font-size:14px;font-weight: bold; color:#333; background-color:#f4f4f4; border:1px solid #eee; cursor:pointer;}
+
+/*订单内容*/
+.orderCont{background-color:#f2f2f2; overflow:hidden; margin-bottom:20px;}
+.order{padding:10px 25px; margin-top:15px;}
+.order h2{ font-size:16px; margin-bottom:25px;}
+ul.goods{overflow:hidden; margin-bottom:16px;}
+ul.goods li{float:left; margin-right:15px;}
+ul.goods li a{font-size:14px; }
+ul.goods li.firstOne{width:100px; height:100px;}
+ul.goods li.firstTwo{max-width:320px;line-height:2em; margin-right:45px;font-size:14px;}
+
+ul.goods li.firstThree{font-size:14px;line-height:2em; overflow:hidden;margin-right:25px; }
+ul.goods span.red{color:#c00000;font-weight:bold;}
+.orderCont .total{height:50px; line-height:50px; border-top:1px solid #fff; font-family:"微软雅黑"; font-weight:bold; color:#333;text-align:right; padding-right:25px; font-size:14px;}
+.total span.red{color:#f00;}
+/*提交*/
+.firmTotal{border-top:5px solid #eee; overflow:hidden; padding:25px 70px;}
+.firmTotal p{text-align:right; line-height:30px;font-family:"微软雅黑"; font-size:14px;}
+.firmTotal p span.red{color:#f00; font-weight:bold;}
+.firmTotal p input{color:#fff; background-color:#c00; border-radius:3px; border:0; padding:13px 29px;font-size:14px;font-weight:bold; cursor:pointer; margin-left:10px; }
+.firmTotal p.sub{font-size:16px;font-family:"宋体"; margin-top:10px;}
+.firmTotal p.sub span.red{font-size:20px;font-family:"微软雅黑";}
+
+
+
+
+
+
+
+
+

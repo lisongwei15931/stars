@@ -1,0 +1,372 @@
+@charset "utf-8";
+
+.register-form{
+    width: 900px;
+    margin: 35px auto 0;
+}
+.register-form1{
+    width: 900px;
+    margin: 35px 0 0 320px;
+}
+
+.register-body{
+    height: 720px;
+}
+.register-body-top{
+    height: 50px;
+    width: 900px;
+    margin: 95px auto 0;
+}
+.register-body-top .box{
+    position: relative;
+    width: 33.333%;
+    z-index: 1;
+}
+.register-body-top .box .line{
+    margin-top: 10px;
+    *margin-top: 0;
+    display: inline-block;
+    width: 100%;
+    border-bottom: 3px solid #dedede;
+}
+.register-body-top .box .line-yellow{
+    border-bottom: 3px solid #ffc000;
+}
+.register-body-top .img{
+    position: absolute;
+    top: 0;
+    left: 50%;
+    margin-left: -13px;
+    width: 25px;
+    height: 25px;
+    z-index: 3;
+}
+.register-body-top .txt{
+    display: inline-block;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #999;
+    line-height: 100%;
+}
+.input-group{
+    position: relative;
+    z-index: 5;
+    display: block;
+    color: #666;
+    font-weight: 500;
+    font-size: 16px;
+    padding: 15px 0;
+    height: 41px;
+    /*overflow: hidden;*/
+}
+.input-group>input[type="file"]{
+    position: absolute;
+    top: 0;
+    left: 180px;
+    font-size: 100px;
+    width: 350px;
+    overflow: hidden;
+    opacity: 0;
+    -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
+    filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
+    z-index: 6;
+}
+.input-group1 .img img{
+    position: relative;
+    top: 10px;
+    left: 8px;
+}
+.input-group1 .img span{
+    position: relative;
+    top: 6px;
+    left: 8px;
+}
+.input-group .input-group-left{
+    width: 180px;
+    line-height: 40px;
+}
+.input-group .input-group-left .color-red{
+    position: relative;
+    top: 2px;
+    color: #c00000;
+}
+.input-group .input-group-right input{
+    width: 279px;
+    height: 18px;
+    padding: 10px 0 10px 6px;
+    border: 1px solid #dedede;
+    color: #999;
+    *float: left;
+    *line-height: 38px;
+    *height: 38px;
+    *padding: 0 0 0 6px;
+    *margin-right: 5px;
+}
+.input-group .input-group-right input:focus{
+    border: 1px solid #89d67d;
+}
+.input-group .input-group-right .error{
+    border: 1px solid #c00000;
+}
+.input-group .input-group-right .input-short{
+    width: 149px;
+}
+.input-group .input-group-right .img{
+    display: inline-block;
+    height: 40px;
+    line-height: 40px;
+}
+.input-group .input-group-right .img img{
+    position: relative;
+    top: 4px;
+    height: 18px;
+    width: 18px;
+    margin-left: 2px;
+}
+.input-group .input-group-right .color-red{
+    display: inline-block;
+    margin-left: 2px;
+}
+
+.get-code{
+    display: inline-block;
+    position: relative;
+    z-index: 10;
+}
+.send{
+    width: 106px;
+    margin-left: 5px;
+    border: none;
+    background-color: #eee;
+    color: #333;
+    height: 40px;
+    line-height: 40px;
+    border-radius: 3px;
+    position:relative;
+    top:2px;
+    z-index: 11;
+    display: inline-block;
+    text-align: center;
+}
+.send:hover{
+    background-color: #c00000;
+    color: #fff;
+}
+.send-cover{
+    position: absolute;
+    top: 2px;
+    right: 0;
+    cursor: pointer;
+    text-align: center;
+}
+
+.register-form .input-group .add-File{
+    display: inline-block;
+    margin-left: 5px;
+    line-height: 40px;
+    color: #000;
+    cursor: pointer;
+    font-size: 14px;
+}
+.register-form .user-agreement{
+    margin-top: 15px;
+    padding-left: 178px;
+    color: #999;
+    font-size: 12px;
+}
+.register-form .user-agreement input[type="checkbox"]{
+    position: relative;
+    top: 3px;
+}
+.register-form .user-agreement a{
+    color: #0000ff;
+    cursor: pointer;
+}
+.register-form .notice{
+    color: #999;
+    margin-left: 180px;
+}
+.register-form .notice p{
+    margin-bottom: 10px;
+    margin-top: 20px;
+}
+.register-form .register-btn{
+    margin-top: 35px;
+    padding-left: 185px;
+}
+.register-form .register-btn input{
+    padding: 14px 48px;
+    color: #fff;
+    font-size: 14px;
+    background-color: #c00000;
+    border-radius: 3px;
+    border: none;
+    cursor: pointer;
+}
+.register-form .register-btn a{
+    margin-left: 24px;
+    color: #000;
+    font-size: 16px;
+}
+.register-form .register-btn1 input{
+    padding: 14px 48px;
+    color: #333;
+    border: #dedede solid 1px;
+    font-size: 14px;
+    background-color: #f4f4f4;
+    border-radius: 3px;
+    cursor: pointer;
+}
+.register-form .register-btn1 a{
+    margin-left: 24px;
+    color: #0088cc;
+    font-size: 12px;
+}
+.register-body-content{
+    width: 430px;
+    margin: 110px auto 0;
+    color: #666;
+    font-size: 14px;
+}
+.register-body-content .finish-txt2{
+    font-size: 16px;
+    color: #666;
+}
+.register-body-content .finish-txt2 img{
+    position: relative;
+    top: 9px;
+    right: 10px;
+}
+.register-body-content .finish-txt{
+    padding-top: 10px;
+}
+.register-body-content .finish-txt p{
+    margin-bottom: 20px;
+}
+.register-body-content .finish-txt .finish-txt1{
+    margin-top: 40px;
+}
+.register-body-content .finish-txt .finish-txt1 a{
+    color: #0066ff;
+    position: relative;
+    left: 10px;
+}
+.register-body-content .finish-txt .finish-txt1 a:hover{
+    color: #c00000;
+    text-decoration: underline;
+}
+/*用户注册协议*/
+.user-agreement a:hover{
+    text-decoration: underline;
+}
+.user-agreement-pupzz{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=60);
+        filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=60);
+    opacity: .6;
+    z-index: 998;
+}
+.user-agreement-pupbody{
+    position: absolute;
+    height: 720px;
+    width: 960px;
+    top: 15%;
+    left: 50%;
+    margin-left: -480px;
+    background-color: #fff;
+    z-index: 999;
+}
+.user-agreement-pupbody .pupbody-top{
+    height: 48px;
+    background-color: #eee;
+}
+.user-agreement-pupbody .pupbody-top .pupbody-title{
+    padding-left: 20px;
+    font-size: 14px;
+    color: #000;
+    line-height: 48px;
+}
+.user-agreement-pupbody .pupbody-top .pupbody-closebtn{
+    padding: 10px;
+    font-size: 24px;
+    cursor: pointer;
+}
+.user-agreement-pupbody .pupbody-content{
+    height: 582px;
+    padding: 15px 30px;
+    line-height: 160%;
+    font-size: 14px;
+    color: #666;
+    overflow-y: auto;
+}
+.user-agreement-pupbody .pupbody-content p{
+    margin-bottom: 20px;
+}
+.user-agreement-pupbody .pupbody-btn{
+    height: 90px;
+}
+.user-agreement-pupbody .pupbody-btn a{
+    display: inline-block;
+    margin-top: 15px;
+    padding: 10px 30px;
+    color: #c00000;
+    background-color: #f5f5f5;
+    border: 1px solid #e2e2e2;
+    border-radius: 3px;
+}
+/*找回密码*/
+.notice1{
+    margin-left: 180px;
+    font-size: 12px;
+    color: #666;
+}
+.notice1 img{
+    position: relative;
+    top: 2px;
+}
+.notice2{
+    color: #c00000;
+}
+.notice3{
+    position: relative;
+    top: 5px;
+    left: -288px;
+}
+.notice-word{
+    position: relative;
+    left: 2px;
+    top: -45px;
+}
+.notice-word img{
+    position: relative;
+    top: 2px;
+}
+.notice-word1{
+    margin-left: 468px;
+}
+.Retrieve-username{
+    margin-left: 160px;
+    margin-bottom: 40px;
+    color: #666;
+    font-size: 16px;
+}
+.Retrieve-username span{
+    color: #ff0000;
+    margin-left: 20px;
+}
+.sbar-box span.sbar{
+    display: inline-block;
+    width: 93px;
+    height: 18px;
+    background: #eee;
+    text-align: center;
+}
+.re-login{
+    padding-top: 40px;
+    font-size: 14px;
+}

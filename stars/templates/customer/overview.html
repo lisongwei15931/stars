@@ -1,0 +1,56 @@
+{% extends "customer/baseaccountpage.html" %}
+
+{% load i18n %}
+{% load staticfiles %}
+{% load history_tags %}
+
+{% block content %}
+    <div class="container fix">
+
+		<!-- 浏览历史 -->
+		{% with history_products=browse_history|slice:":8" %}
+        {% if history_products %}
+		<div class="buydb browsedb">
+            <div class="buydb-title">
+            {% trans 'Products you recently viewed' %}
+            </div>
+            <div class="buydb-show fix">
+                <ul class="l">
+                    {% for product in history_products %}
+                    <li>
+                        <div class="l">
+                            <a href="{{ product.get_absolute_url }}"><img class="small-product-img" src="/media/{{product.primary_image.original}}" /></a>
+                        </div>
+                        <div class="r">
+                            <div class="p-infor">
+                                <a href="{{ product.get_absolute_url }}">{{ product.get_title }}</a>
+                            </div>
+                            <div class="p-price color-red">
+                                <span>￥xxxxx</span>
+                                <del class="color-h">
+                                {% if product.stockrecords.first.price_retail %}
+                                ￥{{ product.stockrecords.first.price_retail }}
+                                {% else %}
+                                {% endif %}
+                                </del>
+                            </div>
+
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% else %}
+        <div class="buydb browsedb">
+        <div class="buydb-title">
+        {% trans 'Products you recently viewed' %}
+        </div>
+        </div>
+        {% endif %}
+        {% endwith %}
+    </div>
+
+</div>
+
+{% endblock %}

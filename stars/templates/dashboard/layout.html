@@ -1,0 +1,287 @@
+{% extends "dashboard/base.html" %}
+
+{% load category_tags %}
+{% load dashboard_tags %}
+{% load i18n %}
+{% load compress %}
+{% load staticfiles %}
+
+{% block mainstyles %}
+    {% compress css %}
+        {% if use_less %}
+            <link rel="stylesheet" type="text/less" href="{% static "oscar/less/dashboard.less" %}" />
+        {% else %}
+            <link rel="stylesheet" type="text/css" href="{% static "oscar/css/dashboard.css" %}" />
+        {% endif %}
+        <link rel="stylesheet" href="{% static "css/dashboard_local.css" %}" />
+        <style type="text/css">
+            .col-md-2 > .lx-sidenav { margin-top: 20px; border: 1px solid #e5e5e5; }
+            .col-md-2 > .lx-sidenav > li { margin-bottom: -1px; }
+            .col-md-2 > .lx-sidenav > li > a { border-left: 0; border-right: 0; border: 1px solid #e5e5e5; border-width: 1px 0; }
+            .col-md-2 > .lx-sidenav > .active > a:focus:before { }
+            .col-md-2 > .lx-sidenav > li.active > a:focus { border-left: 10px solid #f1faff; border-left: 0; }
+            .col-md-2 > .lx-sidenav .dropdown-menu { position: static; float: none; border-radius: 0; border: 0; box-shadow: none; }
+            .col-md-2 > .lx-sidenav .dropdown-toggle .caret { float: right; border-bottom-color: #08c !important; border-top-color: #08c !important; }
+            .col-md-2 > .lx-sidenav > li.dropdown.open.active > a:focus { background-color: #f1faff; border-color: #e5e5e5; color: #0088cc; }
+
+            .page-header{padding-left: 10px;padding-right: 10px;}
+        </style>
+    {% endcompress %}
+{% endblock %}
+
+{% block extrastyles %}
+    {{ block.super }}
+    {% compress css %}
+        {% block jquery-ui-css %}
+            <link rel="stylesheet" href="{% static "oscar/js/jquery-ui/jquery-ui.css" %}">
+        {% endblock %}
+        <link rel="stylesheet" href="{% static "oscar/js/select2/select2.css" %}" />
+        <link rel="stylesheet" href="{% static "oscar/css/select2-bootstrap.css" %}" />
+        <link rel="stylesheet" href="{% static "oscar/js/bootstrap-datetimepicker/bootstrap-datetimepicker.css" %}" />
+    {% endcompress %}
+{% endblock %}
+
+{% block title %}
+    {% trans "Dashboard" %} | {{ block.super }}
+{% endblock %}
+
+{% block layout %}
+    {% block navbar %}
+    <nav class="navbar navbar-static-top navbar-inverse navbar-accounts">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".nav-accounts">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <span class="navbar-pull-left">蓝图百货后台管理</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="collapse navbar-collapse nav-accounts">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><span>{% trans "Welcome" %} <em>{{ user.get_full_name|default:request.user.email }}</em></span></li>
+                    <li><a href="{{ homepage_url }}"><i class="icon-home"></i> {% trans "Return to site" %}</a></li>
+                    <li><a href="{% url 'customer:summary' %}"><i class="icon-user"></i> {% trans "Account" %}</a></li>
+                    <li><a href="{% url 'customer:logout' %}"><i class="icon-signout"></i> {% trans "Log out" %}</a></li>
+                </ul>
+            </div>
+        </div><!-- /navbar-inner -->
+    </nav><!-- /navbar -->
+    {% endblock navbar %}
+    <!--
+    {% block dashboard_nav %}
+        {% dashboard_navigation user as nav_items %}
+
+        <nav class="navbar navbar-static-top navbar-inverse navbar-primary">
+            <div class="container-fluid dashboard">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".nav-primary">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+
+                <div class="collapse navbar-collapse nav-primary">
+                    <ul class="nav navbar-nav dashboard">
+                        {% for item in nav_items %}
+                        <li class="dropdown">
+                            {% if item.is_heading %}
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                                {% if item.icon %}<i class="{{ item.icon }}"></i>{% endif %}
+                                {{ item.label }} <b class="caret"></b>
+                            </a>
+                            {% else %}
+                            <a href="{{ item.url }}">
+                                {% if item.icon %}<i class="{{ item.icon }}"></i>{% endif %}
+                                {{ item.label }}
+                            </a>
+                            {% endif %}
+                            {% if item.has_children %}
+                            <ul class="dropdown-menu">
+                                {% for subitem in item.children %}
+                                <li>
+                                    <a href="{{ subitem.url }}">
+                                    {% if subitem.icon %}<i class="{{ subitem.icon }}"></i>{% endif %}
+                                    {{ subitem.label }}
+                                    </a>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    {% endblock %}
+    -->
+
+    <div class="container-fluid dashboard">
+        {% dashboard_navigation user as nav_items %}
+        <div class="row-fluid">
+            <div class="col-md-2">
+                <ul class="nav nav-list bs-docs-sidenav lx-sidenav" style="margin-top:20px;">
+                    {% if user.userprofile.is_dashboard_admin %}
+                        <li class="dropdown" style="padding-left:10px;padding-top:12px;">
+                            <h4>平台管理</h4>
+                        </li>
+                    {% elif user.userprofile.is_isp %}
+                        <li class="dropdown" style="padding-left:10px;padding-top:12px;">
+                            <h4>交易商功能</h4>
+                        </li>
+                    {% elif user.userprofile.is_warehouse_staff %}
+                        <li class="dropdown" style="padding-left:10px;padding-top:12px;">
+                            <h4>自提点功能</h4>
+                        </li>
+                    {% elif user.userprofile.is_member_unit or user.userprofile.is_trader %}
+                        <li class="dropdown" style="padding-left:10px;padding-top:12px;">
+                            <h4>会员单位功能</h4>
+                        </li>
+                    {% endif %}
+                    {% for item in nav_items %}
+                        <li class="dropdown">
+                            {% if item.is_heading %}
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                    {% if item.icon %}<i class="{{ item.icon }}"></i>{% endif %}
+                                    {{ item.label }} <b class="caret"></b>
+                                </a>
+                            {% else %}
+                                <a href="{{ item.url }}">
+                                    {% if item.icon %}<i class="{{ item.icon }}"></i>{% endif %}
+                                    {{ item.label }}
+                                </a>
+                            {% endif %}
+                            {% if item.has_children %}
+                                <ul class="dropdown-menu">
+                                    {% for subitem in item.children %}
+                                        <li>
+                                            <a href="{{ subitem.url }}">
+                                                {% if subitem.icon %}<i class="{{ subitem.icon }}"></i>{% endif %}
+                                                {{ subitem.label }}
+                                            </a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                            {% if item.label == '自提点管理' %}
+                                {% if user.userprofile.is_dashboard_admin %}
+                                    <li class="dropdown" style="padding-left:10px;padding-top:12px;">
+                                        <h4>会员单位功能</h4>
+                                    </li>
+                                {% endif %}
+                            {% elif item.label == '用户查询' %}
+                                {% if user.userprofile.is_dashboard_admin %}
+                                    <li class="dropdown" style="padding-left:10px;padding-top:12px;">
+                                        <h4>交易员功能</h4>
+                                    </li>
+                                {% endif %}
+                            {% elif item.label == '库转交易' %}
+                                {% if user.userprofile.is_dashboard_admin %}
+                                    <li class="dropdown" style="padding-left:10px;padding-top:12px;">
+                                        <h4>自提点功能</h4>
+                                    </li>
+                                {% endif %}
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="col-md-10" style="padding-left:2px">
+                <ul class="nav nav-list bs-docs-sidenav lx-sidenav" style="margin-top:20px;">
+                {% block breadcrumbs %}
+                <ul class="breadcrumb">
+                    <li><a href="{% url 'dashboard:index' %}">{% trans "Dashboard" %}</a></li>
+                </ul>
+                {% endblock %}
+
+                <div class="content">
+                    {% include 'dashboard/partials/alert_messages.html' %}
+                    {% block header %}
+                    
+                    <div class="page-header action">
+                        <h1>{% block headertext %}{% endblock %}</h1>
+                    </div>
+                    {% endblock %}
+                    <div class="page-content" style="padding-left:10px; padding-right:10px;">
+                        {% block content %}
+                            {% block dashboard_content %}{% endblock dashboard_content %}
+                        {% endblock content %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div><!-- /container -->
+
+    {% block cdn_scripts %}
+        <!-- jQuery -->
+        <script src="http://libs.baidu.com/jquery/1.9.1/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="{% static "oscar/js/jquery/jquery-1.9.1.min.js" %}"><\/script>')</script>
+    {% endblock %}
+
+    {% comment %}
+        This block includes a single pixel from one of the django-oscar
+        organisation's servers. It's included to keep track of which sites are
+        running Oscar in production, and what versions of Python and Django are
+        used. This provides useful data when deciding which versions of Python
+        and Django to support.
+
+        You are, of course, welcome to remove this tracker. To do so, set
+        OSCAR_TRACKING=False in your settings.
+    {% endcomment %}
+    {% block trackerimage %}
+        {% if call_home %}
+            <img src="//analytics.oscarcommerce.com/tracker.gif?{{ call_home }}" style="display:none" />
+        {% endif %}
+    {% endblock %}
+{% endblock %}
+
+{# Local scripts #}
+{% block scripts %}
+    {% compress js %}
+    <!-- Twitter Bootstrap -->
+    <script type="text/javascript" src="{% static "oscar/js/bootstrap3/bootstrap.min.js" %}"></script>
+    <!-- Oscar -->
+    <script src="{% static "oscar/js/oscar/ui.js" %}" type="text/javascript" charset="utf-8"></script>
+    {% endcompress %}
+{% endblock %}
+
+{% block extrascripts %}
+    {{ block.super }}
+
+
+    {% compress js %}
+        {# jQuery plugins #}
+        {% block jquery-ui-js %}
+            <script src="{% static "libs/jquery/jquery-ui.min.js" %}" type="text/javascript" charset="utf-8"></script>
+        {% endblock %}
+        <script src="{% static "oscar/js/mousewheel/jquery.mousewheel.min.js" %}" type="text/javascript" charset="utf-8"></script>
+        <script src="{% static "oscar/js/bootstrap-datetimepicker/bootstrap-datetimepicker.js" %}" type="text/javascript" charset="utf-8"></script>
+        <script src="{% static "oscar/js/bootstrap-datetimepicker/locales/bootstrap-datetimepicker.all.js" %}" type="text/javascript" charset="utf-8"></script>
+        <script src="{% static "oscar/js/inputmask/jquery.inputmask.bundle.min.js" %}" type="text/javascript" charset="utf-8"></script>
+        <script src="{% static "oscar/js/select2/select2.js" %}" type="text/javascript" charset="utf-8"></script>
+        <script src="{% static "oscar/js/oscar/dashboard.js" %}" type="text/javascript" charset="utf-8"></script>
+        {% block ckeditor_js %}
+        {% endblock %}
+
+        {% block tinymce_js %}
+        <script src="{% static "libs/tinymce/tinymce.min.js" %}" type="text/javascript" charset="utf-8"></script>
+        <script src="{% static "libs/tinymce/jquery.tinymce.min.js" %}" type="text/javascript" charset="utf-8"></script>
+        {% endblock %}
+    {% endcompress %}
+
+{% endblock %}
+
+{% block onbodyload %}
+    {{ block.super }}
+    options = {
+      'languageCode': '{{ LANGUAGE_CODE }}'
+    };
+    oscar.dashboard.init(options);
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends "customer/account_base.html" %}
+{% load staticfiles %}
+{% load compress %}
+
+{% block title %}蓝图百货--收货地址{% endblock title %}
+
+{% block oncontentload %}
+    {{ block.super }}
+        <div class="account-cont-right l">
+            <div class="details" style="padding-bottom:0px;">
+                <div class="title-acct title-acct2 fix">
+                    <span class="l">收货地址</span>
+                </div>
+                <div class="account-address">
+                    <a href="{% url 'customer:receiving_address_add' %}">新增收货地址</a>
+                </div>
+                <div id="addr-scroll">
+                {% if current_receiving_addresses %}
+                    {% for address in current_receiving_addresses %}
+                        <div class="account-add-infor">
+                            <div class="add-tit">
+                                <span>{{ address.consignee }}</span>
+                                <span>{{ address.city }}</span>
+                                {% if address.is_default %}
+                                    <div class="defaultadd">
+                                        默认地址
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="add-content">
+                                <div class="add-row fix">
+                                    <div class="leftarea l right">
+                                        收货人：
+                                    </div>
+                                    <div class="rightarea l">
+                                        {{ address.consignee }}
+                                    </div>
+                                </div>
+                                <div class="add-row fix">
+                                    <div class="leftarea l right">
+                                        所在地区：
+                                    </div>
+                                    <div class="rightarea l">
+                                        {{ address.city }} {{ address.district }}
+                                    </div>
+                                </div>
+                                <div class="add-row fix">
+                                    <div class="leftarea l right">
+                                        详细地址：
+                                    </div>
+                                    <div class="rightarea l">
+                                        {{ address.address}}
+                                    </div>
+                                </div>
+                                <div class="add-row fix" style="margin-bottom: 0;">
+                                    <div class="leftarea l right">
+                                        手机号码：
+                                    </div>
+                                    <div class="rightarea l">
+                                        <div class="l">
+                                            {{ address.mobile_phone|slice:":3" }}****{{ address.mobile_phone|slice:"7:" }}
+                                        </div>
+                                        <div class="r">
+                                            {% if not address.is_default %}
+                                                <a class="default" href="{% url 'customer:receiving_address_set_default' address.id %}">设为默认</a>
+                                            {% endif %}
+                                            <a href="{% url 'customer:receiving_address_update' address.id %}">编辑</a>
+                                            <a class="receiving_address_delete" id="{{ address.id }}_delete">删除</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+
+{% block footer_extra_script %}
+    <script type="text/javascript">
+
+        window.onload = function(){
+            $(".footer-menu").find("li").eq(-1).children("span").css("display","none");
+        };
+        $('.receiving_address_delete').click(function(){
+            var id = this.id.split('_')[0];
+            var confirm_frame = confirm("确定要删除此地址？");
+            if (confirm_frame==true) {
+                window.location.href="{% url 'customer:receiving_address_delete' 999 %}".replace(999, id);
+            }
+        })
+    </script>
+{% endblock %}

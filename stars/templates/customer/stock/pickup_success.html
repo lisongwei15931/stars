@@ -1,0 +1,40 @@
+{% extends "customer/safety/account_no_left_nav_base.html" %}
+{% load staticfiles %}
+{% load compress %}
+{% load thumbnail %}
+
+{% block custom_css %}<link rel="stylesheet" href="{% static "css/account2.css" %}" type="text/css">{% endblock %}
+{% block title %}蓝图百货--我的存货-提货成功{% endblock title %}
+
+{% block onbodyload %}
+    <div class="contentVisit">
+        <div class="comTitle"><a href="{% url 'customer:stock' %}">我的存货</a>&gt;上门自提</div>
+        <div class="visitSucess">
+        	<div class="sucessTop">
+                <p style="float:left; width:30px; height:40px;"><img src="{% static "images/sub-success.png" %}" width="30" height="29"></p>
+            	<div class="sucRight">
+                	<p>恭喜，申请提货成功！</p>
+                    {% if captcha %}
+                        <p style="font-size:12px;">凭提货验证码：<span style="color:#c00000;">{{ captcha }}</span> 到已选择的自提点提货。</p>
+                    {% else %}
+                        <p style="font-size:12px;">货物将很快送到您手中。</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="sucessBack">
+                <a href="{% url 'customer:pickup_detail' %}">提货明细</a>
+                <a href="{% url 'customer:stock' %}">我的存货</a>
+                <a href="{% url 'customer:assets' %}">我的账户</a>
+            </div>
+        </div>
+    </div>
+{% endblock onbodyload %}
+
+{% block footer_extra_script %}
+    <script type="text/javascript">
+
+        window.onload = function(){
+            $(".footer-menu").find("li").eq(-1).children("span").css("display","none");
+        };
+    </script>
+{% endblock %}

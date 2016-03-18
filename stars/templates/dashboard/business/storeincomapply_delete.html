@@ -1,0 +1,48 @@
+{% extends 'dashboard/layout.html' %}
+{% load i18n %}
+
+{% block body_class %}{{ block.super }} create-page{% endblock %}
+
+{% block breadcrumbs %}
+    <ul class="breadcrumb">
+        <li>
+            <a href="{% url 'dashboard:index' %}">{% trans "Dashboard" %}</a>
+        </li>
+        <li>
+        <a href="{% url 'dashboard:storeincome-list' %}">入库申请</a>
+    </li>
+    <li class="active">{% trans "删除该条申请？" %}</li>
+</ul>
+{% endblock %}
+
+{% block headertext %}
+    {{ del_product }}
+{% endblock %}
+
+{% block dashboard_content %}
+{% if status = '0' %}
+    {% if disallow %}
+        <p>{% trans "Delete failed." %}</p>
+    {% else %}
+        <div class="table-header">
+            <h2>删除该条申请 </h2>
+        </div>
+        <form action="." method="post" class="well">
+            {% csrf_token %}
+            {{ form }}
+            <p>
+                {% blocktrans with name=object.product %}删除商品: <strong>{{ name }}</strong> - 确定吗?{% endblocktrans %}
+            </p>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-danger" data-loading-text="{% trans 'Deleting...' %}">{% trans "Delete" %}</button>
+            {% trans "or" %} <a href="{% url 'dashboard:storeincome-list' %}">{% trans "cancel" %}</a>
+            </div>
+        </form>
+    {% endif %}
+    {% else %}
+       <div class="table-header">
+            <h2>自提点已经接收该申请,无法删除！--{{status}}</h2>
+        </div>
+{% endif %}
+{% endblock %}
+

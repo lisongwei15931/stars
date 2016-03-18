@@ -1,0 +1,85 @@
+{% extends 'base_stars.html' %}
+{% load staticfiles %}
+{% load thumbnail %}
+{% load currency_filters %}
+{% load purchase_info_tags %}
+{% load widget_tweaks %}
+{% load display_tags %}
+
+{% block public_css %}
+    {{block.super}}
+    <link rel="stylesheet" href="{% static "css/shopcar.css" %}" type="text/css">
+    <link rel="stylesheet" href="{% static "css/help.css" %}" type="text/css">
+{% endblock %}
+{% block custom_css %}
+{% endblock %}
+{% block jquery %}
+    <script type="text/javascript" src="{% static "js/jquery-1.11.1.min.js" %}"></script>
+    {{block.super}}
+{% endblock %}
+{% block title %}蓝图百货{% endblock %}
+{% block content %}
+
+<!--顶部 end--><!-- InstanceBeginEditable name="EditRegion3" -->
+<div class="helpContent">
+	<div class="helpLeft">
+    	<ul class="new-title">
+        	<li id="3"><a href="{% url 'promotions:news_product' %}?flag=3">新品上市</a></li>
+            <li id="4"><a href="{% url 'promotions:news_product' %}?flag=4">购物须知</a></li>
+            <li id="2"><a href="{% url 'promotions:news_product' %}?flag=2">公告</a></li>
+        </ul>
+    </div>
+    <div class="helpRight">
+    	<div class="new-arrival">
+        {% if flag == '3' %}
+        	<h2>新品上市</h2>
+        {% elif flag == '4' %}
+            <h2>购物须知</h2>
+        {% else %}
+            <h2>公告</h2>
+        {% endif %}
+            <div class="new-list">
+                {% for item in news_list %}
+                <dl>
+                	<dt><a href="{% url 'promotions:news_product_detail'  pk=item.id%}">{{ item.title }}</a></dt>
+                    <dd>{{ item.created_datetime }}</dd>
+                </dl>
+                {% endfor %}
+            </div>
+            <!--翻页-->
+                <div class="page-public center" id="pageList" style="margin-left:0px;">
+                    <a class="txt" id="first" href="?{% get_parameters page %}page=1">首页</a>
+                    {% if page_obj.has_previous %}
+                    <a class="txt" id="prev" style="margin-right:0;" href="?{% get_parameters page %}page={{page_obj.previous_page_number}}">上一页</a>
+                    {% else %}
+                      <a class="txt" id="prev" style="margin-right:0;">上一页</a>
+                    {% endif %}
+                    <a class="num active" id="firstpage">{{ page_obj.number }}</a>
+                    {% if page_obj.has_next %}
+                        <a class="txt" id="next" href="?{% get_parameters page %}page={{page_obj.next_page_number}}">下一页</a>
+                    {% else %}
+                    <a class="txt" id="next">下一页</a>
+                    {% endif %}
+                    <a class="txt" id="last" href="?{% get_parameters page %}page={{ page_obj.paginator.num_pages }}">尾页</a>共<span>{{ page_obj.paginator.num_pages }}</span>页
+                    {% comment %}<span>到第<input type="text" value=""/>页</span>
+                    <a class="txt">确认</a>{% endcomment %}
+                </div>
+        </div>
+
+    </div>
+</div>	
+<script type="text/javascript">
+	$(function(){
+        $(".new-arrival").eq(0).show();
+        var id = {{ flag }};
+        $('#'+id).addClass("current").find('a').css('color','#fff');
+        {% comment %}
+		$(".new-title li a").click(function(){
+			$(this).parent().addClass("current").siblings().removeClass("current");
+			var index=$(this).parent().index();
+			$(".new-arrival").eq(index).show().siblings().hide();
+		});{% endcomment %}
+	})
+</script>
+{% endblock %}
+

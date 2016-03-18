@@ -1,0 +1,5 @@
+{% if record.status != '4' %}
+    <a href="{% url 'dashboard:store-income-apply' pk=record.id %}">{{ record.product }}</a>
+{% else %}
+    {{ record.product }}
+{% endif %}

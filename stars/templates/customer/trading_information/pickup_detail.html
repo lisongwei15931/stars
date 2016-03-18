@@ -1,0 +1,397 @@
+{% extends "customer/account_base.html" %}
+{% load staticfiles %}
+{% load compress %}
+{% load public_tags %}
+
+{% block title %}蓝图百货--{{page_title}}{% endblock title %}
+{% block custom_css %}
+<link rel="stylesheet" href="{% static "css/account2.css" %}" type="text/css">
+{% endblock %}
+{% block oncontentload %}
+    {{ block.super }}
+        <div class="account-cont-right l">
+            <div class="details">
+                <div class="title-acct title-acct2 fix">
+                    <span class="l">{{page_title}}</span>
+                </div>
+                <ul class="accTitle">
+                    <li style="width:230px;">时间：<input type="text" id="starttime" class="time" onClick="WdatePicker()">&nbsp;-&nbsp;<input type="text" id="endtime" class="time" onClick="WdatePicker()"/></li>
+                    <li style="width:235px;">
+                        <p style="float:left; height:23px; line-height:23px;">提货方式：</p>
+                        <div id="barWrap">
+                            <input type="button" value="" class="bargin">
+                            <ul class="bargin_box">
+                                <li><input type="checkbox" {% if selfpick %}checked="checked"{% endif %} style="vertical-align:middle; margin-right:5px;" value="1"/>自提</li>
+                                <li><input type="checkbox" {% if express %}checked="checked"{% endif %} style="vertical-align:middle; margin-right:5px"  value="2"/>货运</li>
+                            </ul>
+                        </div>
+                        <input type="submit" onclick="javascript:trading_search();return false;" value="搜索" style="width:42px; height:23px; line-height:21px; text-align:center; background-color:#c00000; border:0; color:#fff; cursor:pointer; margin-left:5px;"/>    
+                        
+                    </li>
+                    <li style="float:right">排序：&nbsp;<a href="#" {% if order == 'created_date' %}onclick="javascript:change_sort('-created_date');return false;" class="current down"{% elif order == '-created_date' %}onclick="javascript:change_sort('created_date');return false;" class="current up"{% else %}onclick="javascript:change_sort('created_date');return false;" class="current 0"{% endif %} >申请时间</a></li>
+                </ul>
+                <div style="text-align:right; color:#999; margin-bottom:10px;">每页20条&nbsp;共<span style="color:#c00000;">{{ pickup_list.paginator.count }}</span>条信息</div>
+                <table class="myBox" cellpadding="0"  cellspacing="0">
+                    <tr style="background-color:#eee;">
+                        <th width="65">申请日期</th>
+                        <th width="100">提货单号</th>
+                        <th width="60">提货方式</th>
+                        <th width="60">提货仓库</th>
+                        <th width="60">提货费用</th>
+                        <th width="60">快递费用</th>
+                        <th width="60">验证码</th>
+                        <th width="70">办理日期</th>
+                        <th width="60">状态</th>
+                        <th width="100">驳回原因</th>
+                        <th width="100">操作</th>
+                    </tr>
+                    {% for pickup_detail in pickup_list %}
+                    <tr>
+                        <td>{{ pickup_detail.created_date|date:'Ymd' }}</td>
+                        <td>{{ pickup_detail.pickup_no }}</td>
+                        {% if pickup_detail.pickup_type == 1 %}
+                            <td>自提</td>
+                        {% elif pickup_detail.pickup_type == 2 %}
+                            <td>货运</td>
+                        {% endif %}
+                        <td>{{ pickup_detail.user_picked_addr.pickup_addr.name }}</td>
+                        <td>{{ pickup_detail.pickup_fee|floatformat:2|default:"-" }}</td>
+                        <td>{{ pickup_detail.express_fee|floatformat:2|default:"-" }}</td>
+                        <td>{{ pickup_detail.pickup_captcha }}</td>
+                        <td>{{ pickup_detail.deal_datetime|date:'Ymd'|default:"-" }}</td>
+                        <td>{{ pickup_detail.get_status_display }}
+                        <td>{{ pickup_detail.refuse_desc }}</td>
+                        <td class="lastTd">
+                            <!--<a href="{% url 'customer:pickup_detail-list' pk=pickup_detail.pk %}">查看</a>-->
+                            <a href="#" pickup_list_id={{ pickup_detail.id }} class="examin">查看</a>
+                            <!--<a href="javascript:void(0);" class="pingJia">评价</a>-->
+                            {% if pickup_detail.status == 4 %}
+                                <a href="{% url 'customer:pickup_detail_update' pickup_detail.id %}">修改</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    <!--
+                    <tr>
+                        <td></td>
+                        <td>合计</td>
+                        <td></td>
+                        <td></td>
+                        <td>{{pickup_fee_total|floatformat:2}}</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    -->
+                </table>
+                <!--翻页-->
+                <div class="page-public center" id="pageList">
+                    <a onclick="javascript:change_page(1);return false;" href="#" class="txt" id="first">首页</a>
+                    {% if pickup_list.has_previous %}
+                    <a class="txt" onclick="javascript:change_page({{ pickup_list.previous_page_number }});return false;" href="#" id="prev">上一页</a>
+                    {% else %}
+                    <a class="disable_txt">上一页</a>
+                    {% endif %}
+                    {% if pickup_list.paginator.num_pages <= 8 %}
+                        {% for page_number in pickup_list.paginator.page_range %}
+                            {% ifequal page_number  pickup_list.number %}
+                              <a class="num active" onclick="javascript:change_page({{ page_number }});return false;" href="#">{{ page_number }}</a>
+                            {% else %}
+                              <a class="num" onclick="javascript:change_page({{ page_number }});return false;" href="#">{{ page_number }}</a>
+                            {% endifequal %}
+                        {% endfor %}
+                    {% elif pickup_list.paginator.num_pages > 8 %}
+                        {% if pickup_list.number > 3 %}
+                            <a class="num" onclick="javascript:change_page(1);return false;" href="#">1</a>...
+                        {% endif %}
+                        {% for page_number in pickup_list.paginator.page_range %}
+                            {% if pickup_list.number|add:-3 < page_number and pickup_list.number|add:+3 > page_number %}
+                                {% ifequal page_number  pickup_list.number %}
+                                  <a class="num active" onclick="javascript:change_page({{ page_number }});return false;" href="#">{{ page_number }}</a>
+                                {% else %}
+                                  <a class="num" onclick="javascript:change_page({{ page_number }});return false;" href="#">{{ page_number }}</a>
+                                {% endifequal %}
+                            {% endif %}
+                        {% endfor %}
+                        {% if pickup_list.number < pickup_list.paginator.num_pages|add:-2 %}
+                           ... <a class="num" onclick="javascript:change_page({{ pickup_list.paginator.num_pages }});return false;" href="#">{{ pickup_list.paginator.num_pages }}</a>
+                        {% endif %}
+                    {% endif %}
+                    {% if pickup_list.has_next %}
+                    <a class="txt" onclick="javascript:change_page({{ pickup_list.next_page_number }});return false;" href="#" id="next">下一页</a>
+                    {% else %}
+                    <a class="disable_txt">下一页</a>
+                    {% endif %}
+                    <a class="txt" id="last" onclick="javascript:change_page('-1');return false;" href="#">尾页</a>共<span>{{ pickup_list.paginator.num_pages }}</span>页
+                    到第<input type="text" id='page_num' value="{{ pickup_list.number }}" style="vertical-align:top; *vertical-align:middle; height:30px; line-height:30px;"/>页
+                    <a class="txt" onclick="javascript:change_page();return false;" href="#">确认</a>
+                </div>
+            </div>
+        </div>
+    <!--弹框 star-->
+    <div id="fullbg"></div>
+    <!--评价 star-->
+    <div class="p-dialog pingjia">
+        <div class="p-title">评价<span class="p-close">×</span></div>
+        <div class="p-content">
+            <dl>
+                <dt><a href="#"><!--<img src="images/pingjia1.jpg"/>--></a></dt>
+                <dd><a href="#">长城特酿3年解百纳干红葡萄酒整箱装 750ml*6瓶</a></dd>
+            </dl>
+            <table cellpadding="0" cellspacing="0" class="p-act">
+                <tr>
+                    <td class="gray"><span class="red">*</span>评分：</td>
+                    <td style="position:relative;">
+                        <div style="overflow:hidden;">
+                            <ul class="star"><li></li><li></li><li></li><li></li><li></li></ul>
+                            <p id="score"></p>
+                        </div>
+                        <div id="selectScore">
+                            <div class="reply"></div>
+                            <div class="btn-score"></div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="gray"><span class="red">*</span>心得：</td>
+                    <td>
+                        <textarea id="p-pro">评价商品~！</textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><input type="submit" value="发表评论" class="p-sub"/></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <!--评价 end-->
+    <!--查看 star-->
+    <div class="p-dialog examWrap" id="all_pickup_detail">
+    </div>
+{% endblock %}
+
+
+
+{% block footer_extra_script %}
+    <script type="text/javascript">
+        var chuHeight=$(window).height()/2-355;
+		var eHeight=$(window).height()/2-275;
+        $(".p-dialog").css("top",chuHeight);
+		$(".examWrap").css("top",eHeight);
+        $(window).scroll(function(){
+            var chuHeight=$(window).height()/2-355;
+            var eHeight=$(window).height()/2-275;
+            var curHeight=chuHeight+$(document).scrollTop()+"px";
+            var eHeight=eHeight+$(document).scrollTop()+"px";
+            $(".p-dialog").css("top",curHeight);
+            $(".examWrap").css("top",eHeight);
+        })
+        $(function(){
+            $(".pingJia,.examin").click(function(){
+            	console.log(1)
+                $("#fullbg").height($("body").height());
+                $("#fullbg").width($("body").width);
+                $("#fullbg").show();
+				$("body").css("overflow","hidden");
+            });
+            $(".examin").click(function(){
+            	console.log(2)
+                var pickup_list_id = $(this).attr('pickup_list_id');
+                $.ajax({
+                    dataType: "json",
+                    url: ".",
+                    data: {'pickup_list_id': pickup_list_id},
+                    success: function (result) {
+                    	console.log(3)
+                        $('#all_pickup_detail').html(result.content_html);
+                        $(".p-close,.p-sub").click(function(){
+                            $("#fullbg").hide();
+                            $(".p-dialog").hide();
+				            $("body").css("overflow","auto");
+                        });
+                    },
+                });
+                $(".examWrap").show();
+            });
+            $(".pingJia").click(function(){
+                $("#score").html("");
+                //$("#fullbg").height($("body").height());
+                //$("#fullbg").width($("body").width);
+                //$("#fullbg").show();
+                $(".pingjia").show();
+            });
+            $(".p-close,.p-sub").click(function(){
+                $("#fullbg").hide();
+                $(".p-dialog").hide();
+				$("body").css("overflow","auto");
+            });
+            //评价得分
+            var selectScore=0;//保存click事件点击的分数
+            var scoreCode=0;//保存mouseover鼠标所在的分数
+            $(".star li").mouseover(function () {
+                $(this).addClass("starCheck").prevAll().addClass("starCheck");
+                $(this).nextAll().removeClass("starCheck");
+                scoreCode=parseInt($(this).index(".star li"))+1;
+                $("#selectScore").show();
+                var index=$(this).index();
+                $("#selectScore").css("marginLeft",25*index+'px');
+                $(".btn-score").html(scoreCode+"分");
+            });
+            $(".star li").mouseout(function (){
+                $("#selectScore").hide();
+                $(this).removeClass("starCheck").prevAll().removeClass("starCheck");
+                if(0==selectScore)$("#score").html("");//如果没有点击事件，置为空
+                else{
+                    $("#score").html(selectScore+"分");//如果点击过某个分数，显示相应的分数
+                    $(".star li").eq(selectScore-1).addClass("starCheck").prevAll().addClass("starCheck");
+                }
+            });
+            //最终得分是
+            $(".star li").click(function () {
+                selectScore=scoreCode;//保存点击的分数
+                $("#score").html(selectScore+"分");
+                $(".star li").removeClass("starCheck");
+                $(this).addClass("starCheck").prevAll().addClass("starCheck");
+            });
+            //textbox文字为默认的时候字体颜色是灰色
+            $("#p-pro").val("评价商品~！");
+            $("#p-pro").focus(function(){
+                if($(this).val()=="评价商品~！"){
+                    $(this).val("");
+                    $("#p-pro").css("color","#333");
+                }
+            });
+            $("#p-pro").blur(function(){
+                if($(this).val()==""){
+                    $(this).val("评价商品~！");
+                    $("#p-pro").css("color","#c6c6c6");
+                }
+            });
+        })
+        function change_page(page){
+        	var url = window.location.href;
+            if(!page){
+                page = $('#page_num').val();
+            }
+            var new_url = changeURLArg(url,'page',page);
+            window.location.href = new_url;
+        }
+        //排序方法未完成
+        function change_order(order){
+        	var url = window.location.href;    
+            if (url.indexOf('?') > -1){
+              url += '&keyWords='+keyWords+'&starttime='+starttime+'&endtime='+endtime+'&type='+type
+            }else{
+              url += '?order=';
+            }
+        	window.location.href += "&order=34";
+        }
+        function change_sort(order){
+        	var url = window.location.href;
+        	var new_url = changeURLArg(url,'order',order);
+        	window.location.href = new_url;
+        }
+        function trading_search(){
+        	var starttime = '';
+            var endtime = '';
+            if($('#starttime').val()){
+                starttime = $('#starttime').val();
+            }
+            if($('#endtime').val()){
+                endtime = $('#endtime').val();
+            }
+        	var type = ''
+        	$("[type='checkbox']:checked").each(function(){
+        		if($(this).val()==1){
+        			type += '&selfpick=1';
+        		}else if($(this).val()==2){
+        			type += '&express=1';
+        		}
+        	})
+        	window.location.href = '?starttime='+starttime+'&endtime='+endtime+type;
+        }
+        $(function(){
+        	update_checkbox();
+        	$(".bargin").click(function(){
+                $(".bargin_box").show();
+            });
+            //排序
+            $(".accTitle li a").click(function(){
+                $(this).addClass("current").siblings().removeClass("current");
+            });
+            //全选
+            $(".check_all").click(function(){
+                if($(this).prop("checked")){//如果选中
+	                $(".myBox tr td input").prop("checked",true)
+	                $(".check_all").prop("checked",true)
+                }else{// 如果取消
+	                $(".myBox tr td input").prop("checked",false)
+	                $(".check_all").prop("checked",false)
+                }
+            });
+            //选中改变值，将选中的值添加给button按钮进行显示
+            $(".bargin_box input").click(function(){
+            	update_checkbox();
+            });
+            document.onclick = function (event)  
+            {     
+                var e = event || window.event;  
+                var elem = e.srcElement||e.target;  
+                      
+                while(elem)  
+                {   
+                    if(elem.id == "barWrap")  
+                    {  
+                            return;  
+                    }  
+                    elem = elem.parentNode;       
+                }  
+                //隐藏div的方法  
+                $(".bargin_box").hide(); 
+            } 
+        })
+        function update_checkbox(){
+        	var val="";//用于记录选中的值
+            var isAll=true;//默认是全选中
+            $(".bargin_box li input").each(function(){//便利每一个checkbox
+                if($(this).prop("checked")){
+                    val=val+$(this).parent("li").text()+",";//拼接所有的值
+                }else{
+                    isAll=false;//如果有任何一个checkbox没有选中，那么就不是全部
+                }
+                });
+                if(val.length>0) val=val.substring(0,val.length-1);//如果有选择的值，去掉最后一个逗号
+                if(isAll){
+                    $(".bargin").val("全部");
+                    }else{
+                        $(".bargin").val(val);}
+        }
+        /*
+        * url 目标url
+        * arg 需要替换的参数名称
+        * arg_val 替换后的参数的值
+        * return url 参数替换后的url
+        */
+        function changeURLArg(url,arg,arg_val){
+            var pattern=arg+'=([^&]*)';
+            console.log(pattern);
+            var replaceText=arg+'='+arg_val;
+            if(url.match(pattern)){
+                var tmp='/('+ arg+'=)([^&]*)/gi';
+                tmp=url.replace(eval(tmp),replaceText);
+                return tmp;
+            }else{
+                if(url.match('[\?]')){
+                    return url+'&'+replaceText;
+                }else{
+                    return url+'?'+replaceText;
+                }
+            }
+            return url+'\n'+arg+'\n'+arg_val;
+        }
+    </script>
+{% endblock %}

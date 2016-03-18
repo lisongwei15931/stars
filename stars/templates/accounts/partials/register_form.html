@@ -1,0 +1,177 @@
+{% load staticfiles %}
+            <form class="register-form" method="post" action="{% url 'accounts:register' %}">
+                {% csrf_token %}
+                <div class="input-group fix">
+                    <div class="input-group-left right l">
+                        <span class="color-red">*</span>
+                        用户名：
+                    </div>
+                    <div class="input-group-right l" id="username">
+                        {{ form.username }}
+                        {% if form.username.errors %}
+                            <div class="img">
+                                <img src="{% static "images/register-error.png" %}"/>
+                                <span class="color-red">{{ form.username.errors }}</span>
+                            </div>
+                        {% else %}
+                            {% if post %}
+                                <div class="img">
+                                    <img src="{% static "images/register-right.png" %}"/>
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="input-group fix">
+                    <div class="input-group-left right l">
+                        <span class="color-red">*</span>
+                        密码：
+                    </div>
+                    <div class="input-group-right l">
+                        {{ form.password }}
+                        {% if form.password.errors %}
+                            <div class="img">
+                                <img src="{% static "images/register-error.png" %}"/>
+                                <span class="color-red">{{ form.password.errors }}</span>
+                            </div>
+                        {% else %}
+                            {% if post %}
+                                <!--
+                                <div class="img">
+                                    <img src="{% static "images/register-right.png" %}"/>
+                                </div>
+                                -->
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="input-group fix">
+                    <div class="input-group-left right l">
+                        <span class="color-red">*</span>
+                        确认密码：
+                    </div>
+                    <div class="input-group-right l" id="re_password">
+                        {{ form.re_password }}
+                        {% if form.re_password.errors %}
+                            <div class="img">
+                                <img src="{% static "images/register-error.png" %}"/>
+                                <span class="color-red">{{ form.re_password.errors }}</span>
+                            </div>
+                        {% else %}
+                            {% if post %}
+                                <!--
+                                <div class="img">
+                                    <img src="{% static "images/register-right.png" %}"/>
+                                </div>
+                                -->
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="input-group fix">
+                    <div class="input-group-left right l">
+                        <span class="color-red">*</span>
+                        手机号：
+                    </div>
+                    <div class="input-group-right l" id='get_captcha'>
+                        {{ form.mobile_phone }}
+                        <div class="get-code" id='get_captcha_button'>
+                            <span class="send" id="J_getCode">获取验证码</span>
+                            <div class="send send-cover" id="J_getCode_Cover">获取验证码</div>
+                        </div>
+                        {% if form.mobile_phone.errors %}
+                            <div class="img" id="null_phone">
+                                <img src="{% static "images/register-error.png" %}"/>
+                                <span class="color-red">{{ form.mobile_phone.errors }}</span>
+                            </div>
+                        {% else %}
+                            {% if post %}
+                                <div class="img">
+                                    <img src="{% static "images/register-right.png" %}"/>
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="input-group fix">
+                    <div class="input-group-left right l">
+                        <span class="color-red">*</span>
+                        验证码：
+                    </div>
+                    <div class="input-group-right l">
+                        {{ form.captcha }}
+                        {% if form.captcha.errors %}
+                            <div class="img">
+                                <img src="{% static "images/register-error.png" %}"/>
+                                <span class="color-red">{{ form.captcha.errors }}</span>
+                            </div>
+                        {% else %}
+                            {% if post %}
+                                <div class="img">
+                                    <img src="{% static "images/register-right.png" %}"/>
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="input-group fix">
+                    <div class="input-group-left right l">
+                        邮箱：
+                    </div>
+                    <div class="input-group-right l">
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                            <div class="img">
+                                <img src="{% static "images/register-error.png" %}"/>
+                                <span class="color-red">{{ form.email.errors }}</span>
+                            </div>
+                        {% else %}
+                            {% if post %}
+                                <!--
+                                <div class="img">
+                                    <img src="{% static "images/register-right.png" %}"/>
+                                </div>
+                                -->
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="input-group fix">
+                    <div class="input-group-left right l">
+                        推荐人：
+                    </div>
+                    <div class="input-group-right l" id="introducer">
+                        {{ form.introducer }}
+                        {% if form.introducer.errors %}
+                            <div class="img">
+                                <img src="{% static "images/register-error.png" %}"/>
+                                <span class="color-red">{{ form.introducer.errors }}</span>
+                            </div>
+                        {% else %}
+                            {% if post %}
+                                <!--
+                                <div class="img">
+                                    <img src="{% static "images/register-right.png" %}"/>
+                                </div>
+                                -->
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="user-agreement">
+                    {{ form.user_agreement }}
+                    <span>我已阅读并同意</span>
+                    <a id="userAgreement">《蓝图百货用户协议》</a>
+                    {% if form.user_agreement.errors %}
+                        <img src="{% static "images/register-error.png" %}"/>
+                        <span class="color-red">{{ form.user_agreement.errors|striptags }}</span>
+                    {% else %}
+                        {% if post %}
+                            <img src="{% static "images/register-right.png" %}"/>
+                        {% endif %}
+                    {% endif %}
+                </div>
+                <div class="register-btn">
+                    <input type="submit" value="下一步"/>
+                </div>
+            </form>

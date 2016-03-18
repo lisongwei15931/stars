@@ -1,0 +1,59 @@
+{% load thumbnail %}
+                {% for pickup_line in pickup_line_list %} 
+                    <div class="orderCont">
+                        <div class="order">
+                            <h2>上门自提</h2>
+                            {% for line in pickup_line.lines %}
+                                <ul class="goods">
+                                    {% with product=line.product %}
+                                        <li class="firstOne">
+                                            <a href="{{ product.get_absolute_url }}" target="_blank">
+                                                {% with image=product.primary_image %}
+                                                    {% thumbnail image.original "100x100" crop="center" as thumb %}
+                                                        <img class="thumbnail" src="{{ thumb.url }}" alt="{{ product.get_title }}" width="100" height="100"/>
+                                                    {% endthumbnail %}
+                                                {% endwith %}
+                                            </a>
+                                        </li>
+                                        <li class="firstTwo">
+                                            <p><a href="{{ product.get_absolute_url }}">{{ product.title }}</a></p>
+                                            <p>杂费：<span class="red">￥{{ product.pickup_price|floatformat:2 }}</span>  ×{{ line.quantity }}</p>
+                                        </li>
+                                        <li class="firstThree"><span class="red">￥{{ product.buy_price|floatformat:2 }}</span></li>
+                                        <li class="firstThree">×{{ line.quantity }}</li>
+                                    {% endwith %}
+                                </ul>
+                            {% endfor %}
+                        </div>
+                        <div class="total">杂费小计：<span class="red">￥{{ pickup_line.pickup_price|floatformat:2 }}</span>&nbsp;&nbsp;快递费：<span class="red">￥0.00</span></div>
+                    </div>
+                {% endfor %}
+                {% for partner_line in partner_line_list %} 
+                    <div class="orderCont">
+                        <div class="order">
+                            <h2>货物运输:{{ partner_line.partner }}</h2>
+                            {% for line in partner_line.lines %}
+                                <ul class="goods">
+                                    {% with product=line.product %}
+                                        <li class="firstOne">
+                                            <a href="{{ product.get_absolute_url }}" target="_blank">
+                                                {% with image=product.primary_image %}
+                                                    {% thumbnail image.original "100x100" crop="center" as thumb %}
+                                                        <img class="thumbnail" src="{{ thumb.url }}" alt="{{ product.get_title }}" width="100" height="100"/>
+                                                    {% endthumbnail %}
+                                                {% endwith %}
+                                            </a>
+                                        </li>
+                                        <li class="firstTwo">
+                                            <p><a href="{{ product.get_absolute_url }}">{{ product.title }}</a></p>
+                                            <p>杂费：<span class="red">￥{{ product.pickup_price|floatformat:2 }}</span>  ×{{ line.quantity }}</p>
+                                        </li>
+                                        <li class="firstThree"><span class="red">￥{{ product.buy_price|floatformat:2 }}</span></li>
+                                        <li class="firstThree">×{{ line.quantity }}</li>
+                                    {% endwith %}
+                                </ul>
+                            {% endfor %}
+                        </div>
+                        <div class="total">杂费小计：<span class="red">￥{{ partner_line.pickup_price|floatformat:2 }}</span>&nbsp;&nbsp;快递费：<span class="red">￥{{ partner_line.express_price|floatformat:2 }}</span></div>
+                    </div>
+                {% endfor %}

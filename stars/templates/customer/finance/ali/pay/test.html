@@ -1,0 +1,18 @@
+﻿{% extends "customer/safety/account_no_left_nav_base.html" %}
+{% load staticfiles %}
+{% load compress %}
+{%  block title %}蓝图百货--微信支付{%  endblock title %}
+{% block custom_css %}
+    <link rel="stylesheet" href="{% static "css/account_safety.css" %}" type="text/css">
+    <link rel="stylesheet" href="{% static "css/pay.css" %}" type="text/css">
+{% endblock %}
+{% block onbodyload %}
+
+    <form id='alipaysubmit' name='alipaysubmit' action='{{ form.action }}' method="post" target='_blank'>
+        {% for k,v  in form.params.items %}
+            <input type='hidden' name='{{ k }}' value='{{ v }}'/>
+        {% endfor %}
+        <input type='submit' value='支付宝支付'>
+    </form>
+
+{% endblock %}

@@ -1,0 +1,32 @@
+{% load django_tables2 %}
+{% load i18n %}
+<div class="btn-toolbar">
+    {% if record.status == '0' %}
+        <div class="btn-group">
+            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="true">
+                {% trans "Actions" %}
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu pull-right">
+                    <li>
+                        <a href="{% url 'dashboard:store-income-apply' pk=record.id %}">入库</a>
+                    </li>
+            </ul>
+        </div>
+    {% elif record.status == '1' %}
+        <div class="btn-group">
+        <li>
+            <span>待审核，无法修改</span>
+        </li>
+    {% elif record.status == '2' %}
+        <div class="btn-group">
+        <li>
+            <span>已驳回，无法修改</span>
+        </li>
+    {% elif record.status == '4' %}
+        <div class="btn-group">
+        <li>
+            <span>已入库，无法修改</span>
+        </li>
+    {% endif %}
+</div>

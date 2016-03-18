@@ -1,0 +1,6 @@
+{% if record.is_parent %}
+    -
+{% else %}
+    {{ record.stockrecords.first.num_in_stock }}
+{% endif %}
+

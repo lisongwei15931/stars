@@ -1,0 +1,307 @@
+{% extends 'base_stars.html' %}
+{% load staticfiles %}
+{% load thumbnail %}
+
+{% block public_css %}
+    <link rel="stylesheet" href="{% static "css/shopcar.css" %}" type="text/css">
+{% endblock %}
+{% block jquery %}
+    <script type="text/javascript" src="{% static "js/jquery-1.11.1.min.js" %}"></script>
+{% endblock %}
+
+{% block title %}蓝图百货—购物车—结算{% endblock %}
+
+{% block logo %}
+    <div class="register-topbar fix">
+        <div class="container fix">
+            <div class="register-topbar-left l">
+                <img src="images/logo1.png"/>
+            </div>
+            <div class="register-topbar-right r">
+                结算页面
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="container shopcar-balance fix">
+        <div class="shopcar-balance-tit">
+            填写并核对订单信息
+        </div>
+        <div class="shopcar-balance-conbody">
+            <div class="row">
+                <div class="row-tit fix">
+                    <span class="l">收货人信息</span>
+                    <a class="row-tit-r r" id="consignee">新增收货地址</a>
+                </div>
+                <div id="consignee-con" style="display: none;">
+                    <div class="shopcar-pupzz"></div>
+                    <div class="shopcar-pupbody">
+                        <div class="pupbody-top fix">
+                            <div class="pupbody-title l">新增收货人信息</div>
+                            <div class="pupbody-closebtn r">×</div>
+                        </div>
+                        <div class="pupbody-content">
+                            shopcarshopcarshopcarshopcarshopcarshopcarshopcarshopcarshopcarshopcarshopcar
+                        </div>
+                        <div class="pupbody-btn center">
+                            <a class="shopcar-btn">保存收货人信息</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="row-con-body">
+                    <div class="row-content fix">
+                        <div class="row-name-addr addrChange l active">
+                            <span>小明&nbsp;&nbsp;&nbsp;北京</span>
+                        </div>
+                        <div class="row-addr">
+                            <div class="row-addr-infor">
+                                <span>小明</span>
+                                <span>北京</span>
+                                <span>朝阳区</span>
+                                <span>四环到五环之间</span>
+                                <span>中关村</span>
+                                <span>130****2121</span>
+                            </div>
+                            <div class="row-addr-a">
+                                <a>编辑</a>
+                                <a>删除</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row-moreaddr1 row-content fix" style="display: none;">
+                        <div class="row-name-addr addrChange l">
+                            <span>小明&nbsp;&nbsp;&nbsp;北京</span>
+                        </div>
+                        <div class="row-addr row-addr1">
+                            <div class="row-addr-infor">
+                                <span>小明</span>
+                                <span>北京</span>
+                                <span>朝阳区</span>
+                                <span>四环到五环之间</span>
+                                <span>中关村</span>
+                                <span>130****2121</span>
+                            </div>
+                            <div class="row-addr-a r">
+                                <a>编辑</a>
+                                <a>删除</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row-moreaddr1 row-content fix" style="display: none;">
+                        <div class="row-name-addr addrChange l">
+                            <span>小明&nbsp;&nbsp;&nbsp;北京</span>
+                        </div>
+                        <div class="row-addr row-addr1">
+                            <div class="row-addr-infor">
+                                <span>小明</span>
+                                <span>北京</span>
+                                <span>朝阳区</span>
+                                <span>四环到五环之间</span>
+                                <span>中关村</span>
+                                <span>130****2121</span>
+                            </div>
+                            <div class="row-addr-a r">
+                                <a>编辑</a>
+                                <a>删除</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row-moreaddr">
+                        更多地址
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="row-tit fix">
+                    <span class="l">支付方式</span>
+                </div>
+                <div class="row-con-body">
+                    <div class="row-content fix">
+                        <div class="fix">
+                            <div class="row-name-addr l active zhifuChange">
+                                <span>余额支付</span>
+                            </div>
+                            <div class="row-name-addr l zhifuChange">
+                                <span>支付宝</span>
+                            </div>
+                            <div class="row-name-addr l zhifuChange">
+                                <span>微信支付</span>
+                            </div>
+                            <div class="row-name-addr l zhifuChange">
+                                <span>银行卡</span>
+                            </div>
+                        </div>
+                        <div class="now-yue">
+                            当前余额：<span class="color-red">￥200</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="row-tit fix">
+                    <span class="l">送货清单</span>
+                    <a class="row-tit-r r">返回修改购物车</a>
+                </div>
+                <div class="row-con-body fix">
+                    <div class="row-content fix">
+                        <div class="l">
+                            <div class="fix">
+                                <div class="row-name-addr l active peisongChange">
+                                    <span>上门自提</span>
+                                </div>
+                                <div class="row-name-addr l peisongChange">
+                                    <span>货物运输</span>
+                                </div>
+                            </div>
+                            <div class="ziti-infor l">
+                                <p>自提地点： <span>北京万寿路</span><a id="Sincesome" class="revise">修改</a></p>
+                                <p>自提时间： <a>短信通知至收货人手机</a></p>
+                                <p>免运费</p>
+                            </div>
+                            <div id="Sincesome-con" style="display: none;">
+                                <div class="shopcar-pupzz"></div>
+                                <div class="shopcar-pupbody">
+                                    <div class="pupbody-top fix">
+                                        <div class="pupbody-title l">选择自提点</div>
+                                        <div class="pupbody-closebtn r">×</div>
+                                    </div>
+                                    <div class="pupbody-content">
+                                        shopcarshopcarshopcarshopcarshopcarshopcarshopcarshopcarshopcarshopcarshopcar
+                                    </div>
+                                    <div class="pupbody-btn center">
+                                        <a class="shopcar-btn">保存自提点</a>
+                                        <a class="delete">取消</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="goods l">
+                            <div class="item fix">
+                                <div class="l">
+                                    <img src="images/shop-list2.jpg"/>
+                                </div>
+                                <div class="item-infor r">
+                                    <span>长城特酿3年解百纳干红葡萄酒 整箱装 750ml*6瓶</span>
+                                    <span class="color-red">￥178</span>
+                                    <span>×1</span>
+                                </div>
+                            </div>
+                            <div class="item fix">
+                                <div class="l">
+                                    <img src="images/shop-list2.jpg"/>
+                                </div>
+                                <div class="item-infor r">
+                                    <span>长城特酿3年解百纳干红葡萄酒 整箱装 750ml*6瓶</span>
+                                    <span class="color-red">￥178</span>
+                                    <span>×1</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="beizhu">
+                        <span>添加订单备注</span>
+                        <input type="text"/>
+                        <span class="tishi">提示：请勿填写有关支付、收货、发票方面的信息</span>
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="border-bottom: none;">
+                <div class="row-tit fix">
+                    <span class="l">发票信息</span>
+                </div>
+                <div class="row-con-body">
+                    <div class="row-content">
+                        普通发票（纸质）     发票抬头：个人    内容：明细
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row-total r">
+            <div>
+                4 件商品，总金额：
+                <span>￥6615.00</span>
+            </div>
+            <div>
+                包装费：
+                <span class="color-red">￥20.00</span>
+            </div>
+            <div>
+                运费：
+                <span class="color-red">￥65.00</span>
+            </div>
+            <div>
+                应付总额：
+                <span class="color-red f-size24">￥6680</span>
+            </div>
+            <div class="tijiao">
+                提交订单
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block footer_script %}
+    <script type="text/javascript">
+        window.onload = function(){
+            $(".footer-menu").find("li").eq(-1).children("span").css("display","none");
+        };
+        $(document).ready(function(){
+            $("#consignee").click(function(){
+                $("#consignee-con").css("display","block");
+                $(".pupbody-closebtn,.pupbody-btn>a").click(function(){
+                    $("#consignee-con").css("display","none");
+                });
+                $(".pupbody-btn>a").click(function(){
+
+                });
+            });
+            $("#Sincesome").click(function(){
+                $("#Sincesome-con").css("display","block");
+                $(".pupbody-closebtn,.pupbody-btn>a.shopcar-btn").click(function(){
+                    $("#Sincesome-con").css("display","none");
+                });
+                $(".pupbody-btn>a").click(function(){
+
+                });
+            });
+        });
+        //得到焦点触发事件
+        function OnfocusFun(element,elementvalue)
+        {
+            if(element.value==elementvalue)
+            {
+                element.value="";
+                element.style.color="#343434";
+            }
+        }
+        //离开输入框触发事件
+        function OnBlurFun(element,elementvalue)
+        {
+            if(element.value=="" || element.value.replace(/\s/g,"")=="")
+            {
+                element.value=elementvalue;
+                element.style.color="#999";
+            }
+        }
+        $(function(){
+            $(".row-con-body>.row-moreaddr").click(function(){
+                $(".row-moreaddr1").css("display","block");
+            });
+
+            $(".zhifuChange,.peisongChange").click(function(){
+                $(this).addClass("active");
+                $(this).siblings().removeClass("active");
+            });
+            $(".addrChange").click(function(){
+                $(".addrChange").removeClass("active");
+                $(this).addClass("active");
+
+            });
+        });
+    </script>
+{% endblock %}

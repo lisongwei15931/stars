@@ -1,0 +1,365 @@
+{% extends "customer/safety/account_no_left_nav_base.html" %}
+{% load staticfiles %}
+{% load compress %}
+{% load thumbnail %}
+
+{% block custom_css %}<link rel="stylesheet" href="{% static "css/account2.css" %}" type="text/css">{% endblock %}
+{% block custom_js %}
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=b2Oy0FxhxxotX9o1YC7UXVLU"></script>
+{% endblock %}
+{% block title %}蓝图百货--我的存货-申请提货{% endblock title %}
+
+{% block onbodyload %}
+    <div class="contentVisit">
+        <div class="comTitle" style="width:1140px;border-bottom:1px solid #eee;"><a href="{% url 'customer:stock' %}">我的存货</a>&gt;上门自提<a class="backMy" href="{% url 'customer:stock' %}">返回我的存货</a></div>
+        <div class="visitDot">
+        	<div id="pickup_apply_left" class="visitDot_left">
+                {% include 'customer/stock/partials/pickup_apply_left.html' %}
+            </div>
+            <div class="visitDot_right">
+            	<div class="priceTitle">
+                    <p>共计&nbsp;<span style="color:#ff0000;">{{ record_quantity }}</span>&nbsp;种商品</p>
+                    <p>提货费用：&nbsp;<span style="color:#ff0000;" id="total_pickup_price">20</span>&nbsp;元(含包装及其他)</p>
+                    <p class="mail">快递费：&nbsp;<span style="color:#ff0000;" id="total_express_price">20</span>&nbsp;元</p>
+                </div>
+                <div class="goodsScroll">
+                    {% for record in record_list %}
+                        <ul class="rightGoods">
+                            <li class="firstOne">
+                                <a href="{{ record.product.get_absolute_url }}">
+                                    {% with image=record.product.primary_image %}
+                                        {% thumbnail image.original "100x100" crop="center" as thumb %}
+                                            <img class="thumbnail" src="{{ thumb.url }}" alt="{{ record.product.get_title }}" width="100" height="100"/>
+                                        {% endthumbnail %}
+                                    {% endwith %}
+                                </a>
+                            </li>
+                            <li style="display:none">
+                                <span id="pickup_price_{{ record.id }}">{{ record.pickup_price }}</span>
+                                <span id="express_price_{{ record.id }}">{{ record.express_price }}</span>
+                            </li>
+                            <li class="firstTwo">
+                                <a href="{{ record.product.get_absolute_url }}">{{ record.product.get_title}}</a><br />
+                                {% if not record.product.can_pickup or pickup_addr_list %}
+                                    <span style="color:red;">此商品不支持自提</span>
+                                {% endif %}
+                            </li>
+                            <li class="firstThree">余量 <span id="max_quantity_{{ record.id }}">{{ record.max_quantity }}</span></li>
+                            <li class="firstFour">
+                            <img class="trim-l l" src="{% static "images/num-h.png" %}">
+                            <input id="quantity_{{ record.id }}" class="l center pickup_quantity" type="text" value="{{ record.quantity }}" style="height:26px; line-height:26px;">
+                                <img class="trim-r l" src="{% static "images/num+h.png" %}">
+                            </li>
+                        </ul>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <form id='pickup_data' method="post" action='.' style="display:none">
+            {% csrf_token %}
+            <input type="text" name="pickup_type" id="pickup_type" value="1" />
+            <input type="text" name="receiving_address_id" id="receiving_address_id" />
+            <input type="text" name="pickup_address_id" id="pickup_address_id" />
+            <input type="text" name="pickup_price_value" id="pickup_price_value" />
+            <input type="text" name="express_price_value" id="express_price_value" />
+        </form>
+        <div class="sub1"><input type="submit" value="立即提交" id="sub_able"/><input type="submit" value="立即提交" id="sub_unable"/></div>
+            <div class="unable-point">需支付<span id="total_price">20</span>元，可用余额：<span id="user_balance">{{ user_balance|floatformat:2 }}</span>元 &nbsp;</span><span id="recharge" style="color:black;">请<a href="#">充值</a></span></div>
+    </div>
+{% endblock %}
+
+{% block index_script %}
+{% endblock %}
+
+{% block onfooterload %}
+    {{ block.super }}
+    <div id="fullbg"></div>
+    <div id="dialog" style="width:800px; height:500px; position:absolute; left:50%; top:50%; margin-left:-400px; margin-top:-250px;">
+        <div class="closeMap">关闭</div>
+        <div style="width:798px;height:500px;border:#ccc solid 1px;" id="dituContent"></div>
+    </div>
+{% endblock %}
+
+{% block footer_extra_script %}
+    <script type="text/javascript" src="{% static "js/map.js" %}"></script>
+    <script type="text/javascript">
+
+        window.onload = function(){
+            $(".footer-menu").find("li").eq(-1).children("span").css("display","none");
+            pickup_quantity_check($('.pickup_quantity').first());
+        };
+        
+        $('#sub_able').click(function(){
+            if ($('#to_pickup').hasClass('active')) {
+                var current_pickup_address = $("#ziti li.current");
+                if (current_pickup_address.length > 0) {
+                    var pickup_address_id = current_pickup_address.attr('id');
+                }
+                else {
+                    alert('没有选择自提点。如果您还没有添加过自提点，请添加。');
+                    return false;
+                }
+                $('#pickup_address_id').val(pickup_address_id);
+                $('#pickup_type').val('1');
+                var receiving_address_id = $("#huoyun li.current").attr('id');
+                $('#receiving_address_id').val(receiving_address_id);
+            }
+            else {
+                var current_receiving_address = $("#huoyun li.current");
+                if (current_receiving_address.length > 0) {
+                    var receiving_address_id = current_receiving_address.attr('id');
+                }
+                else {
+                    alert('没有选择收货地址。如果您还没有添加过收货地址，请添加。');
+                    return false;
+                }
+                $('#receiving_address_id').val(receiving_address_id);
+                $('#pickup_type').val('2');
+                var pickup_address_id = $("#ziti li.current").attr('id');
+                $('#pickup_address_id').val(pickup_address_id);
+            }
+            $('#pickup_data').submit();
+            /*
+            $.ajax({
+                type: "GET",
+                data: {'pickup_address_id': pickup_address_id, 'pickup_type': pickup_type.value},
+                url: "{% url 'customer:pickup_store_check' %}",
+                success: function (result) {
+                    if(result.result) {
+                        $('#pickup_data').submit();
+                    }
+                    else {
+                        alert('此自提点目前不支持这些货物同时自提，请选择其他自提点。');
+                    }
+                }
+            })
+            */
+        })
+
+        function pickup_quantity_check(pickup_quantity) {
+            var max_num = parseInt($('#max_'+pickup_quantity[0].id).html());
+            var quantity = parseInt(pickup_quantity.val());
+            //var add_button = product_quantity.next();
+            //var minus_button = product_quantity.prev();
+            if (isNaN(quantity)) {
+                alert('请填入数字');
+                pickup_quantity.val(1);
+                //add_button.addClass('active');
+                //minus_button.removeClass('active');
+            }
+            else {
+                pickup_quantity.val(quantity);
+                if (quantity > max_num) {
+                    alert('商品数量超限');
+                    pickup_quantity.val(max_num);
+                    //minus_button.addClass('active');
+                    //add_button.removeClass('active');
+                }
+                else if (quantity <= 0) {
+                    alert('请填入大于0的数量');
+                    pickup_quantity.val(1);
+                    //add_button.addClass('active');
+                    //minus_button.removeClass('active');
+                }
+            }
+            /*
+            if (max_num <= 1) {
+                add_button.removeClass('active');
+                minus_button.removeClass('active');
+            }
+            */
+            
+            // all pickup_price
+            var all_quantity = $('.pickup_quantity');
+            var total_pickup_price = 0;
+            for (var i=0;i<all_quantity.length;i++) {
+                var current_quantity_input = all_quantity[i];
+                var current_quantity = parseInt($(current_quantity_input).val());
+                var current_pickup_price = parseFloat($('#pickup_price_' + current_quantity_input.id.split('_')[1]).html());
+                total_pickup_price = total_pickup_price + current_quantity * current_pickup_price;
+            }
+            $('#total_pickup_price').html(total_pickup_price.toFixed(2));
+            $('#pickup_price_value')[0].value = total_pickup_price.toFixed(2);
+            
+            // all express_price
+            var all_quantity = $('.pickup_quantity');
+            var total_express_price = 0;
+            for (var i=0;i<all_quantity.length;i++) {
+                var current_quantity_input = all_quantity[i];
+                var current_quantity = parseInt($(current_quantity_input).val());
+                var current_express_price = parseFloat($('#express_price_' + current_quantity_input.id.split('_')[1]).html());
+                total_express_price = total_express_price + current_quantity * current_express_price;
+            }
+            $('#total_express_price').html(total_express_price.toFixed(2));
+            $('#express_price_value')[0].value = total_express_price.toFixed(2);
+            
+            // totol price
+            if ($('#to_express').attr('class').indexOf('active') >= 0) {
+                var total_price = total_pickup_price + total_express_price;
+            }
+            else {
+                var total_price = total_pickup_price;
+            }
+            $('#total_price').html(total_price.toFixed(2));
+            
+            // balance
+            var user_balance = parseFloat($('#user_balance').html());
+            if (user_balance < total_price) {
+                $('#sub_unable').show();
+                $('#sub_able').hide();
+                $('#recharge').show();
+            }
+            else {
+                $('#sub_unable').hide();
+                $('#sub_able').show();
+                $('#recharge').hide();
+            }
+            // change backend data
+            var record_id = pickup_quantity[0].id.split('_')[1];
+            $.ajax({
+                type: "GET",
+                data: {'pickup_quantity': pickup_quantity.val(), 'record_id': record_id},
+                url: "{% url 'customer:pickup_quantity_set' %}",
+                success: function (data) {
+                    return false;
+                }
+            })
+            /*
+            if ($('#to_pickup').hasClass('active')) {
+                $.ajax({
+                    type: "GET",
+                    data: {},
+                    url: "{% url 'customer:pickup_apply' %}",
+                    success: function (result) {
+                        $('#pickup_apply_left').html(result.content_html);
+                        init_page();
+                    }
+                })
+            }
+            */
+        }
+        $('.pickup_quantity').change(function () {
+            pickup_quantity_check($(this));
+        })
+       function init_page(){
+		   //选择运输方式，自提或货运
+		   $(".checkCont:first").show().siblings(".checkCont").hide();
+		    $(".checkStyle li").click(function(){
+				//点击货运的时候加上运费
+				var index=$(this).index();
+				if(index==1){
+					$(".priceTitle .mail").css("display","block");
+				}
+                if(index==0) {
+                    $(".priceTitle .mail").css("display","none");//上门自提时没有运费
+                    {% if not can_pickup %}
+                        alert('您的提货单中有不支持自提的商品。');
+                        return false;
+                    {% endif %}
+                }
+            	$("#ziti li:first").show().siblings().hide();
+		    	$("#huoyun li:first").show().siblings().hide();
+            	$("#huoyunMore").show();
+            	$("#zitiMore").show();
+		   		$(this).addClass("active").siblings().removeClass("active");
+				var index=$(this).index();
+				$(".checkCont").eq(index).show().siblings(".checkCont").hide();
+                pickup_quantity_check($('.pickup_quantity').first());
+		   })
+		   //默认自提点
+		   $("#ziti li:first").show().siblings().hide();
+		   $("#huoyun li:first").show().siblings().hide();
+		   $("#zitiMore").click(function(){
+			   $("#ziti li").show();
+			   $(this).hide();
+			   $("#ziti").css("overflow-y","scroll");
+			   });
+			$("#huoyunMore").click(function(){
+			   $("#huoyun li").show();
+			   $(this).hide();
+			   $("#huoyun").css("overflow-y","scroll");
+			});
+			$(".visitAddress li").click(function(){
+				$("#zitiMore").show();
+				$("#huoyunMore").show();
+				$("#ziti").css("overflow-y","hidden");
+				$("#huoyun").css("overflow-y","hidden");
+                $(this).addClass('current').siblings("li").removeClass("current");
+				$(this).css({"border":"1px solid #c00000","display":"block"}).siblings().css({"border":"1px solid #eee","display":"none"});
+			});
+		   $(".visitAddress li .default").click(function(){
+			   $(".caoZuo .default").show();
+			   $(this).parent(".caoZuo").parent("li").addClass("current");
+			   $(this).parent(".caoZuo").parent("li").siblings("li").removeClass("current");
+			   $(this).parent(".caoZuo").parent("li").find("h2").append('<span class="defaultadd">默认自提点</span>');
+			   $(this).parent(".caoZuo").parent("li").siblings("li").find("h2").find("span").remove();
+			   $(this).hide();
+			});
+			   $(".deleteAddr").click(function(){
+				   $(this).parent(".caoZuo").parent("li").remove();
+				   });
+			$(".onMap").click(function(){
+				var height=$("body").height();
+				var width=$("body").width();
+				$("#fullbg").height(height);
+				$("#fullbg").width(width);
+				$("#fullbg").show();
+				$("#dialog").show();
+
+                // map
+                var lng_lat = this.id.split('_');
+                var current_lng = lng_lat[0];
+                var current_lat = lng_lat[1];
+                var point = this.id.replace('_', '|');
+                var map = new BMap.Map("dituContent");
+                map.centerAndZoom(new BMap.Point(current_lng, current_lat),15);
+                map.enableScrollWheelZoom(true);
+                //点击查看地图
+                //标注点数组
+                var markerArr = [{title:"自提点",content:"上门路<br/><br/>010",point:point,isOpen:0,icon:{w:23,h:25,l:46,t:21,x:9,lb:12}}];
+                toLocation(map, current_lng, current_lat, markerArr);
+            });
+			$(".closeMap").click(function(){
+				$("#fullbg").hide();
+				$("#dialog").hide();
+            });
+           {% if receiving_address_status %}
+                $('#to_express').trigger('click');
+                {% if not pickup_addr_list %}
+                    $('#to_pickup').remove();
+                {% endif %}
+           {% endif %}
+		}
+        $(function(){
+			//加一减一
+		   $(".firstFour>.trim-l").click(function(){
+                var inputVal = $(this).next().val();
+                inputVal--;
+                if(inputVal > 1){
+                    $(this).next().val(inputVal);
+                    $(this).next().next().attr("src","{% static "images/num+h.png" %}");
+                }else if(inputVal == 1){
+                    $(this).next().val(inputVal);
+                    //$(this).attr("src","{% static "images/num-.png" %}");
+                }
+                pickup_quantity_check($(this).next());
+            });
+            $(".firstFour>.trim-r").click(function(){
+                var inputVal = $(this).prev().val();
+                inputVal++;
+                if(inputVal > 1){
+                    $(this).prev().val(inputVal);
+                    $(this).prev().prev().attr("src","{% static "images/num-h.png" %}");
+                }if(inputVal == 100000000000000000){
+                    $(this).prev().val(inputVal);
+                    //$(this).attr("src","{% static "images/num+.png" %}");
+                }else if(inputVal > 100000000000000000){
+                    return false;
+                }
+                pickup_quantity_check($(this).prev());
+            });
+		   
+            init_page();
+        })
+    </script>
+{% endblock %}

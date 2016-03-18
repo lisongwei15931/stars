@@ -1,0 +1,106 @@
+                <ul class="checkStyle">
+                    <li id="to_pickup" class="current l active">
+                        上门自提
+                    </li>
+                    <li id="to_express" class="current l">
+                        货物运输
+                    </li>
+                </ul>
+                <div class="now-yue">
+                    自提免运费
+                </div>
+                <div class="checkCont">
+                	<ul class="visitAddress" id="ziti">
+                    {% for pickup_address in pickup_address_list %}
+                        {% if forloop.counter0 == 0 %}
+                            <li id="{{ pickup_address.id }}" class="current cur-2">
+                        {% else %}
+                            <li id="{{ pickup_address.id }}" >
+                        {% endif %}
+                            <h2>{{ pickup_address.pickup_addr.name }}
+                                {% if pickup_address.is_default %}
+                                    <span class="defaultadd">默认自提点</span>
+                                {% endif %}
+                            </h2>
+                            <table cellpadding="0" cellspacing="0" style="margin-top:10px;">
+                                <tr>
+                                    <td class="firstGray">自提点名称：</td>
+                                    <td style="font-weight:bold;">{{ pickup_address.pickup_addr.name }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="firstGray">所在地区：</td>
+                                    <td>{{ pickup_address.pickup_addr.city }} {{ pickup_address.pickup_addr.district }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="firstGray">详细地址：</td>
+                                    <td>{{ pickup_address.pickup_addr.addr }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="firstGray">联系电话：</td>
+                                    <td>{{ pickup_address.pickup_addr.tel }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="firstGray">联系人：</td>
+                                    <td>{{ pickup_address.pickup_addr.contact }}</td>
+                                </tr>
+                            </table>
+                            <div class="caoZuo">
+                                <!--
+                                <p class="deleteAddr">删除</p>
+                                <p class="default">设置默认</p>
+                                -->
+                                <p class="onMap" id="{{ pickup_address.pickup_addr.lng }}_{{ pickup_address.pickup_addr.lat }}">查看地图</p>
+                            </div>
+                        </li>
+                    {% endfor %}
+                    </ul>
+                	<div class="visitMore">
+                        <!--<a href="{% url 'customer:add_pickup_addr' %}" id="btn-1">添加自提点</a>-->
+                    <a href="javascript:void(0)" class="more-Addr" id="zitiMore">更多自提点</a>
+                </div>
+            	</div>
+                <div class="checkCont">
+                	<ul class="visitAddress" id="huoyun">
+                        {% for receiving_address in receiving_address_list %}
+                            {% if forloop.counter0 == 0 %}
+                                <li class="current" id={{ receiving_address.id }}>
+                            {% else %}
+                                <li id={{ receiving_address.id }}>
+                            {% endif %}
+                                <h2>{{ receiving_address.consignee }} {{ receiving_address.city }} {{ receiving_address.district}}
+                                    {% if receiving_address.is_default %}
+                                        <span class="defaultadd">默认地址</span>
+                                    {% endif %}
+                                </h2>
+                                <table cellpadding="0" cellspacing="0" style="margin-top:10px;">
+                                    <tr>
+                                        <td class="firstGray">所在地区：</td>
+                                        <td>{{ receiving_address.city }} {{ receiving_address.district}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="firstGray">详细地址：</td>
+                                        <td>{{ receiving_address.address }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="firstGray">联系电话：</td>
+                                        <td>{{ receiving_address.mobile_phone }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="firstGray">联系人：</td>
+                                        <td>{{ receiving_address.consignee }}</td>
+                                    </tr>
+                                </table>
+                                <div class="caoZuo">
+                                    <!--
+                                    <p class="deleteAddr">删除</p>
+                                    <p class="default">设置默认</p>
+                                    -->
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                	<div class="visitMore">
+                    <a href="{% url 'customer:add_receiving_addr' %}" id="btn-1">新建收货地址</a>
+                    <a href="javascript:void(0)" class="more-Addr" id="huoyunMore">更多地址</a>
+                </div>
+                </div>

@@ -1,0 +1,52 @@
+{% extends 'base_stars.html' %}
+{% load staticfiles %}
+{% load thumbnail %}
+{% load currency_filters %}
+{% load purchase_info_tags %}
+{% load widget_tweaks %}
+
+{% block public_css %}
+    {{block.super}}
+    <link rel="stylesheet" href="{% static "css/shopcar.css" %}" type="text/css">
+    <link rel="stylesheet" href="{% static "css/help.css" %}" type="text/css">
+{% endblock %}
+{% block custom_css %}
+    <style type="text/css">
+    .new-title li.current a{
+        color: #fff;
+    }
+    </style>
+{% endblock %}
+{% block jquery %}
+    <script type="text/javascript" src="{% static "js/jquery-1.11.1.min.js" %}"></script>
+    {{block.super}}
+{% endblock %}
+{% block title %}蓝图百货{% endblock %}
+{% block content %}
+<!--顶部 end--><!-- InstanceBeginEditable name="EditRegion3" -->
+<div class="helpContent">
+	<div class="helpLeft">
+    	<ul class="new-title" id="dt-title">
+        	<li {%if news_product_detail.category == 3%}class="current"{%endif%}>
+                <a href="{% url 'promotions:news_product' %}?flag=3">新品上市</a>
+            </li>
+            <li {%if news_product_detail.category == 4%}class="current"{%endif%}>
+                <a href="{% url 'promotions:news_product' %}?flag=4">购物须知</a>
+            </li>
+            <li {%if news_product_detail.category == 2%}class="current"{%endif%}>
+                <a href="{% url 'promotions:news_product' %}?flag=2">公告</a>
+            </li>
+        </ul>
+    </div>
+    <div class="helpRight dt-helpRight">
+		<div class="dt-title">
+			<div class="back"></div>
+            <div class="caption">{{news_product_detail.title}}</div>
+        </div>
+        <div class="dt-time">{{ news_product_detail.created_datetime }}</div>
+        <div class="main-wz">
+        	{{ news_product_detail.content |safe}}
+        </div>
+    </div>
+</div>	
+{%endblock%}

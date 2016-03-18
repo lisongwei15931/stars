@@ -1,0 +1,77 @@
+﻿{% extends "customer/safety/account_no_left_nav_base.html" %}
+{% load staticfiles %}
+{% load compress %}
+{%  block title %}蓝图百货--微信支付{%  endblock title %}
+{% block custom_css %}
+    <link rel="stylesheet" href="{% static "css/account_safety.css" %}" type="text/css">
+    <link rel="stylesheet" href="{% static "css/pay.css" %}" type="text/css">
+{% endblock %}
+{% block onbodyload %}
+
+    <!--账户安全body start-->
+    <div class="contentVisit">
+        <div class="comTitle">微信支付 <a href="#" class="other_pay">&lt;选择其他支付方式</a></div>
+        <div class=""></div>
+        <div class="pay-lable">
+            	<div class="left">
+                	<p class="bold">请您及时付款，以便订单尽快处理！ 订单号：{{ order_no }}</p>
+                    <div id="not_overdue">
+                        <p  style="margin-bottom:0;">距离二维码过期还剩<span class="red" id="remaining_s">{{ remaining_seconds  }}</span>秒，过期后请刷新页面重新获取二维码。</p>
+                    </div>
+                    <div id="overdue" style="visibility: hidden">
+                        <p id="overdue" style="margin-bottom:0;">二维码已过期，
+                            <a href="{% url 'customer:finance-wx-pay_home' %}?order_no={{ order_no }}"  style="color:#0088cc; cursor:pointer;">刷新</a>页面重新获取二维码。</p>
+                    </div>
+                </div>
+                <div class="right">
+                    <p class="blue" style="margin-bottom:0;">订单详情<b class="arr"></b></p>
+                </div>""
+        </div>
+        <div class="dd-detail">
+{#        	<p>收货地址：{{ address }}北京海淀区中关村 &nbsp;&nbsp; 收货人：{{ username }}xxx &nbsp;{{ mobile }}139****2491 </p>#}
+            <p>商品名称：{% for name in product_names %}{{ names }}{% if not forloop.last %}&nbsp;{% endif %}{% endfor %}卡饰社 汽车车用可显示手机号防滑垫 多功能止滑垫置物垫</p>
+        </div>
+        <script>
+        	$(function(){
+				$(".blue").click(function(){
+						$(".dd-detail").toggle();
+				});	
+			})
+        </script>
+        <div class="pay-image">
+        	<div class="left">
+            	<p class="p1"><img src="{{ qr_code_url }}" width="240" height="239"></p>
+                <p class="p2">请使用微信扫一扫&nbsp;&nbsp;扫描二维码支付</p>
+            </div>
+            <div class="right"><img src="{% static "images/pay1.jpg" %}" width="358" height="408"></div>
+        </div>
+    </div>
+    <!--账户安全body end-->
+{% endblock onbodyload %}
+
+{% block footer_extra_script %}
+
+<script type="text/javascript">
+        var period={{ remaining_seconds }};
+        wait = period;
+        function clock() {
+            if (wait <= 0) {
+{#                document.getElementById("not_overdue").style.visibility="hidden";#}
+                document.getElementById("overdue").style.visibility="visible";
+                $("#J_getCode_Cover").css("display","block");
+                //document.getElementById("J_getCode").removeAttribute("disabled");
+                $("#J_getCode").css("background-color","#0a8fc7");
+                document.getElementById("remaining_s").innerHTML="0";
+            } else {
+                //document.getElementById("J_getCode").setAttribute("disabled", true);
+                document.getElementById("J_getCode").innerHTML=wait--;
+{#                setTimeout(function() {#}
+{#                            time()#}
+{#                        },#}
+{#                        1000)#}
+            }
+        }
+    timer = setInterval("clock()", 1000);
+    </script>
+
+{% endblock %}

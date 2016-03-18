@@ -1,0 +1,196 @@
+{% extends "customer/account_base.html" %}
+{% load staticfiles %}
+{% load compress %}
+
+{%  block title %}蓝图百货--账户资产{%  endblock title %}
+
+{% block oncontentload %}
+    {{ block.super }}
+    <!--银行卡 body start-->
+    <div class="account-item-body1 container">
+        <div class="account-item-con" id="content">
+            <div class="account-item-tit">
+                <a href="account-银行卡.html">银行卡&nbsp;>&nbsp;</a>
+                <span>修改手机</span>
+            </div>
+            <div class="account-item-matter">
+                <div class="bank-card-item bank-card-item2 fix">
+                    <div class="bank-tit">
+                        <img src="images/CCB.png" class="l"/>
+                        <div class="personal-infor r">
+                            <p class="card-type">存储卡</p>
+                            <p class="card-name">蓝图百货</p>
+                        </div>
+                    </div>
+                    <div class="card-num">
+                        <div class="card-num-con">
+                            卡号<span>**** **** **** 2125</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-group fix">
+                    <div class="input-group-left right l">
+                        输入新手机号：
+                    </div>
+                    <div class="input-group-right l">
+                        <input type="text" onfocus="OnfocusFun(this,'')" onblur="OnBlurFun(this,'')" class="l"/>
+                        <div class="marked-words l">
+                            不能为空不能为空不能为空不能为空不能为空不能为空
+                        </div>
+                    </div>
+                </div>
+                <div class="attention">
+                    请填写您在银行预留的手机号码，以验证银行卡是否属于您本人
+                </div>
+                <div class="input-group fix">
+                    <div class="input-group-left right l">
+                        短信验证码：
+                    </div>
+                    <div class="input-group-right l">
+                        <input type="text" value="" onfocus="OnfocusFun(this,'')" onblur="OnBlurFun(this,'')"/>
+                        <div class="get-code">
+                            <span class="send" id="J_getCode">获取验证码</span>
+                            <div class="send send-cover" id="J_getCode_Cover" onclick="time()">获取验证码</div>
+                        </div>
+                    </div>
+                    <div class="marked-words marked-words1 l">
+                        不能为空不能为空不能为空不能为空不能为空不能为空
+                    </div>
+                </div>
+                <div class="center refer">
+                    <input type="submit" value="提交"/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--银行卡 body end-->
+    <!--footer start-->
+    <div class="footer">
+        <div class="container">
+            <ul class="footer-menu fix">
+                <li><a href="#">帮助中心</a><span>|</span></li>
+                <li><a href="#">新手指导</a><span>|</span></li>
+                <li><a href="#">视频教程</a><span>|</span></li>
+                <li><a href="#">常见问题</a><span>|</span></li>
+                <li><a href="#">视频教程</a><span>|</span></li>
+                <li><a href="#">意见建议</a><span>|</span></li>
+                <li><a href="#">问题反馈</a><span>|</span></li>
+                <li><a href="#">关于我们</a><span>|</span></li>
+                <li><a href="#">联系我们</a><span>|</span></li>
+                <li><a href="#">加入我们</a><span>|</span></li>
+            </ul>
+            <p>
+                <span>增值电信业务经营许可证：浙B2-20110446</span>
+                <span>网络文化经营许可证：浙网文[2015]0295-065号</span>
+                <span>互联网医疗保健信息服务审核同意书 浙卫网审【2014】6号</span>
+            </p>
+            <p>互联网药品信息服务资质证书编号：浙-（经营性）-2012-0005</p>
+            <p>© 2014-2015 YZW.COM 版权所有</p>
+            <div class="footer-web">
+                <span class="di-1"></span>
+                <span class="di-2"></span>
+                <span class="di-3"></span>
+                <span class="di-4"></span>
+                <span class="di-5"></span>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+
+        window.onload = function(){
+            $(".footer-menu").find("li").eq(-1).children("span").css("display","none");
+        };
+        //得到焦点触发事件
+        function OnfocusFun(element,elementvalue)
+        {
+            if(element.value==elementvalue)
+            {
+                element.value="";
+                element.style.color="#343434";
+            }
+        }
+        //离开输入框触发事件
+        function OnBlurFun(element,elementvalue)
+        {
+            if(element.value=="" || element.value.replace(/\s/g,"")=="")
+            {
+                element.value=elementvalue;
+                element.style.color="#999";
+            }
+        }
+        //得到焦点触发事件
+        function OnfocusFun1(element,elementvalue)
+        {
+            if(element.value==elementvalue)
+            {
+                element.value="";
+                element.type="password";
+                element.style.color="#343434";
+            }
+        }
+        //离开输入框触发事件
+        function OnBlurFun1(element,elementvalue)
+        {
+            if(element.value=="" || element.value.replace(/\s/g,"")=="")
+            {
+                element.value=elementvalue;
+                element.type="text";
+                element.style.color="#999";
+            }
+        }
+
+        var wait=6;
+        function time() {
+
+            if (wait <= 0) {
+                wait = 6;
+                $("#J_getCode_Cover").css("display","block");
+                //document.getElementById("J_getCode").removeAttribute("disabled");
+                $("#J_getCode").css("background-color","#0a8fc7");
+                document.getElementById("J_getCode").innerHTML="重新发送";
+                document.getElementById("J_getCode_Cover").innerHTML="重新发送";
+            } else {
+                $("#J_getCode_Cover").css("display","none");
+                //document.getElementById("J_getCode").setAttribute("disabled", true);
+                $("#J_getCode").css("background-color","#bfbfbf");
+                document.getElementById("J_getCode").innerHTML= wait + "S";
+                wait--;
+                setTimeout(function() {
+                            time()
+                        },
+                        1000)
+            }
+        }
+
+        //改变页码
+        $(".page-public>.num").click(function(){
+            $(this).addClass("active");
+            $(this).siblings().removeClass("active");
+        });
+        //支付记录查看
+        $(".title-acct>.l>.jilu").click(function(){
+            $(this).addClass("active");
+            $(this).siblings().removeClass("active");
+        });
+
+    </script>
+    <script type="text/javascript">
+
+        //窗口高度自适应
+        $(document).ready(function() {
+            var wh = $(window).height();
+            var dh = $(document).height();
+            if(wh == dh){
+                $("#content").css({"height": wh-804+374+"px"});
+            } else {
+            }
+        });
+        $(window).resize(function(){
+            var wh = $(window).height();
+            var dh = $(document).height();
+            if(wh == dh){
+                $("#content").css({"height": wh-804+374+"px"});
+            }
+        });
+    </script>
+{% endblock oncontentload %}

@@ -1,0 +1,5 @@
+{% if record.is_parent %}
+    -
+{% else %}
+    {{ record.product.stock_config_product.opening_price }}
+{% endif %}

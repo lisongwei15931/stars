@@ -1,0 +1,130 @@
+{% extends "customer/account_base.html" %}
+{% load staticfiles %}
+{% load compress %}
+{% block custom_css %}
+<link rel="stylesheet" href="{% static "css/register.css" %}" type="text/css">
+{% endblock %}
+{% block custom_js %}
+    <!-- <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=b2Oy0FxhxxotX9o1YC7UXVLU"></script> -->
+{% endblock %}
+{% block title %}蓝图百货--用户自提地址{% endblock title %}
+
+{% block oncontentload %}
+    {{ block.super }}
+        <div class="account-cont-right l">
+            <div class="details" style="padding-bottom:0px;">
+                <div class="title-acct title-acct2 fix">
+                    <span class="l">自提地址</span>
+                </div>
+                <div class="account-address">
+                    <a href="{% url 'customer:add_pickup' %}">新增自提地址</a>   
+                </div>
+
+                {% if  userpickup_addr %}
+                <div id = 'addr-scroll'>
+                    {% for address in userpickup_addr %}
+                    <div class="account-add-infor">
+                        <div class="add-tit">
+                           <span id = "{{ address.pickup_addr.lng}}|{{ address.pickup_addr.lat}}">自提点名称  : {{ address.pickup_addr.name }}</span>
+                            {% if address.is_default %}
+                                <div class="defaultadd">
+                                    默认地址
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="add-content">
+                            <div class="add-row fix">
+                                <div class="leftarea l right">
+                                    联系人：
+                                </div>
+                                <div class="rightarea l">
+                                    {{ address.pickup_addr.contact }}
+                                </div>
+                            </div>
+                            <div class="add-row fix">
+                                <div class="leftarea l right">
+                                    所在地区：
+                                </div>
+                                <div class="rightarea l">
+                                    {{ address.pickup_addr.city }} {{ address.pickup_addr.district }}
+                                </div>
+                            </div>
+                            <div class="add-row fix">
+                                <div class="leftarea l right">
+                                    详细地址：
+                                </div>
+                                <div class="rightarea l">
+                                    {{ address.pickup_addr.addr}}
+                                </div>
+                            </div>
+           
+                            <div class="add-row fix" style="margin-bottom: 0;">
+                                <div class="leftarea l right">
+                                    电话号码：
+                                </div>
+                                <div class="rightarea l">
+                                    <div class="l">
+                                        {{ address.pickup_addr.tel }}
+                                    </div>
+                                    <div class="r">
+                                        {% if not address.is_default %}
+                                            <a class="default" href="{%url 'customer:default_pickup' address.id %}">设为默认</a>
+                                        {% endif %}
+                                        <!--<a href="#" id="view_map">查看地图</a>-->
+                                        <a href="{% url 'customer:update_pickup' address.id %}">编辑</a>
+                                        <a class="del_pickup" id="{{ address.id }}_delete">删除</a>
+                                    </div>
+
+                                </div>
+                        </div>
+                    </div>
+                    </div>
+                    {% endfor %}
+                    </div>
+                {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block footer_extra_script %}
+<script src="{% static "js/map.js" %}"></script>
+    <script type="text/javascript">
+
+        window.onload = function(){
+            $(".footer-menu").find("li").eq(-1).children("span").css("display","none");
+        };
+        $('.del_pickup').click(function(){
+            var id = this.id.split('_')[0];
+            var confirm_frame = confirm("确定要删除此地址？");
+            if (confirm_frame==true) {
+                window.location.href="{% url 'customer:del_pickup' 999 %}".replace(999, id);
+            }
+        });
+        $("#view_map").click(function(){
+        	$("#user-agreement-con").show();
+        	set_map();
+        });
+        $(".pupbody-closebtn").click(function(){
+        	$("#user-agreement-con").hide();
+        });
+        
+        function set_map() {
+            // map
+            var current_pickup_addr = $(".add-tit span");
+            var lng_lat = current_pickup_addr.attr('id').split('|');
+            var current_lng = lng_lat[0];
+            var current_lat = lng_lat[1];
+            var point = current_pickup_addr.attr('lng_lat');
+            var map = new BMap.Map("pupbody-content");
+            map.centerAndZoom(new BMap.Point(current_lng, current_lat),15);
+            map.enableScrollWheelZoom(true);
+            //点击查看地图
+            //标注点数组
+            var markerArr = [{title:"自提点",content:"上门路<br/><br/>010",point:point,isOpen:0,icon:{w:23,h:25,l:46,t:21,x:9,lb:12}}];
+            toLocation(map, current_lng, current_lat, markerArr);
+        }
+        
+
+    </script>
+{% endblock %}

@@ -1,0 +1,61 @@
+    <div class="p-title">订单详情<span class="p-close">×</span></div>
+    <div class="OrderManagement">
+        <div>
+            <h4>收货人信息</h4>
+            <div class="Receiver-infor fix">
+                <div class="Receiver-left">
+                    <span>收货人：</span>
+                </div>
+                <div class="Receiver-right">
+                    <span>{{order.receive_addr.consignee}}</span>
+                </div>
+            </div>
+            <div class="Receiver-infor fix">
+                <div class="Receiver-left">
+                    <span>地址：</span>
+                </div>
+                <div class="Receiver-right">
+                    <span>{{order.receive_addr.address}}</span>
+                </div>
+            </div>
+            <div class="Receiver-infor fix">
+                <div class="Receiver-left">
+                    <span>手机号码：</span>
+                </div>
+                <div class="Receiver-right">
+                    <span>{{order.receive_addr.mobile_phone|slice:":3"}}****{{order.receive_addr.mobile_phone|slice:"7:"}}</span>
+                </div>
+            </div>
+            <div class="Receiver-infor fix">
+                <div class="Receiver-left">
+                    <span>电子邮件：</span>
+                </div>
+                <div class="Receiver-right">
+                    <span>{% if order.receive_addr.email %}{{order.receive_addr.email|slice:":2"}}***@***{% else %}-{% endif %}</span>
+                </div>
+            </div>
+        </div>
+        <div class="orderList">
+            <h4>商品详情</h4>
+            <div class="orderTitle fix">
+                <div class="Goods OrderName">商品名称<span>|</span></div>
+                <div class="Goods OrderPrice">价格<span>|</span></div>
+                <div class="Goods OrderNumber">数量<span>|</span></div>
+                <div class="Goods OrderState">状态<span>|</span></div>
+                <div class="Goods Orderlogistics-com">物流公司<span>|</span></div>
+                <div class="Goods Orderlogistics-num">物流单号</div>
+            </div>
+            <div class="orderContent">
+            	{% for info in all_info %}
+                <div class="orderContent-p fix">
+                    <div class="Goods OrderName">{{ info.product.title }}</div>
+                    <div class="Goods OrderPrice">{{ info.price }}</div>
+                    <div class="Goods OrderNumber">{{ info.product_num }}</div>
+                    <div class="Goods OrderState">{{ info.status }}</div>
+                    <div class="Goods Orderlogistics-com">{{ info.order_pickup_detail.logistics_company|default:"-" }}</div>
+                    <div class="Goods Orderlogistics-num">{{ info.order_pickup_detail.logistics_no|default:"-" }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>

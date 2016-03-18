@@ -1,0 +1,115 @@
+{% extends "customer/safety/account_no_left_nav_base.html" %}
+{% load staticfiles %}
+{% load compress %}
+
+{%  block title %}蓝图百货--账户设置--实名认证{%  endblock title %}
+
+{% block onbodyload %}
+    <div class="register-body">
+        <div class="container">
+            <!--form start-->
+            <form action="." method="post" enctype="multipart/form-data" class="register-form">
+                {% csrf_token %}
+                <div class="input-group fix">
+                    <div class="input-group-left right l">
+                        姓名：
+                    </div>
+                    <div class="input-group-right l">
+                        {{ form.real_name }}
+                        {% if form.real_name.errors %}
+                            <div class="img">
+                                <img src="{% static "images/register-error.png" %}"/>
+                                <span class="color-red">{{ form.real_name.errors }}</span>
+                            </div>
+                        {% else %}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="input-group fix">
+                    <div class="input-group-left right l">
+                        身份证号码：
+                    </div>
+                    <div class="input-group-right l">
+                        {{ form.identification_card_number }}
+                        {% if form.identification_card_number.errors %}
+                            <div class="img">
+                                <img src="{% static "images/register-error.png" %}"/>
+                                <span class="color-red">{{ form.identification_card_number.errors }}</span>
+                            </div>
+                        {% else %}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="input-group input-group1 fix">
+                    <div class="input-group-left right l">
+                        本人身份证证件照正面：
+                    </div>
+                    <div class="input-group-right l">
+                        {{ form.identification_card_image_front }}
+                    </div>
+                    {% if form.identification_card_image_front.errors %}
+                        <div class="img l">
+                            <img src="{% static "images/register-error.png" %}"/>
+                            <span class="color-red">{{ form.identification_card_image_front.errors|striptags }}</span>
+                        </div>
+                    {% else %}
+                    {% endif %}
+                </div>
+                <div class="input-group input-group1 fix">
+                    <div class="input-group-left right l">
+                        本人身份证证件照背面：
+                    </div>
+                    <div class="input-group-right l">
+                        {{ form.identification_card_image_back }}
+                    </div>
+                    {% if form.identification_card_image_back.errors %}
+                        <div class="img l">
+                            <img src="{% static "images/register-error.png" %}"/>
+                            <span class="color-red">{{ form.identification_card_image_back.errors|striptags }}</span>
+                        </div>
+                    {% else %}
+                    {% endif %}
+                </div>
+                <div class="notice">
+                    <p>1. 请上传您的身份证正反两面图（支持jpg,jpeg,bmp格式），大小不超过3M</p>
+                    <p>2. 请保证上传图片的清晰度，以便于我们审核</p>
+                </div>
+                <div class="register-btn">
+                    <input type="submit" value="提交"/>
+                    <a href="{% url "customer:safety-real_name_auth" %}"></a>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+{% block footer_script %}
+    <script type="text/javascript">
+        window.onload = function(){
+            $(".footer-menu").find("li").eq(-1).children("span").css("display","none");
+        };
+
+        //得到焦点触发事件
+        function OnfocusFun(element,elementvalue)
+        {
+            if(element.value==elementvalue)
+            {
+                element.value="";
+                element.style.color="#343434";
+            }
+        }
+        //离开输入框触发事件
+        function OnBlurFun(element,elementvalue)
+        {
+            if(element.value=="" || element.value.replace(/\s/g,"")=="")
+            {
+                element.value=elementvalue;
+                element.style.color="#999";
+            }
+        }
+        function uploadFile(){
+            var fileName = document.getElementById("idFile").value;
+
+            document.getElementById("idText").value = fileName;
+        }
+    </script>
+{% endblock %}

@@ -1,0 +1,650 @@
+{% load staticfiles %}
+{% load i18n %}
+{% load thumbnail %}
+{% load currency_filters %}
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <link rel="shortcut icon" href="{% static "images/web_logo.ico" %}" />
+    <link rel="stylesheet" href="{% static "css/public.css" %}" type="text/css">
+    {% block public_css %}
+    {% endblock %}
+    {% block custom_css %}
+        <link rel="stylesheet" href="{% static "css/product.css" %}" type="text/css">
+    {% endblock %}
+    {% block jquery %}
+        <script type="text/javascript" src="{% static "js/jquery-1.11.1.min.js" %}"></script>
+        <script type="text/javascript">
+            $(document).ready(function(){
+
+                //收益显示
+                $.get("{% url 'customer:getuserincome' %}",function(result,status){
+                	if(result.yesterday_icome>=0){
+                	$("#add").html("+" + result.yesterday_icome.toFixed(2));
+                	$("#add1").html("+" + result.yesterday_icome.toFixed(2));
+                	}else{
+                		$("#add").html(result.yesterday_icome.toFixed(2));
+                    	$("#add1").html(result.yesterday_icome.toFixed(2));	
+                	}
+                });
+                // 购物车显示
+
+                $("#shopcar-li").hover(function () {
+                    $(".shopcar-products",this).show();
+
+                    $("#shopcar-li>a").css({
+                        "background-color": "#fff",
+                        "box-shadow": "0 0 3px #666",
+                        "color": "#c00000"
+                    });
+                    var totalprices = $(".total-price") ;
+                    var totalprice = 0.00;
+                    totalprices.each(function(){
+                    	totalprice += $(this).html()*1; 
+                    });
+/*                     function num2e(num){
+                    	var p = Math.floor(Math.log(num)/Math.LN10);
+                    	var n = num*Math.pow(10,-p);
+                    	return n+'e'+p;
+                    }; */
+                    if (totalprice > 1000000){
+                    	totalprice = totalprice.toExponential(2);
+                    }else{
+                    	totalprice = totalprice.toFixed(2);
+                    }
+                    
+                    $(".bottom-total-item #total-price").html(totalprice);
+                    $("#border-type").show();
+                }, function () {
+                    $(".shopcar-products").hide();
+                    $("#shopcar-li>a").css({
+                        "background-color": "#ededed",
+                        "box-shadow": "none",
+                        "color": "#333"
+                    });
+                    $("#border-type").hide();
+                });
+               // 删除购物车
+                $(".del_basket").click(function(){
+                	if (confirm("确定要删除该商品吗？")){
+                	var line_id = $(this).attr("id").split("del_")[1];
+                	$.ajax({
+                		type:"GET",
+                		url :'/basket/delete-line/'+line_id,
+                		//data :{"pk":line_id},
+                		async:false,  
+                		success: function(){
+                			$(".shopcar-products-content[id="+line_id+"]").remove();
+                			location.reload();
+                		}
+                		
+                	});
+                	
+                	}else {}
+                 });
+               
+              //我的收益
+                $("#shouyi-li").hover(function () {
+                    $.ajax({
+                        dataType: "json",
+                        url: "{% url 'customer:getuserincome' %}",
+                        data: {},
+                        success: function (result) {
+                        	var zrsy = result.yesterday_icome.toFixed(2) ;
+                        	var ljsy = result.total_icome.toFixed(2);
+                        	var zhye = result.user_balance.toFixed(2);
+                            $("#zrsy").html('￥ '+ zrsy);
+                            $("#ljsy").html('￥ '+ ljsy);
+                            $("#zhye").html('￥ '+ zhye);
+                        },
+                    });
+
+                    $(".shopcar-products",this).show();
+
+                    $("#shouyi-li>a").css({
+                        "background-color": "#fff",
+                        "box-shadow": "0 0 3px #666",
+                        "color": "#c00000"
+                    });
+                    $("#border-type1").show();
+                }, function () {
+                    $(".shopcar-products").hide();
+                    $("#shouyi-li>a").css({
+                        "background-color": "#ededed",
+                        "box-shadow": "none",
+                        "color": "#333"
+                    });
+                    $("#border-type1").hide();
+                });
+              
+            });
+        </script>
+    {% endblock %}
+    {% block custom_js %}
+    {% endblock %}
+
+    
+    <title>{% block title %}蓝图百货{% endblock %}</title>
+</head>
+<body>
+    {% block top %}
+    <!--顶部 start-->
+    <div class="top">
+        {% block topmenu %}
+        <!--顶层状态、登录条-->
+        <div class="login">
+            <div class="container fix">
+                <div class="l login-left">
+                    {% if user.is_authenticated %}
+                    <span>{% trans "Welcome" %}&nbsp; <em>{{ user.username }}</em></span>
+                    &nbsp;
+                    <a href="{% url "accounts:logout" %}">注销</a>
+                    {% else %}
+                    <a href="{% url "accounts:login" %}">登录</a>
+                    <a href="{% url "accounts:register" %}">注册</a>
+                    {% endif %}
+                </div>
+                {% if user.is_authenticated %}
+                <ul class="r login-right">
+                    <li class="first-menu">
+                        <a href="{% url 'customer:summary' %}">我的账户<span class="jt"></span></a>
+                        <ul>
+                            <li><a href="{% url 'customer:assets' %}">账户资产</a></li>
+                            <li><a href="{% url 'customer:stock' %}">我的存货</a></li>
+                            <li><a href="{% url 'customer:trading_information' %}">交易记录</a></li>
+                            <li><a href="{% url 'customer:pickup_detail' %}">提货明细</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="{% url 'customer:assets' %}">充值</a></li>
+                    <li><a href="{% url 'tradingcenter:trading_center_index' %}">交易大厅</a></li>
+                    <li><a href="{% url 'dashboard:business-login' %}">商家中心</a></li>
+                    <li><a href="{% url 'dashboard:pickup-login' %}">自提点</a></li>
+                    <li class = "first-menu">
+                        <a href="{% url 'helper:helper_index' %}">帮助中心<span class="jt"></span></a>
+                        <ul>
+                            <li><a href="{% url 'helper:helper_index' %}">新手指导</a></li>
+                            <li><a href="{% url 'helper:helper_index' %}">常见问题</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                {% else %}
+                <ul class="r login-right">
+                    <li>
+                        <a href="{% url 'accounts:login' %}">我的账户</a>
+                    </li>
+                    <li><a href="{% url 'accounts:login' %}">充值</a></li>
+                    <li><a href="{% url 'tradingcenter:trading_center_index' %}">交易大厅</a></li>
+                    <li><a href="{% url 'dashboard:business-login' %}">商家中心</a></li>
+                    <li><a href="{% url 'dashboard:pickup-login' %}">自提点</a></li>
+                    <li>
+                        <a href="{% url 'helper:helper_index' %}">帮助中心<span class="jt"></span></a>
+                        <ul>
+                            <li><a href="{% url 'helper:helper_index' %}">新手指导</a></li>
+                            <li><a href="{% url 'helper:helper_index' %}">常见问题</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                {% endif %}
+            </div>
+        </div>
+        {% endblock %}
+        {% block logo %}
+        <!--logo、搜索、购物车-->
+        <div class="logo container fix">
+            <div class="logo-img1 l">
+                <a href ="{% url 'promotions:home' %}"><img src="{% static "images/logo-1.png" %}"/></a>
+            </div>
+            <div class="search-box l">
+                <form method="get" action="{% url 'catalogue:allproducts' %}" class="form-horizontal">
+                {% csrf_token %} 
+                <div class="input-t">
+                {% if kwargs.search_q %}
+                    <input type="text" name="q" value="{{kwargs.search_q}}" onfocus="OnfocusFun(this,'输入商品名、货号、商品关键字')" onblur="OnBlurFun(this,'输入商品名、货号、商品关键字')" style='color:#999;'/>
+                {% else %}
+                    <input type="text" name="q" value="输入商品名、货号、商品关键字" onfocus="OnfocusFun(this,'输入商品名、货号、商品关键字')" onblur="OnBlurFun(this,'输入商品名、货号、商品关键字')" style='color:#999;'/>
+                {% endif %}  
+                    <span class="search-img"></span>
+                </div>
+                <div class="input-s">
+                    <input type="submit" value="搜索"/>
+                </div>
+                </form>
+                <ul class="keywords l">
+                     <li><a>红酒</a><span>|</span></li>
+                    <li><a class="color-red">白酒</a><span class="color-h">|</span></li>
+                    <li><a>啤酒</a><span class="color-h">|</span></li>
+                    <li><a>洋酒</a><span class="color-h" style="display: none;">|</span></li>
+                </ul>
+            </div>
+            <ul class="r">
+               <li class="shopcar-menu" id="shopcar-li">
+                   {% if request.basket.num_items < 1000 %}
+                    <a href="{% url 'basket:summary' %}">
+                        <span class="shopcar-img"></span>
+                       &nbsp;购物车&nbsp;<span class="shopcar-num">{{request.basket.num_items}}</span>
+                       <span class="arrow"></span>
+                    </a>
+                   {% else %}
+                   <a href="{% url 'basket:summary' %}">
+                        <span class="shopcar-img"></span>
+                      &nbsp; 购物车&nbsp;
+                        <span class="arrow"></span>
+                    </a>
+                    <div class="good-num">
+                        <span>{{request.basket.num_items}}</span>
+                    </div>
+                    {% endif %}
+                    <div class="border-type" id="border-type" style="display: none;"></div>
+                    <div class="shopcar-products" style="display: none;">
+                         {% if request.basket.num_lines %}
+                        <div class="shopcar-products-tit">
+                            <h3>最新加入的商品</h3>
+                        </div>
+                        
+                        <div class="shopcar-products-con-body">
+                        {% for line in request.basket.all_lines %}
+                        <div class="shopcar-products-content fix" id={{line.id}}>
+                            <div class="leftarea l right">
+                            {% with image=line.product.primary_image %}
+                            {% thumbnail image.original "60x60" upscale=False as thumb %}
+                                <a href="{{ line.product.get_absolute_url }}"><img class="thumbnail" src="{{ thumb.url }}" alt="{{ line.product.get_title }}"></a>
+                            {% endthumbnail %}
+                            {% endwith %}
+                            </div>
+                            <div class="rightarea l left fix">
+                                <div class="infor-name l">
+                                    <a href="{{ line.product.get_absolute_url }}">{{ line.description }}</a>
+                                </div>
+                                <div class="information-con l right">
+                                <div class="infor-price">
+                                    <!-- <img src="{% static 'images/renmingbi1.png' %}"/> -->
+                                    <span class="color-lred"> ￥{{ line.buy_price|floatformat:2 }}</span>
+                                    <img src="{% static 'images/chenghao.png' %}" class="chenghao"/>
+                                    <span>{{ line.quantity }}</span> <span class="total-price" style="display:none">{{line.total_price|floatformat:2}}</span>
+                                </div>
+                                 
+                                <div class="infor-del">
+                                    <!--<span><a href = "{% url 'basket:delete_line' pk=line.id %}">删除</a></span> -->
+                                    <span class = "del_basket" id = 'del_{{line.id}}'>删除</span> 
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        </div>
+                        
+                        <div class="shopcar-products-bottom fix ">
+                            <div class="bottom-total fix">
+                                <div class="bottom-total-item l">
+                                       {% if request.basket.num_items > 10000 %}
+                                                             共约<span class="color-red">
+                                       {% widthratio request.basket.num_items|floatformat:3 10000 1 %}
+                    </span>万件商品&nbsp;&nbsp;
+                                       {% else %}
+                                                           共<span class="color-red">
+                                       {{request.basket.num_items}}
+                    </span>件商品&nbsp;&nbsp;
+                                       {% endif %}
+                                {% if request.basket.is_tax_known %}
+                                         共计&nbsp;￥<span class="color-red" id = "total-price"> &nbsp;</span>
+                                {% else %}
+                                        共计&nbsp;￥<span class="color-red" id ="total-price"> &nbsp;</span>              
+                                 {% endif %}
+                                </div>
+                                <div class="bottom-total-btn center r">
+                                    <a href="{% url 'basket:summary' %}">去结算</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="shopcar-products-tit">
+                            <h3>{% trans "Your basket is empty." %}</h3>
+                        </div>
+                    {% endif %}
+                    </div>
+                </li>
+
+                {% if request.user.is_authenticated %}
+                <li class="shouyi-menu" id="shouyi-li">
+                    <a href="{% url 'customer:assets' %}">
+                        <span class="shouyi-img"></span>
+                        我的收益
+                        <span class="arrow"></span>
+                        <span class="add" id="add"></span>
+                    </a>
+                    <div class="border-type" id="border-type1" style="display: none;"></div>
+                    <div class="shopcar-products fix" style="display: none;">
+                        
+                            <div class="proceeds-img l">
+                                <a href="#"><img src="{% static 'images/jinbi.png' %}"/></a>
+                            </div>
+                            <div class="proceeds-des l">
+                                <p>昨日收益：<span id = "zrsy" style="color: #00dd88;"></span></p>
+                                <p>累计收益：<span id = "ljsy" style="color: #ffc000;"></span></p>
+                                <p>账户余额：<span id = "zhye" style="color: #ff0000;"></span></p>
+                                <p><a href = {% url 'customer:finance-ab-withdraw' %}>提现</a>
+                                <a class="chonghzhi" href ="{% url 'customer:finance-ab-recharge' %}">充值</a></p>
+                            </div>
+                        
+                    </div>
+                </li>
+                  {% else %}
+                    <li class="shouyi-menu" id="">
+                    <a href="{% url 'customer:assets' %}">
+                        <span class="shouyi-img"></span>
+                        我的收益
+                        <span class="arrow"></span>
+                        <span class="add" style="display: none;">+15000</span>
+                    </a>           
+                    </li>
+                            {% endif %}
+            </ul>
+        </div>
+        {% endblock %}
+    </div>
+    {% endblock %}
+    <!--顶部 end-->
+    
+    <!--顶部搜索 -->
+{% block searchfix %}
+    <div class="searchFix" style="display: none;">
+        <div class="container fix">
+            <div class="fix-logo l"><img src="{%static 'images/logo3交易大厅.png' %}" /></div>
+            <div class="search-box search-box2 l">
+            <form method="get" action="{% url 'catalogue:allproducts' %}" >
+            <div class="input-t">
+                <input type="text" name="q" value="输入商品名、货号、商品关键字" onfocus="OnfocusFun(this,'输入商品名、货号、商品关键字')" onblur="OnBlurFun(this,'输入商品名、货号、商品关键字')" style='color:#999;'/>
+                <span class="search-img"></span>
+            </div>
+            <div class="input-s">
+                <input type="submit" value="搜索" />
+            </div>
+            </form>
+            </div>
+            <ul class="r fix">
+                <li class="shopcar-menu" id="shopcar-li1">
+                {% if request.basket.num_items < 1000 %}
+                    <a href="{% url 'basket:summary' %}">
+                        <span class="shopcar-img"></span>
+                        &nbsp;购物车&nbsp;<span class="shopcar-num">{{request.basket.num_items}}</span>
+                       <span class="arrow"></span>
+                    </a>
+                   {% else %}
+                   <a href="{% url 'basket:summary' %}">
+                        <span class="shopcar-img"></span>
+                      &nbsp;购物车&nbsp;
+                        <span class="arrow"></span>
+                    </a>
+                    <div class="good-num1">
+                        <span>{{request.basket.num_items}}</span>
+                    </div>
+                    {% endif %}
+                    <div class="border-type" id="border-type2" style="display: none;"></div>
+                    <div class="shopcar-products" style="display: none;">
+                         {% if request.basket.num_lines %}
+                        <div class="shopcar-products-tit">
+                            <h3>最新加入的商品</h3>
+                        </div>
+                        
+                        <div class="shopcar-products-con-body">
+                        {% for line in request.basket.all_lines %}
+                        <div class="shopcar-products-content fix" id={{line.id}}>
+                            <div class="leftarea l right">
+                            {% with image=line.product.primary_image %}
+                            {% thumbnail image.original "60x60" upscale=False as thumb %}
+                                <a href="{{ line.product.get_absolute_url }}"><img class="thumbnail" src="{{ thumb.url }}" alt="{{ line.product.get_title }}"></a>
+                            {% endthumbnail %}
+                            {% endwith %}
+                            </div>
+                            <div class="rightarea l left fix">
+                                <div class="infor-name l">
+                                    <a>{{ line.description }}</a>
+                                </div>
+                                <div class="information-con l right">
+                                <div class="infor-price">
+                                    <!-- <img src="{% static 'images/renmingbi1.png' %}"/> -->
+                                    <span class="color-lred"> ￥{{ line.buy_price|floatformat:2 }}</span>
+                                    <img src="{% static 'images/chenghao.png' %}" class="chenghao"/>
+                                    <span>{{ line.quantity }}</span> <span class="total-price1" style="display:none">{{line.total_price|floatformat:2}}</span>
+                                </div>
+                                 
+                                <div class="infor-del">
+                                    <!--<span><a href = "{% url 'basket:delete_line' pk=line.id %}">删除</a></span> -->
+                                    <span class = "del_basket" id = 'del_{{line.id}}'>删除</span> 
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        </div>
+                        
+                        <div class="shopcar-products-bottom fix ">
+                            <div class="bottom-total fix">
+                                <div class="bottom-total-item l" style="margin-top:15px;">
+                                       {% if request.basket.num_items > 10000 %}
+                                                             共约<span class="color-red">
+                                       {% widthratio request.basket.num_items|floatformat:3 10000 1 %}
+                    </span>万件商品&nbsp;&nbsp;
+                                       {% else %}
+                                                           共<span class="color-red">
+                                       {{request.basket.num_items}}
+                    </span>件商品&nbsp;&nbsp;
+                                       {% endif %}
+                                {% if request.basket.is_tax_known %}
+                                         共计&nbsp;￥<span class="color-red" id = "total-price1"> &nbsp;</span>
+                                {% else %}
+                                        共计&nbsp;￥<span class="color-red" id ="total-price1"> &nbsp;</span>              
+                                 {% endif %}
+                                </div>
+                                <div class="bottom-total-btn center r">
+                                    <a href="{% url 'basket:summary' %}">去结算</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="shopcar-products-tit">
+                            <h3>{% trans "Your basket is empty." %}</h3>
+                        </div>
+                    {% endif %}
+                    </div>
+                </li>
+                {% if request.user.is_authenticated %}
+                <li class="shouyi-menu" id="shouyi-li1">
+                    <a href="{% url 'customer:assets' %}">
+                        <span class="shouyi-img"></span>
+                        我的收益
+                        <span class="arrow"></span>
+                        <span class="add" id="add1"></span>
+                    </a>
+                    <div class="border-type" id="border-type3" style="display: none;"></div>
+                    <div class="shopcar-products" style="display: none;">
+                        <div class="fix">
+                            <div class="proceeds-img l">
+                                <a href="#"><img src="{% static 'images/jinbi.png' %}"/></a>
+                            </div>
+                            <div class="proceeds-des l">
+                                <p>昨日收益：<span id = "zrsy1" style="color: #00dd88;"></span></p>
+                                <p>累计收益：<span id = "ljsy1" style="color: #ffc000;"></span></p>
+                                <p>账户余额：<span id = "zhye1" style="color: #ff0000;"></span></p>
+                                <p><a href = {% url 'customer:finance-ab-withdraw' %}>提现</a>
+                                <a class="chonghzhi" href ="{% url 'customer:finance-ab-recharge' %}">充值</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                  {% else %}
+                    <li class="shouyi-menu" id="shouyi-li1">
+                    <a href="{% url 'customer:assets' %}">
+                        <span class="shouyi-img"></span>
+                        我的收益
+                        <span class="arrow"></span>
+                        <span class="add" style="display: none;">+15000</span>
+                    </a>           
+                    </li>
+                   {% endif %}
+            </ul>
+        </div>
+    </div>
+{% endblock %}
+
+    {% block content %}
+    {% endblock %}
+    
+    {% block to-top %}
+	 <div class="fix-to-top">
+        <div class="to-top" style="display: none;">
+            <a><img src="{% static 'images/top.png'%}"/></a>
+        </div>
+        <div class="kefu" style="display: none;">
+            <a><img src="{%static 'images/kefu.png'%}"/></a>
+        </div>
+    </div>
+    {% endblock %}
+  
+
+    {% include "base_footbar.html" %}
+
+    {% block footer_script %}
+        <script type="text/javascript">
+            //得到焦点触发事件
+            function OnfocusFun(element,elementvalue)
+            {
+                if(element.value==elementvalue)
+                {
+                    element.value="";
+                    element.style.color="#343434";
+                }
+            }
+            //离开输入框触发事件
+            function OnBlurFun(element,elementvalue)
+            {
+                if(element.value=="" || element.value.replace(/\s/g,"")=="")
+                {
+                    element.value=elementvalue;
+                    element.style.color="#999";
+                }
+            }
+
+            $(function(){
+                $(".shop-list>ul>li").click(function(){
+                $(".shop-list>ul>li>ul").hide();
+                $("ul",this).slideDown(500);
+                });
+                
+                //固定搜索栏
+                $(window).scroll(function(){
+                    var curHeight=$(document).scrollTop();
+                    if(curHeight>=400){
+                        $(".searchFix").slideDown();
+                        $(".to-top").show();
+                    }else{
+                        $(".searchFix").slideUp();
+                        $(".to-top").hide();
+                    }
+                });
+                $(".to-top").click(function(){
+                    $(window).scrollTop(0);
+                });
+              //购物车1
+                $("#shopcar-li1").hover(function () {
+                    $(".shopcar-products",this).show();
+
+                    $("#shopcar-li1").css({
+                        "background-color": "#fff",
+                        "box-shadow": "0 0 3px #666",
+                        "color": "#c00000"
+                    });
+                    var totalprices = $(".total-price1") ;
+                    var totalprice = 0.00;
+                    totalprices.each(function(){
+                    	totalprice += $(this).html()*1; 
+                    });
+                    if (totalprice > 1000000){
+                    	totalprice = totalprice.toExponential(2);
+                    }else{
+                    	totalprice = totalprice.toFixed(2);
+                    };
+                    
+                    $(".bottom-total-item #total-price1").html(totalprice);
+                    $("#border-type2").show();
+                }, function () {
+                    $(".shopcar-products").hide();
+                    $("#shopcar-li1").css({
+                        "background-color": "#ededed",
+                        "box-shadow": "none",
+                        "color": "#333"
+                    });
+                    $("#border-type2").hide();
+                });
+                //我的收益1
+                $("#shouyi-li1").hover(function () {
+                	$.ajax({
+                        dataType: "json",
+                        url: "{% url 'customer:getuserincome' %}",
+                        data: {},
+                        success: function (result) {
+                        	var zrsy = result.yesterday_icome.toFixed(2) ;
+                        	var ljsy = result.total_icome.toFixed(2);
+                        	var zhye = result.user_balance.toFixed(2);
+                            $("#zrsy1").html('￥ '+ zrsy);
+                            $("#ljsy1").html('￥ '+ ljsy);
+                            $("#zhye1").html('￥ '+ zhye);
+                        },
+                    });
+                    $(".shopcar-products",this).show();
+
+                    $("#shouyi-li1").css({
+                        "background-color": "#fff",
+                        "box-shadow": "0 0 3px #666",
+                        "color": "#c00000"
+                    });
+                    $("#border-type3").show();
+                }, function () {
+                    $(".shopcar-products").hide();
+                    $("#shouyi-li1").css({
+                        "background-color": "#ededed",
+                        "box-shadow": "none",
+                        "color": "#333"
+                    });
+                    $("#border-type3").hide();
+                });
+            });
+
+        function menuFix() {
+        var sfEls = document.getElementById("lid");
+        for (var i=0; i<sfEls.length; i++) {
+        sfEls[i].onmouseover=function() {
+        this.className+=(this.className.length>0? " ": "") + "sfhover";
+        }
+        sfEls[i].onMouseDown=function() {
+        this.className+=(this.className.length>0? " ": "") + "sfhover";
+        }
+        sfEls[i].onMouseUp=function() {
+        this.className+=(this.className.length>0? " ": "") + "sfhover";
+        }
+        sfEls[i].onmouseout=function() {
+        this.className=this.className.replace(new RegExp("( ?|^)sfhover\\b"),"");
+        }
+        }
+        }
+       
+        
+            window.onload=menuFix;
+            window.onload = function(){
+                $(".keywords").find("li").eq(-1).children("span").css("display","none");
+                $(".footer-menu").find("li").eq(-1).children("span").css("display","none");
+            };
+            
+
+            
+            
+        </script>
+
+
+    {% endblock %}
+</body>
+</html>

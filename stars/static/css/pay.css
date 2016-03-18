@@ -1,0 +1,105 @@
+@charset "utf-8";
+.contentVisit{width:1200px; min-height:592px; margin:10px auto 0; background-color:#fff; padding:0; overflow:hidden;}
+.comTitle{font-size:16px;position:relative;height: 40px;border-bottom: #c00000 solid 2px;}
+.comTitle li{float: left;background-color: #eee;color:#666;width: 110px;height:40px; line-height:38px;margin-right: 5px;text-align: center;cursor: pointer;}
+.comTitle li.active{background-color: #c00000;color: #fff;}
+/*.comTitle a{font-size:12px; font-weight:normal; color:#666;}*/
+.com-border{border: #eee solid 1px;border-top: none;min-height: 575px;}
+
+/*我的存货--进货*/
+/*.comTitle a.backMy{position:absolute; right:0; top:2px; color:#0088cc;}*/
+.pay-lable{overflow:hidden;padding:25px 35px;color:#333;}
+.pay-lable .left{width:700px; overflow:hidden; float:left;}
+.pay-lable p{margin-bottom:15px;}
+.pay-lable p.bold{font-size:16px;}
+.pay-lable p .red{color:#ff0000;}
+
+.pay-lable .right{width:300px; overflow:hidden; float:right;}
+.pay-lable .right p{font-size:14px;}
+.pay-lable .right p .red{font-weight:bold;}
+.pay-lable .right p.blue{color:#0088cc; font-size:12px; cursor:pointer; position:relative; padding-right:12px;}
+b.arr{position:absolute; border-width:5px; border-style: solid dashed dashed; border-color:#b1b1b1 transparent transparent; top:4px; right:0;}
+.dd-detail{overflow:hidden; display:none; margin-top:1px;background-color:#f5f5f5; padding:15px 35px; color:#999;}
+.dd-detail p{line-height:24px;}
+
+.pay-entry{width: 30%;margin: 50px auto;font-size: 16px;color: #000;}
+.pay-entry .leftarea{line-height: 40px;}
+.pay-entry .rightarea input[type=password]{height: 38px;line-height: 38px;width: 260px;border: #dedede 1px solid;}
+.pay-entry .rightarea .pay-notice{margin-top: 15px;}
+.pay-notice span{color: #ff0000;}
+.pay-notice a{color: #0088cc;margin-left: 15px;}
+.pay-notice a:hover{text-decoration: underline;}
+.pay-entry .pay-btn{width: 120px;height: 40px;background-color: #c00000;border-radius: 3px;margin-top: 20px;margin-left: 65px;}
+.pay-entry .pay-btn input{border: none;outline: none;background: none;color: #fff;font-family:"宋体";font-size: 14px;font-weight: bold;width: 120px;line-height: 40px;cursor: pointer;}
+.pay-entry .pay-error{color: #333;margin-bottom: 60px;}
+.pay-entry .pay-error span{position: relative;top: -10px;margin-left: 10px;}
+
+.pay-image{width:770px; overflow:hidden; margin:15px auto 100px;}
+.pay-image .left{float:left;width:292px; margin-top:30px;}
+.pay-image .left .p1{width:240px; height:240px; border:1px solid #dedede; padding:25px;}
+.pay-image .left .p2{color:#c00; width:292px; text-align:center;font-size:14px; font-weight:bold; margin-top:8px;}
+.pay-image .right{float:right;}
+
+.user-agreement a:hover{
+    text-decoration: underline;
+}
+.user-agreement-pupzz{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=60);
+    filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=60);
+    opacity: .6;
+    z-index: 1010;
+}
+.user-agreement-pupbody{
+    position: absolute;
+    height: 200px;
+    width: 360px;
+    top: 30%;
+    left: 50%;
+    margin-left: -180px;
+    background-color: #fff;
+    z-index: 9999;
+}
+.user-agreement-pupbody .pupbody-top{
+    height: 48px;
+    background-color: #eee;
+}
+.user-agreement-pupbody .pupbody-top .pupbody-title{
+    padding-left: 20px;
+    font-size: 14px;
+    color: #000;
+    line-height: 48px;
+}
+.user-agreement-pupbody .pupbody-top .pupbody-closebtn{
+    padding: 10px;
+    font-size: 24px;
+    cursor: pointer;
+}
+.user-agreement-pupbody .pupbody-content{
+    padding: 15px 30px;
+    font-size: 16px;
+    color: #666;
+}
+.user-agreement-pupbody .pupbody-content p{
+    margin-bottom: 20px;
+}
+.user-agreement-pupbody .pupbody-btn{
+    height: 40px;
+}
+.user-agreement-pupbody .pupbody-btn a{
+    color: #c00000;
+    font-size: 14px;
+    background: url("../images/sign-btn.jpg");
+    width: 100px;
+    height: 40px;
+    line-height: 40px;
+}
+
+
+
+

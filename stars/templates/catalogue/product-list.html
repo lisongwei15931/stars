@@ -1,0 +1,669 @@
+{% extends 'base_stars.html' %}
+
+{% load staticfiles %}
+{% load i18n %}
+{% load display_tags %}
+{% load public_tags %}
+{% load purchase_info_tags %}
+{% load basket_tags %}
+{% load thumbnail %}
+{% block custom_css %}
+{{block.super}}
+<style type="text/css">
+    button{outline:none;}
+    #add_to_basket_form button {
+        position: relative;
+        left: -22px;
+        top: -5px;
+        width: 88px;
+        height: 26px;
+        padding-left: 20px;
+        line-height: 26px;
+        color: #666;
+        border: none;
+        -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+        -webkit-user-modify: read-write-plaintext-only;
+        background: url("{%static 'images/shopcar-y.png'%}") left center no-repeat #fff;
+        cursor: pointer;
+        z-index: 4;
+    }
+    .btn-active:active{
+        border: none;
+        -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+        -webkit-user-modify: read-write-plaintext-only;
+    }
+</style>
+{% endblock %}
+{% block title %}
+商品搜索
+{% endblock %}
+
+{% block content %}
+    <div class="content-body">
+        <!--产品详细-content-body-start-->
+        <div class="container fix">
+            <div class="shopclass l" id="shopclass">
+                <ul>
+                    <li>
+                        <h3><a href="#">全部商品分类</a></h3>
+                        <ul>
+                        {% for c in category_list %}
+                            <li class="shopclass-item">
+                                <a class="first-lei" href = "{% url 'catalogue:allproducts' %}?category={{c.name}} ">{{c.name}}</a>
+                                <ul>
+                                {% for cc in c.get_children %}
+                                    <li>
+                                        
+                                        <div class="menu-row fix">
+                                            <div class="menu-left l"><a href = "{% url 'catalogue:allproducts' %}?category={{cc.name}} " >{{cc.name}}</a></div>
+                                            <ul class="menu-ul l fix">
+                                            {% for ccc in cc.get_children %}
+                                                <li><a href="{% url 'catalogue:allproducts' %}?category={{ccc.name}} ">{{ccc.name}}</a><span><img src="{% static 'images/shuxian.png' %}"></span></li>
+                                            {% endfor %}
+                                            </ul>
+                                        </div>
+                                    </li>
+                                 {% endfor %}
+                                    <img src="{%static 'images/ad1-nav.jpg' %}" class="menu-img">
+                                </ul>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <ul class="banner-top l">
+                <li>
+                    <a href="{% url 'promotions:brandgather_product' %}">品牌汇</a>
+                </li>
+                 <li>
+                    <a href="{% url 'promotions:today_new_view' %}">新品汇</a>
+                </li>
+                <li>
+                    <a href="{% url 'tradingcenter:trading_center_index' %}"  target="_blank">交易大厅</a>
+                </li>
+                <li style="float:left;background-image: none;font-size:16px; border-right:none">
+                    <a href="{% url 'helper:helper_index' %}">蓝图学院</a>
+                </li>
+               <li class="last-child"> 
+               <div class="open fix">
+                <div class="l">
+                    {% if open_or_close %}
+                    <img src="{% static 'images/open.png' %}"/>
+                    {% else %}
+                    <img src="{%static 'images/close.png' %}"/>
+		            {% endif %}
+                </div>
+                <marquee class="l"scrolldelay="150" direction="left">{{open_close_msg}}</marquee>
+              </div>
+              </li>
+            </ul>
+        </div>
+        
+        <div class="container product-nav-ul product-nav-ul1 fix">
+            <ul class="l">
+            {% if category %}<li><a class="first" href='.'>全部商品</a></li>
+            {% for ca in category.get_ancestors_and_self %}
+			<li><a href = "{% url 'catalogue:allproducts' %}?category={{ca.name}} ">&nbsp;&gt;&nbsp;&nbsp;{{ca.name}}</a></li>
+			{% endfor %}
+			 {% else %}
+			 <li><a class="first" href='.'>全部商品&nbsp;&gt;&nbsp;&nbsp;</a></li>
+			 {% endif %}
+ 
+            </ul>
+        </div>
+        
+        <div class="container fix">
+            <div class="buy-des-left l">
+                <div class="buydb">
+                    <div class="buydb-show fix">
+                    <h4>热卖推荐</h4>
+                        <ul class="l">
+                        {% for product in hotproduct %}
+                            <li>
+                                <div class="l">
+                             {% with image=product.primary_image %}
+                            {% thumbnail image.original "60x60" crop="center" as thumb %}
+                            <a href="{{ product.get_absolute_url }}">
+                            <img class="thumbnail" src="{{ thumb.url }}" alt="{{ product.get_title }}"/>
+                            </a>
+                            {% endthumbnail %}
+                            {% endwith %} 
+                                </div>
+                                <div class="r">
+                                    <div class="p-infor">
+                                        <a href="{{ product.get_absolute_url }}">{{product.title}}</a>
+                                    </div>
+                                    <div class="p-price color-red">
+                                        <span>￥{{ product.buy_price }}</span>
+                                        <del class="color-h">{{ product.stockrecords.first.price_retail }}</del>
+                                    </div>
+                                    <div class="p-sold">
+                                       已售： {{product.volume}}
+                                    </div>
+                                </div>
+                            </li>
+                            {% endfor %}
+
+                        </ul>
+                    </div>
+                </div>
+                <div class="buydb browsedb">
+                    <div class="buydb-show fix">
+                    <h4>用户浏览历史</h4>
+                        <ul class="l">
+                        {% with history_products=history_products|slice:":7" %}
+                        {% if history_products %}
+                        {% for product in history_products %}
+                            <li>
+                                <div class="l">
+                             {% with image=product.primary_image %}
+                            {% thumbnail image.original "60x60" crop="center" as thumb %}
+                            <a href="{{ product.get_absolute_url }}">
+                            <img class="thumbnail" src="{{ thumb.url }}" alt="{{ product.get_title }}"/>
+                            </a>
+                            {% endthumbnail %}
+                            {% endwith %}
+                                </div>
+                                <div class="r">
+                                    <div class="p-infor">
+                                        <a href="{{ product.get_absolute_url }}">{{ product.get_title }}</a>
+                                    </div>
+                                    <div class="p-price color-red">
+                                        <span>￥{{ product.buy_price }}</span>
+                                        <del class="color-h">{{product.stockrecords.first.price_retail}}</del>
+                                    </div>
+                                    <div class="p-sold">
+                                        已售： {{product.volume}}
+                                    </div>
+                                </div>
+                            </li>
+                            {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="buy-des-right1 r fix">
+
+			<form action='' method ='get' id = "pdsForm">
+                <div class="select fix" id="choice" style = "margin-top:0">
+                    <div class="choice l">你的选择：</div>
+                  
+                    <div class="choice choice1 l choice-brand" id="listBrand">
+                    
+                    {% if kwargs.category %}
+                    <span>{{kwargs.category}}<img src="{% static 'images/redx.png'%}"/></span>
+                    {% else %}
+                    <span></span>
+                    {% endif %}
+					</div>
+                    
+                    
+                    <div class="choice choice1 l choice-price" id="listPrice">
+                    
+                    {% if kwargs.price %}
+                    <span>{{kwargs.price}}<img src="{% static 'images/redx.png'%}"/></span>
+                    {% else %}
+                    <span></span>
+                    {% endif %}
+                    
+                    </div>
+                    
+                    <div class="choice choice1 l choice-size" id="listSize">
+                   
+                    
+                    </div>
+                    
+                    
+                    <div class="choice choice1 l choice-degree" id="listDegree">
+                    <input id = "alcoholicity" type ="hidden" name = "alcoholicity" value = "{{kwargs.alcoholicity}}"/>
+                    {% if kwargs.alcoholicity %}
+                    <span>{{kwargs.alcoholicity}}<img src="{% static 'images/redx.png'%}"/></span>
+                    {% else %}
+                    <span></span>
+                    {% endif %}
+                    </div>
+                    
+                    {% for p_c in category.get_product_class %}
+                    <div class="choice choice1 l choice-{{p_c.code}}" id="ch_{{p_c.id}}">
+                     {% if attribute_kw|get_dictvalue:p_c.code %}
+                    <span>{{attribute_kw|get_dictvalue:p_c.code}}<img src="{% static 'images/redx.png'%}"/></span>
+                    {% else %}
+                    <span></span>
+                    {% endif %}
+                    </div> 
+                    {% endfor %}
+                    
+                    
+                </div>
+              <input id = "category" type ="hidden" name = "category" value = "{{kwargs.category}}"/>
+              {% if category.get_children  %}
+                <div class="list-select-brand fix brand">
+                    <div class="list-select-left l right">
+                        分类 :
+                    </div>
+                    <div class="list-select-right l">
+                    
+                        <ul>
+                        {% for c in category.get_children %}
+                            <li><a>{{c.name}}</a></li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            {% endif %}
+            {% if not category %}
+             <div class="list-select-brand fix brand">
+                    <div class="list-select-left l right">
+                        分类 :
+                    </div>
+                    <div class="list-select-right l">
+                        <ul>
+                        {% for c in category_all %}
+                            <li style="width:200px;"><a style="margin:auto 20px ;width: 180px;height: 30px;">{{c.name}}</a></li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            {% endif %}
+            {% if category.depth > 2 %}
+            {% for p_c in category.get_product_class %}
+                <div class="list-select-brand fix {{p_c.code}} ">
+                    <div class="list-select-left l right ">
+                        {{p_c.name}} :
+                        <input id = {{p_c.id}} type ="hidden" name ={{p_c.code}}  value ="{{attribute_kw|get_dictvalue:p_c.code}}"/>
+                    </div>
+                    <div class="list-select-right l">
+                        <ul>
+                        {% for s_v in p_c.get_attributes %}
+                            <li><a>{{s_v.search_value}}</a></li>
+                        {% endfor %}
+                        </ul>
+                        
+                    </div>
+                </div>
+             {% endfor %}
+                <div class="list-select-brand list-select-price fix price">
+                <input id = "price" type ="hidden" name = "price" value ="{{kwargs.price}}"/>
+                    <div class="list-select-left l right">
+                        价格 :
+                    </div>
+                    <div class="list-select-right l">
+                        <ul>
+                            <li><a>0-299</a></li>
+                            <li><a>300-699</a></li>
+                            <li><a>700-1199</a></li>
+                            <li><a>1200-1999</a></li>
+                            <li><a>2000-3899</a></li>
+                            <li><a>3900-7299</a></li>
+                            <li><a>7300以上</a></li>
+                        </ul>
+                    </div>
+                </div>
+          {% endif %}
+                <div class="total fix">
+                    <div class="total-num r">共有<span class="color-red">{{count}}</span>件商品</div>
+                </div>
+                <div class="list-infor fix">
+                    <div class="list-infor-left">
+                       
+                        <div class="list-infor-sort l">
+                            <span class="term">排序：</span>
+                            {% if kwargs.xiaoliang == "DESC" %}
+                            <span class="term1 active price-down" id ="xiaoliang">                                                       
+                                                                                   销量
+                            </span>  
+                            {% endif %}                                                      
+                            {% if kwargs.xiaoliang == "ASC" %}
+                            <span class="term1 active price-up" id ="xiaoliang">                                                       
+                                                                                   销量
+                            </span> 
+                            {% endif %}
+                            {% if not kwargs.xiaoliang %}
+                           <span class="term1" id ="xiaoliang">                                                       
+                                                                                   销量
+                            </span> 
+                            {% endif %}
+                            <!--  
+                            <span class="term1" id = "reping">热评<img src="{% static 'images/shuh.png'%}"/></span>
+                            -->
+                            {% if kwargs.jgpx == "DESC" %}
+                            <span class="term1 active price-down" id ="jiage">                                                       
+                                                                                   价格
+                            </span>  
+                            {% endif %}                                                      
+                            {% if kwargs.jgpx == "ASC" %}
+                            <span class="term1 active price-up" id ="jiage">                                                       
+                                                                                   价格
+                            </span> 
+                            {% endif %}
+                            {% if not kwargs.jgpx %}
+                           <span class="term1" id ="jiage">                                                       
+                                                                                   价格
+                            </span> 
+                            {% endif %}                                                     
+                            <input id = "xiaoliang" type ="hidden" name = "xiaoliang" value = "{{kwargs.xiaoliang}}"/>
+                            <input id = "jgpx" type ="hidden" name = "jgpx" value = "{{kwargs.jgpx}}"/>
+                        </div>
+                        
+                        <div class="list-infor-keywords l">
+                            <span class="term">关键字：</span>
+                            <input type="text" name="q1" value="{{kwargs.search_q1}}"/>
+                            <input type ="hidden" name = "q" value = "{{kwargs.search_q}}"/>
+                        </div>
+                        
+                        
+                        <div class="list-infor-price l">
+                            <span class="term">价格：</span>
+                            <input type="text" name = "xiaoprice" onkeyup="value=value.replace(/[^\d]/g,'')" value="{{kwargs.xiaoprice}}"/>
+                            <span>-</span>
+                            <input type="text" name = "daprice" onkeyup="value=value.replace(/[^\d]/g,'')" value="{{kwargs.daprice}}"/>
+                            <a href="#" class="center" id="queding">确定</a>
+                        </div>
+                        </form>
+                    </div>
+                    <div class="list-infor-right r">
+                        <span class="term2">
+                            <span>{{ page_obj.number }}</span>/{{ paginator.num_pages }}
+                        </span>
+                        <span class="jiant jiant1">
+                        {% if page_obj.has_previous %}
+                        <a href="?{% get_parameters page %}page={{ page_obj.previous_page_number }}"><img src="{% static 'images/leftjth.png'%}" /></a>
+                        {% else %}
+                        <img src="{% static 'images/leftjt.png'%}" />
+                        {% endif %} 
+                        </span>
+                        <span class="jiant">
+                        {% if page_obj.has_next %}
+                        <a href="?{% get_parameters page %}page={{ page_obj.next_page_number }}"><img src="{% static 'images/rightjth.png'%}" /></a>
+                        {% else %}
+                        <img src="{% static 'images/rightjt.png'%}" />
+                        {% endif %}
+                        </span>
+                    </div>
+                </div>
+               
+                
+                
+                {% if products %}
+                <div class="list-box fix">
+                {% for product in products %}
+                    <div class="list-item l">
+                        <div class="list-item-img">
+                            {% with image=product.primary_image %}
+                            {% thumbnail image.original "200x200" crop="center" as thumb %}
+                            <a href="{{ product.get_absolute_url }}">
+                            <img class="thumbnail" src="{{ thumb.url }}" alt="{{ product.get_title }}"/>
+                            </a>
+                            {% endthumbnail %}
+                            {% endwith %}
+                        </div>
+                        <div class="list-item-all">
+                            <div class="list-item-tit">
+                                <a href="{{ product.get_absolute_url }}" style="margin:15px auto;"> {{ product.title }} </a>
+                            </div>
+           <!--                  <div class="list-item-infor color-red">
+                                {{ product.description }}
+                            </div> -->
+                            <div class="list-item-sold fix">
+                                <div class="l">
+                                    已售：<span>{{product.volume}}</span>
+                                </div>
+                                <div class="r">
+                                    好评：<span>95%</span>
+                                </div>
+                            </div>
+                            <div class="list-item-price fix">
+                                <span class="l">￥{{ product.buy_price }}</span>
+                                <del class="r">￥{{ product.stockrecords.first.price_retail }}</del>
+                            </div>
+                            <div class="list-item-addto">
+                                <div class="addtocar l">
+                                   <a href="{{ product.get_absolute_url }}">&nbsp;&nbsp;立即购买</a>
+                     <!--  {% purchase_info_for_product request product as session %}
+                                {% if session.availability.is_available_to_buy %}
+                                {% basket_form request product as basket_form %}
+                     <form id="add_to_basket_form" action="{% url 'basket:buy' pk=product.pk  %}" method="post" class="add-to-basket">
+                     {% csrf_token %}
+                     {% include "partials/form_fields.html" with form=basket_form %}
+                     <button type="submit" class="btn btn-lg btn-primary btn-add-to-basket" value="{% trans "Add to basket" %}" data-loading-text="{% trans 'Adding...' %}">立即购买</button>
+                    </form>
+                    {% else %}
+                    {% endif %} 
+                    -->
+                                </div>
+                                <div class="dis r">
+                                    评论<span>2</span>条
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    </div>
+                    {% else %}
+                    <div style="height:300px">
+                    <div style="margin:120px 150px">                
+                    <strong>抱歉，没有找到相关商品，请重新搜索。</strong>
+                    </div>
+                    </div>
+                    {% endif %}
+                    
+                
+            <div class="page-public center">
+            {% if paginator.num_pages > 1 %}
+            {% if page_obj.has_previous %}
+               <a class = "txt" href="?{% get_parameters page %}page={{ page_obj.previous_page_number }}">{% trans "previous" %}</a>
+            {% endif %}
+            
+            {% blocktrans with page_num=page_obj.number total_pages=paginator.num_pages %}
+                Page {{ page_num }} of {{ total_pages }}
+            {% endblocktrans %}
+            &nbsp;&nbsp;
+            {% if page_obj.has_next %}
+            <a class = "txt" href="?{% get_parameters page %}page={{ page_obj.next_page_number }}">{% trans "next" %}</a>
+            {% endif %}
+            {% endif %}
+                </div>
+            </div>
+			
+        </div>
+    </div>
+
+
+    <script type="text/javascript">
+        //得到焦点触发事件
+        function OnfocusFun(element,elementvalue)
+        {
+            if(element.value==elementvalue)
+            {
+                element.value="";
+                element.style.color="#343434";
+            }
+        }
+        //离开输入框触发事件
+        function OnBlurFun(element,elementvalue)
+        {
+            if(element.value=="" || element.value.replace(/\s/g,"")=="")
+            {
+                element.value=elementvalue;
+                element.style.color="#999";
+            }
+        }
+
+        window.onload = function(){
+            $(".keywords").find("li").eq(-1).children("span").css("display","none");
+            $(".footer-menu").find("li").eq(-1).children("span").css("display","none");
+            $(".product-nav-ul").find("li").eq(-1).children("span").css("display","none");
+
+        };
+        $(document).ready(function(){
+        	if($("input#category").val()!= "" && typeof($("input#category").val())!="undefined" ){
+            $("#listBrand").show();
+        	}
+        	if($("input#price").val()!= "" && typeof($("input#price").val())!="undefined"  ){
+                $("#listPrice").show();
+            }
+        	if($("input#size").val()!= "" && typeof($("input#size").val())!="undefined"){
+                $("#listSize").show();
+            }
+        	if($("input#alcoholicity").val()!= "" && typeof($("input#alcoholicity").val())!="undefined"){
+                $("#listDegree").show();
+            } 
+        	{% for p_c in category.get_product_class %}
+        	if($("input#{{p_c.id}}").val()!= "" && typeof($("input#{{p_c.id}}").val())!="undefined"){
+                $("#ch_{{p_c.id}}").show();
+            }
+        	{% endfor%}
+        	
+        	
+        });
+
+        $(function(){
+            //改变选项的背景颜色和图片
+            $(".choice1").hover(function(){
+                $("img", this).attr("src","{% static 'images/huix.png'%}");
+            },function(){
+                $("img", this).attr("src","{% static 'images/redx.png'%}");
+            });
+            //点击x，隐藏选项
+            $(".choice1 span ,.choicel span img").click(function(){
+                $(this).parent(".choice1").hide();
+                if ($(this).parents(".choice1").hasClass("choice-brand") == true){
+                    $(".brand>.list-select-right>ul>li").removeClass("active");
+                    $("input[type='hidden'][name!='quantity'][name!='csrfmiddlewaretoken']").val("");
+                    $("input[name='q1']").val("");
+                    $("input[name='xiaoprice']").val("");
+                    $("input[name='daprice']").val("");
+                    {% if category %}
+                    var c_name = "{{category.get_parent.name}}"
+                    $("input#category").val(c_name);
+                    {% endif %}
+
+                } else if($(this).parents(".choice1").hasClass("choice-price") == true){
+                    $(".price>.list-select-right>ul>li").removeClass("active");
+                    $("input#price").val("");
+                } else if($(this).parents(".choice1").hasClass("choice-size") == true){
+                    $(".size>.list-select-right>ul>li").removeClass("active");
+                } else if($(this).parents(".choice1").hasClass("choice-degree") == true){
+                    $(".degree>.list-select-right>ul>li").removeClass("active");
+                    $("input#alcoholicity").val("");
+                }
+                {% for p_c in category.get_product_class %}
+                else if($(this).parents(".choice1").hasClass("choice-{{p_c.code}}") == true){
+                	$(".{{p_c.code}}>.list-select-right>ul>li").removeClass("active");
+                    $("input#{{p_c.id}}").val("");      
+                }
+                {% endfor %}
+                $("form#pdsForm").submit();
+            });
+            //点击按钮，切换颜色，切换选项
+            $(".list-select-right>ul>li").click(function(){
+                var btnParentsTxt = $(this).parents(".list-select-brand").children(".list-select-left").html();
+                var imgTxt = $("a",this).html()+'<img src="{% static 'images/redx.png'%}"/>';
+                var btnTxt = $("a",this).html();
+
+                $(this).addClass("active");
+                $(this).siblings().removeClass("active");
+                if ($(this).parents(".list-select-brand").hasClass("brand") == true){
+                	$("input[name='q']").val('');
+                    $("#listBrand").show();
+                    $("#listBrand>span").html(imgTxt);
+                    $("input#category").val(btnTxt);
+                    //$("#listBrand").css('display',show =='block'?'none':show);
+                    
+                } else if($(this).parents(".list-select-brand").hasClass("price") == true){
+                    $("#listPrice").show();
+                    $("#listPrice>span").html(imgTxt);
+                    $("input#price").val(btnTxt);
+                    
+                } else if($(this).parents(".list-select-brand").hasClass("size") == true){
+                    $("#listSize").show();
+                    $("#listSize>span").html(imgTxt);
+                    
+                } else if($(this).parents(".list-select-brand").hasClass("degree") == true){
+                    $("#listDegree").show();
+                    $("#listDegree>span").html(imgTxt);
+                    $("input#alcoholicity").val(btnTxt);
+                    
+                }
+                {% for p_c in category.get_product_class %}
+                else if($(this).parents(".list-select-brand").hasClass("{{p_c.code}}") == true){
+                	$("#ch_{{p_c.id}}").show();
+                    $("#ch_{{p_c.id}}>span").html(imgTxt);
+                    $("input#{{p_c.id}}").val(btnTxt);
+                    
+                }
+                {% endfor %}
+                
+                $("form#pdsForm").submit();
+                
+            });
+            //改变选项的背景颜色和图片
+            $(".term1").hover(function(){
+                $("img", this).attr("src","{% static 'images/shu.png' %}");
+            },function(){
+                $("img", this).attr("src","{% static 'images/shuh.png'%}");
+            });
+            //改变页码
+            $(".page-public>.num").click(function(){
+                $(this).addClass("active");
+                $(this).siblings().removeClass("active");
+            });
+            // 点击排序
+            $(".term1#jiage").click(function(){
+            	$("input#xiaoliang").val("");
+            	if($("input#jgpx").val()==""){
+            		var px = "ASC";
+            		$("input#jgpx").val(px);
+            	}
+            	else if($("input#jgpx").val()=="DESC"){
+            		var px = "";
+            		$("input#jgpx").val(px);
+            	}
+            	else if($("input#jgpx").val()=="ASC"){
+            		var px = "DESC";
+            		$("input#jgpx").val(px);
+            	}
+            	$("form#pdsForm").submit();
+            });
+            //销量排序
+            $(".term1#xiaoliang").click(function(){
+            	$("input#jgpx").val("");
+            	if($("input#xiaoliang").val()==""){
+            		var px = "ASC";
+            		$("input#xiaoliang").val(px);
+            	}
+            	else if($("input#xiaoliang").val()=="DESC"){
+            		var px = "";
+            		$("input#xiaoliang").val(px);
+            	}
+            	else if($("input#xiaoliang").val()=="ASC"){
+            		var px = "DESC";
+            		$("input#xiaoliang").val(px);
+            	}
+            	$("form#pdsForm").submit();
+            });
+            
+            
+           //点击确定
+           $(".center#queding").click(function(){
+        	   $("form#pdsForm").submit();   
+           });
+           // NAV
+           //全部商品分类
+           $(".shopclass-item").hover(function () {
+                       $(this).next().css("display", "block");
+                       $(".shopclass-item").css("background-color", "#c00000");
+                       $(this).css({"background-color": "#fafafa", "color": "#333"});
+                       $(".first-lei", this).css("color", "#333");
+                   },
+                   function () {
+                       $(".shopclass-item>a").css("color", "#fff");
+                       $(this).css({"background-color": "#c00000", "color": "#fff"});
+                   });
+ 
+        })
+    </script>
+{% endblock content%}

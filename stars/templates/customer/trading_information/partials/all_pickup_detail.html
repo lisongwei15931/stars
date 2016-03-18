@@ -1,0 +1,41 @@
+        <div class="p-title">查看<span class="p-close">×</span></div>
+        <div style="width:1218px; border:1px solid #cad9ea;">
+            <div style="width:1218px;">
+                <table border="1" class="tab_css_1">
+                    <tr>
+                        <th width="80">提货单ID</th>
+                        <th width="70">提货验证码</th>
+                        <th width="60">提货类型</th>
+                        <th width="200">提货点</th>
+                        <th width="180">商品名称</th>
+                        <th width="50">数量</th>
+                        <th width="240">收货地址</th>
+                        <th width="70">办理日期</th>
+                        <th width="70">状态</th>
+                        <th width="180">驳回原因</th>
+                    </tr>
+                </table>
+            </div>
+            <div style="overflow-y:scroll; height:468px;">
+                <table border="1" class="tab_css_1">
+                {% for pickup_detail in all_pickup_detail %}
+                    <tr class="tr_css" align="center">
+                        <td width="80">{{ pickup_detail.pickup_list_id.pickup_no }}</td>
+                        <td width="70">{{ pickup_detail.pickup_captcha }}</td>
+                        {% if pickup_detail.pickup_type == 2 or pickup_detail.pickup_type == 3 %}
+                            <td width="60">货运</td>
+                        {% elif pickup_detail.pickup_type == 1 %}
+                            <td width="60">自提</td>
+                        {% endif %}
+                        <td width="200">{{ pickup_detail.pickup_addr|default_if_none:'' }}</td>
+                        <td width="180">{{ pickup_detail.product }}</td>
+                        <td width="50">{{ pickup_detail.quantity }}</td>
+                        <td width="240">{{ pickup_detail.user_address|default_if_none:'' }}</td>
+                        <td width="70">{{ pickup_detail.deal_datetime|default_if_none:'' }}</td>
+                        <td width="70">{{ pickup_detail.get_status_display }}</td>
+                        <td width="180">{{ pickup_detail.refuse_desc }}</td>
+                    </tr>
+                {% endfor %}
+                </table>
+            <div>
+        </div>

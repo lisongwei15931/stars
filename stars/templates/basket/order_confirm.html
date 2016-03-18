@@ -1,0 +1,614 @@
+{% extends 'base_stars.html' %}
+{% load staticfiles %}
+{% load thumbnail %}
+{% load currency_filters %}
+{% load purchase_info_tags %}
+{% load widget_tweaks %}
+
+{% block public_css %}
+    {{block.super}}
+    <link rel="stylesheet" href="{% static "css/order_confirm.css" %}" type="text/css">
+{% endblock %}
+{% block custom_css %}
+{% endblock %}
+{% block jquery %}
+    <script type="text/javascript" src="{% static "js/jquery-1.11.1.min.js" %}"></script>
+    {{block.super}}
+{% endblock %}
+{% block title %}蓝图百货—确认订单{% endblock %}
+{% block content %}
+    <div class="register-topbar fix">
+        <div class="container fix" style="padding-top:0px; height:50px;">
+            <div class="register-topbar-right r" style="padding-top: 10px;">确认订单</div>
+        </div>
+    </div>
+    <div class="firmMain">
+    	<h2>填写并核对订单信息</h2>
+        <div class="firmCont">
+        <div class="content">
+        	<div class="row">
+                <div class="row-tit fix">
+                    <span class="l">收货人信息</span>
+                    <a class="row-tit-r r" id="consignee">新增收货地址</a>
+                </div>
+                <!--遮罩 start-->
+                <div id="consignee-con" style="display: none;">
+                	<!--mask-->
+                    <div class="shopcar-pupzz"></div>
+                    <!--mask-->
+                    <!--新增收货地址 start-->
+                    <div class="shopcar-pupbody">
+                        <div class="pupbody-top fix">
+                            <div class="pupbody-title l">新增收货地址</div>
+                            <div class="pupbody-closebtn r">×</div>
+                        </div>
+                        <form id="receiving_address_form" method="post" action="{% url 'customer:receiving_address_add' %}">
+                        {% csrf_token %}
+                        <div class="pupbody-content pupbody-content1">
+                            <div class="input-group fix">
+                                <div class="input-group-left right l">
+                                    <span class="color-red">*</span>
+                                    收货人：
+                                </div>
+                                <div class="input-group-right l">
+                                    {{ form.consignee }} 
+                                    <span class="err_span" style="color:red" id="consignee_err"></span>
+                                </div>
+                            </div>
+                            <div class="input-group fix">
+                                <div class="input-group-left right l">
+                                    <span class="color-red">*</span>
+                                    所在地区：
+                                </div>
+                                {{ form.province }} 
+	                            {{ form.city }} 
+	                            {{ form.district }} <span class="err_span" style="color:red" id="district_err"></span>
+                            </div>
+                            <div class="input-group fix">
+                                <div class="input-group-left right l">
+                                    <span class="color-red">*</span>
+                                    详细地址：
+                                </div>
+                                <div class="input-group-right l">
+                                    {{ form.address }} <span class="err_span" style="color:red" id="address_err"></span>
+                                </div>
+                            </div>
+                            <div class="input-group fix">
+                                <div class="input-group-left right l">
+                                    <span class="color-red">*</span>
+                                    手机号码：
+                                </div>
+                                <div class="input-group-right l">
+                                    {{ form.mobile_phone }} <span class="err_span" style="color:red" id="mobile_phone_err"></span>
+                                </div>
+                            </div>
+                            <div class="input-group fix">
+                                <div class="input-group-left right l">
+                                    固定电话：
+                                </div>
+                                <div class="input-group-right l">
+                                    {{ form.telephone }} 
+                                </div>
+                            </div>
+                            <div class="input-group fix">
+                                <div class="input-group-left right l">
+                                    邮箱：
+                                </div>
+                                <div class="input-group-right right l">
+                                    {{ form.email }}
+                                </div>
+                            </div>
+                            <div class="quasi">
+                                {{ form.is_default }}
+                                <span>设为默认收货地址</span>
+                            </div>
+                        </div>
+                        </form>
+                        <div class="pupbody-btn-no center">
+                            <a id="submit_form" class="shopcar-btn">保存收货地址</a>
+                        </div>
+                    </div>
+                    <!--新增收货地址 end-->
+                    <!--自提提示 start-->
+                    <div class="shopcar-pupbody">
+                        <div class="pupbody-top fix">
+                            <div class="pupbody-title l">商品确认</div>
+                            <div class="pupbody-closebtn r">×</div>
+                        </div>
+                        <div class="firmGoods">
+                            <p>尊敬的{{ user.username }}：</p>
+                            <p class="carefull">您购买的共<span class="red">{{ product_num }}</span>件商品中，<span id="express_num" class="red">1</span>件不支持自提，已经帮您转入货运，请您知晓。为此给您带来的麻烦请谅解。</p>
+                        </div>
+                        <div class="pupbody-btn center">
+                            <a class="shopcar-btn" id="care">我知道了</a>
+                        </div>
+                    </div>
+                    <!--自提提示 end-->
+                    <!--重选自提点 start-->
+                    <div class="shopcar-pupbody" id="ziti">
+                        <div class="pupbody-top fix">
+                            <div class="pupbody-title l">选择自提点</div>
+                            <div class="pupbody-closebtn r">×</div>
+                        </div>
+                        <div class="checkKf">
+   	  						<div class="checkKfleft">
+            					<table>
+                					<tr>
+                    					<td class="firstTd">所在区域：</td>
+                        			<td>
+                        				<select>
+                    						<option>全部区域</option>
+                        					<option>北京</option>
+                        					<option>天津</option>
+                                			<option>全部区域</option>
+                        					<option>北京</option>
+                        					<option>天津</option>
+                                			<option>全部区域</option>
+                        					<option>北京</option>
+                        					<option>天津</option>
+                    					</select>
+                    					<select>
+                    						<option>全部区域</option>
+                        					<option>自提点1</option>
+                        					<option>自提点2</option>
+                    					</select>
+                       			 </td>
+                    		</tr>
+                    		<tr>
+                    			<td class="firstTd" style=" vertical-align:top;">选择自提点：</td>
+                        		<td>
+                        			<ul class="addr">
+                            			<li class="curr">
+                                        	<div class="addrList">
+                                				<h2><span>1</span>&nbsp;北京市海淀区中关村自提点</h2>
+                                    			<div class="addr-detail">
+                                    				<p>地址：北京市海淀区五环到六环之间上地十街辉煌国环到六环之间上地十街辉煌国际旁</p>
+                                        			<p>联系电话：010-58440208    联系人：XXXXXX</p>
+                                    			</div>
+                                            </div>
+                                            <div class="default"><input type="checkbox"/>设为默认自提点</div>
+                                		</li>
+                                		<li>
+                                			<div class="addrList">
+                                				<h2><span>1</span>&nbsp;北京市海淀区中关村自提点</h2>
+                                    			<div class="addr-detail">
+                                    				<p>地址：北京市海淀区五环到六环之间上地十街辉煌国环到六环之间上地十街辉煌国际旁</p>
+                                        			<p>联系电话：010-58440208    联系人：XXXXXX</p>
+                                    			</div>
+                                            </div>
+                                            <div class="default"><input type="checkbox"/>设为默认自提点</div>
+                                		</li>
+                                		<li>
+                                			<div class="addrList">
+                                				<h2><span>1</span>&nbsp;北京市海淀区中关村自提点</h2>
+                                    			<div class="addr-detail">
+                                    				<p>地址：北京市海淀区五环到六环之间上地十街辉煌国环到六环之间上地十街辉煌国际旁</p>
+                                        			<p>联系电话：010-58440208    联系人：XXXXXX</p>
+                                    			</div>
+                                            </div>
+                                            <div class="default"><input type="checkbox"/>设为默认自提点</div>
+                                		</li>
+                                		<li>
+                                			<div class="addrList">
+                                				<h2><span>1</span>&nbsp;北京市海淀区中关村自提点</h2>
+                                    			<div class="addr-detail">
+                                    				<p>地址：北京市海淀区五环到六环之间上地十街辉煌国环到六环之间上地十街辉煌国际旁</p>
+                                        			<p>联系电话：010-58440208    联系人：XXXXXX</p>
+                                    			</div>
+                                            </div>
+                                            <div class="default"><input type="checkbox"/>设为默认自提点</div>
+                                		</li>
+                                		<li>
+                                			<div class="addrList">
+                                				<h2><span>1</span>&nbsp;北京市海淀区中关村自提点</h2>
+                                    			<div class="addr-detail">
+                                    				<p>地址：北京市海淀区五环到六环之间上地十街辉煌国环到六环之间上地十街辉煌国际旁</p>
+                                        			<p>联系电话：010-58440208    联系人：XXXXXX</p>
+                                    			</div>
+                                            </div>
+                                            <div class="default"><input type="checkbox"/>设为默认自提点</div>
+                                		</li>
+                                		<li>
+                                			<div class="addrList">
+                                				<h2><span>1</span>&nbsp;北京市海淀区中关村自提点</h2>
+                                    			<div class="addr-detail">
+                                    				<p>地址：北京市海淀区五环到六环之间上地十街辉煌国环到六环之间上地十街辉煌国际旁</p>
+                                        			<p>联系电话：010-58440208    联系人：XXXXXX</p>
+                                    			</div>
+                                            </div>
+                                            <div class="default"><input type="checkbox"/>设为默认自提点</div>
+                                		</li>
+                            	</ul>
+                          		<p class="more-addr">更多</p>
+                          		<div class="btn-keep"><input type="submit" value="保存自提点"/><a href="javascript:void(0)" id="cancel">取消</a></div>
+                        	</td>
+                    	</tr>
+                	</table>
+            				</div>
+            				<div class="checkKfright">
+            					<div style="width:454px;height:454px;border:#ccc solid 1px;" id="dituContent1"></div>
+            				</div>
+      					</div>
+                    </div>
+                    
+                    <!--重选自提点 end-->
+                    <!--查看地图-->
+                    <div class="shopcar-pupbody" id="ziti">
+                        <div class="pupbody-top fix">
+                            <div class="pupbody-title l">查看地图</div>
+                            <div class="pupbody-closebtn r">×</div>
+                        </div>
+                        <div style="width:1118px;height:650px;border:#ccc solid 1px;" id="dituContent2"></div>
+                    </div>
+                </div>
+                <!--遮罩 end-->
+                <div class="row-con-body">
+                    {% for address in current_address_list %}
+                        {% if forloop.counter0 == 0 %}
+                            <div class="row-content fix">
+                                <div address_id="{{ address.id }}" class="row-name-addr addrChange l active">
+                                    <span>{{ address.consignee }} {{ address.city }}</span>
+                                </div>
+                        {% else %}
+                            <div class="row-moreaddr1 row-content fix" style="display: none;">
+                                <div address_id="{{ address.id }}" class="row-name-addr addrChange l">
+                                    <span>{{ address.consignee }} {{ address.city }}</span>
+                                </div>
+                        {% endif %}
+                                <div class="row-addr">
+                                    <div class="row-addr-infor">
+                                        <span>{{ address.consignee }}</span>
+                                        <span>{{ address.city }} {{ address.distinct }} {{ address.address }}</span>
+                                        <span>
+                                            {{ address.mobile_phone|slice:":3" }}****{{ address.mobile_phone|slice:"7:" }}
+                                        </span>
+                                    </div>
+                                    <!--  <div class="row-addr-a">
+                                        <a>编辑</a>
+                                        <a>删除</a>
+                                    </div>-->
+                                </div>
+                            </div>
+                    {% endfor %}
+                    <div class="row-moreaddr">
+                        更多地址
+                    </div>
+                    <!--当没有信息的时候的样式-->
+                    <!--<div>无收货地址，请<span class="blue">添加收货地址</span>才能提交订单</div>-->
+                    <!--当没有信息的时候的样式-->
+                </div>
+            </div>
+            <!--货运还是自提-->
+            <ul class="checkStyle">
+            	<li id="express_status" class="current l active">货物运输</li>
+            	<li id="pickup_status" class="current l">上门自提</li>
+                <li class="care">自提免运费</li>
+            </ul>
+            <!--自提点-->
+            <div class="ziti">
+                <div class="content2" pickup_addr_id={{ pickup_addr.id }} id="pickup_addr">
+                    {% if pickup_addr %}
+                        <h2>{{ pickup_addr.name}}<span>重选自提点</span></h2>
+                        <table cellpadding="0" cellspacing="0" style="margin-top:10px; margin-left:10px;">
+                            <tr>
+                                <td class="firstGray">所在地区：</td>
+                                <td>{{ pickup_addr.city }} {{ pickup_addr.distinct }}</td>
+                            </tr>
+                            <tr>
+                                <td class="firstGray">详细地址：</td>
+                                <td>{{ pickup_addr.addr }}</td>
+                            </tr>
+                            <tr>
+                                <td class="firstGray">联系电话：</td>
+                                <td>{{ pickup_addr.tel }}</td>
+                            </tr>
+                            <tr>
+                                <td class="firstGray">联系人：</td>
+                                <td>{{ pickup_addr.contact }}</td>
+                            </tr>
+                        </table>
+                        <p class="onMap">查看地图</p>
+                    {% endif %}
+                </div>
+                <!--<div class="ziti-btn">选择自提点</div>--><!--没有自提点时的样式-->
+            </div>
+            
+            <!--自提点-->
+            <!--订单内容 start-->
+            <div id="order">
+                {% include 'basket/partials/order_confirm_order_content.html' %}
+            </div>
+            <!--订单内容 end-->
+        </div>
+        <form id='order_data' method="post" action='.' style="display:none">
+            {% csrf_token %}
+            <input type="text" name="pickup_type" id="pickup_type" value="2" />
+            <input type="text" name="receiving_address_id" id="receiving_address_id" />
+            <input type="text" name="pickup_address_id" id="pickup_address_id" value="{{pickup_addr.id}}"/>
+           <!-- <input type="text" name="total_price_value" id="total_price_value" /> -->
+        </form>
+        <div class="firmTotal" id="price">
+            {% include 'basket/partials/order_confirm_price.html' %}
+        </div>
+        </div>
+    </div>
+{% endblock %}
+{% block footer_script %}
+    <script type="text/javascript">
+    $('#submit_form').click(function() {
+    	 var form = $('#receiving_address_form');
+    	 $('.err_span').each(function(){
+    		 $(this).html("");
+ 		 });
+    	 $.ajax({
+             type: form.attr('method'),
+             url: form.attr('action'),
+             data: form.serialize(),
+             success: function (data) {
+                 if(data=='ok'){
+                	location.reload();
+                 }else{
+                	for (var key in data){
+                		keys = "#"+key+"_err";
+                		console.log(keys);
+                		console.log(data[key][0]['message'])
+                		$(keys).html(data[key][0]['message'])
+                	}
+                 }
+             }
+         });
+    })
+    $('#id_province').change(function () {
+        var province_id = $('#id_province').val();
+        $.ajax({
+            type: "GET",
+            data: {'province_id': province_id},
+            url: "{% url 'customer:get_location' %}",
+            success: function (data) {
+                // city
+                $('#id_city option[selected]').html('---------');
+
+                var city_options = $('#id_city option');
+                var id_city = $('#id_city')
+                var citys = data.citys;
+
+                city_options.remove();
+                id_city.append('<option value="">---------</option>');
+                for (var i = 0; i < citys.length; i++) {
+                    var current_city = citys[i];
+                    id_city.append('<option value=' + current_city.id + '>' + current_city.name + '</option>');
+                }
+                // district
+                $('#id_city option[selected]').html('---------');
+
+                var district_options = $('#id_district option');
+                var id_district = $('#id_district')
+                var districts = data.districts;
+
+                district_options.remove();
+                id_district.append('<option value="">---------</option>');
+                for (var i = 0; i < districts.length; i++) {
+                    var current_district = districts[i];
+                    id_district.append('<option value=' + current_district.id + '>' + current_district.name + '</option>');
+                }
+            }
+        })
+    });
+    $('#id_city').change(function () {
+        var city_id = $('#id_city').val();
+        $.ajax({
+            type: "GET",
+            data: {'city_id': city_id},
+            url: "{% url 'customer:get_location' %}",
+            success: function (data) {
+                $('#id_city option[selected]').html('---------');
+
+                var district_options = $('#id_district option');
+                var id_district = $('#id_district')
+                var districts = data.districts;
+
+                district_options.remove();
+                id_district.append('<option value="">---------</option>');
+                for (var i = 0; i < districts.length; i++) {
+                    var current_district = districts[i];
+                    id_district.append('<option value=' + current_district.id + '>' + current_district.name + '</option>');
+                }
+            }
+        })
+    });
+    $('#receiving_address_id').attr('value', $('.addrChange.active').attr('address_id'));
+        function choose_pickup(pickup_addr_id) {
+            $.ajax({
+                dataType: "json",
+                url: ".",
+                data: {'pickup_addr_id': pickup_addr_id},
+                success: function (result) {
+                    var express_num = result.express_num;
+                    if (express_num > 0) {
+                        $('#express_num').html(express_num);
+                    }
+                    $('#order').html(result.order_content_template_html);
+                    $('#price').html(result.order_price_template_html);
+                    if(result.pickup_addr_id){
+                    	$('#pickup_address_id').attr('value', result.pickup_addr_id);
+                    }
+                   	$('#submit_order').click(function(){
+                   		$('#order_data').submit();
+                    })
+                },
+            });
+            check_order()
+        }
+        $('#submit_order').click(function(){
+            $('#order_data').submit();
+        })
+        function check_order() {
+            $('#receiving_address_id').attr('value', $('.addrChange.active').attr('address_id'));
+            //自提
+            if ($('#pickup_status').hasClass('active')) {
+                $('#pickup_addr_id').attr('value', $('#pickup_addr').attr('pickup_addr_id'));
+                $('#pickup_type').attr('value', '1');
+            }
+            //物流
+            else {
+                $('#pickup_type').attr('value', '2');
+            }
+            $('#total_price_value').attr('value', $('#total_price').text());
+        }
+
+        window.onload = function(){
+            $(".footer-menu").find("li").eq(-1).children("span").css("display","none");
+        };
+        $(document).ready(function(){
+            $("#consignee,.row-con-body .blue").click(function(){
+                $("#consignee-con,.shopcar-pupbody:eq(0)").css("display","block");
+                $(".pupbody-closebtn,.pupbody-btn>a").click(function(){
+                    $("#consignee-con").css("display","none");
+					$(".shopcar-pupbody").hide();
+                });
+
+            });
+            check_order()
+            var province_id = $('#id_province').val();
+            $.ajax({
+                type: "get",
+                data: {'province_id': province_id},
+                url: "{% url 'customer:get_location' %}",
+                success: function (data) {
+                    // city
+
+                    var city_options = $('#id_city option');
+                    var id_city = $('#id_city')
+                    var citys = data.citys;
+                    var selected_city_id = $('#id_city').val();
+
+                    city_options.remove();
+                    id_city.append('<option value="">---------</option>');
+                    for (var i = 0; i < citys.length; i++) {
+                        var current_city = citys[i];
+                        if (current_city.id==selected_city_id) {
+                            id_city.append('<option selected="selected" value=' + current_city.id + '>' + current_city.name + '</option>');
+                        }
+                        else {
+                            id_city.append('<option value=' + current_city.id + '>' + current_city.name + '</option>');
+                        }
+                    }
+                }
+            })
+            var city_id = $('#id_city').val();
+            $.ajax({
+                type: "get",
+                data: {'city_id': city_id},
+                url: "{% url 'customer:get_location' %}",
+                success: function (data) {
+
+                    var district_options = $('#id_district option');
+                    var id_district = $('#id_district')
+                    var districts = data.districts;
+                    var selected_districts_id = $('#id_district').val();
+
+                    district_options.remove();
+                    id_district.append('<option value="">---------</option>');
+                    for (var i = 0; i < districts.length; i++) {
+                        var current_district = districts[i];
+                        if (current_district.id==selected_districts_id) {
+                            id_district.append('<option selected="selected" value=' + current_district.id + '>' + current_district.name + '</option>');
+                        }
+                        else {
+                            id_district.append('<option value=' + current_district.id + '>' + current_district.name + '</option>');
+                        }
+                    }
+                }
+            })
+        });
+        //得到焦点触发事件
+        function OnfocusFun(element,elementvalue)
+        {
+            if(element.value==elementvalue)
+            {
+                element.value="";
+                element.style.color="#343434";
+            }
+        }
+        //离开输入框触发事件
+        function OnBlurFun(element,elementvalue)
+        {
+            if(element.value=="" || element.value.replace(/\s/g,"")=="")
+            {
+                element.value=elementvalue;
+                element.style.color="#999";
+            }
+        }
+        $(function(){
+            $(".row-con-body>.row-moreaddr").click(function(){
+                $(".row-moreaddr1").css("display","block");
+            });
+
+            $(".zhifuChange,.peisongChange").click(function(){
+                $(this).addClass("active");
+                $(this).siblings().removeClass("active");
+            });
+            $(".addrChange").click(function(){
+                $(".addrChange").removeClass("active");
+                $(this).addClass("active");
+
+            });
+        });
+		//选择货运还是自提
+		$(".ziti").hide();
+		$(".checkStyle li").click(function(){
+			var index=$(this).index();
+            if ($(this).hasClass('active')) {
+                return;
+            }
+			if(index==2){
+                return
+            }
+			$(this).addClass("active").siblings().removeClass("active");
+			if(index==1){
+				$(".ziti").show();
+				$(".pupbody-closebtn,.pupbody-btn>a,#cancel,.btn-keep input").click(function(){
+                    $("#consignee-con").css("display","none");
+					$(".shopcar-pupbody").hide();
+                });
+                var pickup_addr_id = $('#pickup_addr').attr('pickup_addr_id');
+                choose_pickup(pickup_addr_id);
+				$("#consignee-con,.shopcar-pupbody:eq(1)").css("display","block");
+				//重选自提点
+                $(".ziti h2 span,.ziti-btn").click(function(){
+                    $(".shopcar-pupbody").hide();
+                    $("#consignee-con,.shopcar-pupbody:eq(2)").css("display","block");	
+                });
+			}else{
+                choose_pickup('express');
+				$(".ziti").hide();
+			}
+		});
+		
+		//重新选择自提点
+		$(function(){
+		   $(".addr li").click(function(){
+			   $(this).addClass("curr").siblings().removeClass("curr");
+			   });
+		   $(".addr li").each(function(){
+				var index=$(this).index();
+				if(index<4){
+					$(this).show();
+				}else{
+					$(this).hide();
+				}
+			});
+		   $(".more-addr").click(function(){
+			   $(".addr li").show();
+			   $(this).hide();
+			   $(".addr").css("overflow-y","scroll");
+			   });
+		   })
+		//点击查看地图
+		$(".onMap").click(function(){
+			$(".shopcar-pupbody").hide();
+			$("#consignee-con,.shopcar-pupbody:eq(3)").css("display","block");
+		});
+    </script>
+    <script type="text/javascript" src="{% static "js/map.js" %}"></script>
+{% endblock %}

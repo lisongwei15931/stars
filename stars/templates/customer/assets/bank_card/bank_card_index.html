@@ -1,0 +1,53 @@
+{% extends "customer/account_base.html" %}
+{% load staticfiles %}
+{#{% load static %}#}
+{#{% get_static_prefix as STATIC_PREFIX %}#}
+{% load compress %}
+
+{%  block title %}蓝图百货--账户资产{%  endblock title %}
+
+{% block oncontentload %}
+    {{ block.super }}
+    <div class="account-cont-right account-cont-right1 l">
+            <div class="details details1">
+                <div class="title-acct title-acct2 fix">
+                    <span class="l">银行卡</span>
+                </div>
+                <div class="bank-card-box fix">
+                    {% for card in cards %}
+                        <div class="bank-card-list l">
+                            <div class="bank-card-item fix">
+                                <div class="bank-tit">
+                                    <img src="{% static card.img_url %}" class="l"/>
+                                    <div class="personal-infor r">
+    {#                                    <p class="card-type">存储卡</p>#}
+                                        <p class="card-name">{{ card.name }}</p>
+                                    </div>
+                                </div>
+                                <div class="card-num">
+                                    <div class="card-num-con">
+                                        卡号<span>{{ card.num }}</span>
+                                    </div>
+                                </div>
+                            </div>
+{#                            <div class="card-bottom">#}
+{#                                <a class="active">默认</a>#}
+{#                                <a>删除</a>#}
+{#                                <a>修改手机</a>#}
+{#                            </div>#}
+                        </div>
+                    {% endfor %}
+
+{#                    <div class="bank-card-list l">#}
+{#                        <div class="bank-card-item bank-card-item1 l center"#}
+{#                             onclick="window.location.href = '{% url 'customer:assets-add_bank_card' %}'">#}
+{#                            <img src="{% static "images/addcard.png" %}"/>#}
+{#                            <div>添加银行卡</div>#}
+{#                        </div>#}
+{#                    </div>#}
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--银行卡body end-->
+  {% endblock oncontentload %}

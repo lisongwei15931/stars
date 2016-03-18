@@ -1,0 +1,55 @@
+{% extends "dashboard/layout.html" %}
+{% load currency_filters %}
+{% load sorting_tags %}
+{% load i18n %}
+{% load widget_tweaks %}
+
+{% block body_class %}{{ block.super }} consultations{% endblock %}
+{% block title %}
+    出库办理 | {{ block.super }}
+{% endblock %}
+
+{% block breadcrumbs %}
+    <ul class="breadcrumb" xmlns="http://www.w3.org/1999/html">
+        <li>
+            <a href="{% url 'dashboard:index' %}">{% trans "Dashboard" %}</a>
+            <span class="divider"></span>
+        </li>
+        <li class="active">出库办理</li>
+    </ul>
+{% endblock %}
+
+{% block header %}
+    <div class="page-header">
+        <h1>出库办理</h1>
+    </div>
+{% endblock header %}
+
+{% block dashboard_content %}
+{% if status != 2 or status != 5 %}
+    <form action="." class="form-stacked" method="post">
+        {% csrf_token %}
+        <div class="tab-pane" id="sales_attributes">
+            <table class="table table-striped table-bordered" id="table-bordered">
+                <caption>
+                    出库办理——{{ object.product }}
+                </caption>
+                {% for field in form %}
+                <tr>
+                    <td>
+                        {% include "partials/form_field.html" %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <div class="form-actions">
+            <button class="btn btn-primary btn-large" type="submit">{% trans "Save" %}</button> {% trans "or" %}
+            <a href="{% url 'dashboard:pickup-apply-pickup-list' %}">{% trans "cancel" %}</a>
+        </div>
+    </form>
+ {% else %}
+ <div class="tab-pane" id="sales_attributes">商品已经出库！</div>
+ {% endif %}
+{% endblock dashboard_content %}

@@ -1,0 +1,56 @@
+       	    <div class="checkKfleft">
+            	<table>
+                	<tr>
+                    	<td class="firstTd">所在区域：</td>
+                        <td>
+                        	<select id="province">
+                    			<option value="all">全部区域</option>
+                                {% for province in province_list %}
+                                    {% if province.id == current_province_id %}
+                                        <option selected="selected" value="{{ province.id }}">{{ province.name }}</option>
+                                    {% else %}
+                                        <option value="{{ province.id }}">{{ province.name }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                    		</select>
+                    		<select id="city">
+                    			<option value="all">全部区域</option>
+                                {% for city in city_list %}
+                                    {% if city.id == current_city_id %}
+                                        <option selected="selected" value="{{ city.id }}">{{ city.name }}</option>
+                                    {% else %}
+                                        <option value="{{ city.id }}">{{ city.name }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                    		</select>
+                        </td>
+                    </tr>
+                    <tr>
+                    	<td class="firstTd" style=" vertical-align:top;">选择自提点：</td>
+                        <td>
+                        	<ul id="addr" class="addr">
+                                {% for addr in pickup_address_list %}
+                                    {% if forloop.counter0 == 0 %}
+                                        <li class="curr" id="{{ addr.id }}" lng_lat="{{ addr.lng }}_{{ addr.lat }}">
+                                    {% else %}
+                                        <li id="{{ addr.id }}" lng_lat="{{ addr.lng }}_{{ addr.lat }}">
+                                    {% endif %}
+                                        <h2><span>{{ forloop.counter0|add:"1" }}</span>&nbsp;{{ addr.name }}</h2>
+                                        <div class="addr-detail">
+                                            <p>地址：{{ addr.addr }}</p>
+                                            <p>联系电话：{{ addr.tel }} 联系人：{{ addr.contact }}</p>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                          {% if pickup_address_list.count > 4 %}
+                            <p class="more-addr">更多</p>
+                          {% endif %}
+                          <div class="btn-keep"><input id="add_addr" type="submit" value="保存自提点"/><a href="{% url 'customer:pickup_apply' %}" id="cancel">取消</a></div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="checkKfright">
+            	<div style="width:454px;height:454px;border:#ccc solid 1px;" id="dituContent"></div>
+            </div>

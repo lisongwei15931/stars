@@ -1,0 +1,80 @@
+{% extends "customer/account_base.html" %}
+{% load staticfiles %}
+{% load compress %}
+
+{%  block title %}蓝图百货--账户资产{%  endblock title %}
+
+{% block oncontentload %}
+    {{ block.super }}
+    <!--银行卡body start-->
+    <div class="account-item-body1 container">
+        <div class="account-item-con" id="content">
+            <div class="account-item-tit">
+                <a>账户安全&nbsp;>&nbsp;</a>
+                <span>修改银行卡</span>
+            </div>
+            <div class="account-item-matter1">
+                <img src="{% static "images/sub-success.png" %}"/>
+                <span>修改成功！</span>
+                <div class="notice">
+{#                    <span>5</span>后自动跳转到银行卡!#}
+                    <a>返回银行卡</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--银行卡body end-->
+    <!--footer start-->
+    <div class="footer">
+        <div class="container">
+            <ul class="footer-menu fix">
+                <li><a href="#">帮助中心</a><span>|</span></li>
+                <li><a href="#">新手指导</a><span>|</span></li>
+                <li><a href="#">视频教程</a><span>|</span></li>
+                <li><a href="#">常见问题</a><span>|</span></li>
+                <li><a href="#">视频教程</a><span>|</span></li>
+                <li><a href="#">意见建议</a><span>|</span></li>
+                <li><a href="#">问题反馈</a><span>|</span></li>
+                <li><a href="#">关于我们</a><span>|</span></li>
+                <li><a href="#">联系我们</a><span>|</span></li>
+                <li><a href="#">加入我们</a><span>|</span></li>
+            </ul>
+            <p>
+                <span>增值电信业务经营许可证：浙B2-20110446</span>
+                <span>网络文化经营许可证：浙网文[2015]0295-065号</span>
+                <span>互联网医疗保健信息服务审核同意书 浙卫网审【2014】6号</span>
+            </p>
+            <p>互联网药品信息服务资质证书编号：浙-（经营性）-2012-0005</p>
+            <p>© 2014-2015 YZW.COM 版权所有</p>
+            <div class="footer-web">
+                <span class="di-1"></span>
+                <span class="di-2"></span>
+                <span class="di-3"></span>
+                <span class="di-4"></span>
+                <span class="di-5"></span>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+
+        window.onload = function(){
+            $(".footer-menu").find("li").eq(-1).children("span").css("display","none");
+        };
+        //窗口高度自适应
+        $(document).ready(function() {
+            var wh = $(window).height();
+            var dh = $(document).height();
+            if(wh == dh){
+                $("#content").css({"height": wh-804+374+"px"});
+            } else {
+            }
+        });
+        $(window).resize(function(){
+            var wh = $(window).height();
+            var dh = $(document).height();
+            if(wh == dh){
+                $("#content").css({"height": wh-804+374+"px"});
+            }
+        });
+    </script>
+{% endblock oncontentload %}

@@ -1,0 +1,230 @@
+{% extends "customer/safety/account_no_left_nav_base.html" %}
+{% load staticfiles %}
+{% load compress %}
+
+{%  block title %}蓝图百货--用户地址-新增地址{%  endblock title %}
+
+{% block onbodyload %}
+    <div class="account-item-body1 container">
+        <div class="account-item-con" id="content">
+            <div class="account-item-tit">
+                <a href="{% url 'customer:receiving_address' %}">收货地址&nbsp;>&nbsp;</a>
+                {% if add %}
+                    <span>新增收货地址</span>
+                {% else %}
+                    <span>编辑收货地址</span>
+                {% endif %}
+            </div>
+            <form id="receiving_address_form" method="post">
+                {% csrf_token %}
+                <div class="account-item-matter">
+                    <div id="consignee-con1">
+                        <div class="input-group fix">
+                            <div class="input-group-left right l">
+                                <span class="color-red">*</span>
+                                收货人：
+                            </div>
+                            <div class="input-group-right l">
+                                {{ form.consignee }}
+                            </div>
+                            <div class="marked-words l">
+                                {{ form.consignee.errors|striptags }}
+                            </div>
+                        </div>
+                        <div class="input-group fix">
+                            <div class="input-group-left right l">
+                                <span class="color-red">*</span>
+                                所在地区：
+                            </div>
+                            {{ form.province }}
+                            {{ form.city }}
+                            {{ form.district }}
+                            <div class="marked-words l">
+                                {% if form.province.errors or form.city.errors or form.district.errors %}
+                                    请填入完整的地区信息。
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="input-group fix">
+                            <div class="input-group-left right l">
+                                <span class="color-red">*</span>
+                                详细地址：
+                            </div>
+                            <div class="input-group-right l">
+                                {{ form.address }}
+                            </div>
+                            <div class="marked-words l">
+                                {{ form.address.errors|striptags }}
+                            </div>
+                        </div>
+                        <div class="input-group fix">
+                            <div class="input-group-left right l">
+                                <span class="color-red">*</span>
+                                手机号码：
+                            </div>
+                            <div class="input-group-right l">
+                                {{ form.mobile_phone }}
+                            </div>
+                            <div class="marked-words l">
+                                {{ form.mobile_phone.errors|striptags }}
+                            </div>
+                        </div>
+                        <div class="input-group fix">
+                            <div class="input-group-left right l">
+                                固定电话：
+                            </div>
+                            <div class="input-group-right l">
+                                {{ form.telephone }}
+                            </div>
+                            <div class="marked-words l">
+                                {{ form.telephone.errors|striptags }}
+                            </div>
+                        </div>
+                        <div class="input-group fix">
+                            <div class="input-group-left right l">
+                                邮箱：
+                            </div>
+                            <div class="input-group-right l">
+                                {{ form.email }}
+                                <span>用来接收订单提醒邮件，便于您及时了解订单状态</span>
+                            </div>
+                        </div>
+                        <div class="marked-words marked-words1">
+                            {{ form.email.errors|striptags }}
+                        </div>
+                        <br />
+                        <div class="quasi">
+                            {{ form.is_default }}
+                            <span>设为默认收货地址</span>
+                        </div>
+                    </div>
+                    <div class="shopcar-btn">
+                        <a id="submit_form">保存收货地址</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block index_script %}
+{% endblock %}
+
+{% block footer_extra_script %}
+    <script type="text/javascript">
+        $('#submit_form').click(function() {
+            $('#receiving_address_form').submit();
+        })
+        $('#id_province').change(function () {
+            var province_id = $('#id_province').val();
+            $.ajax({
+                type: "GET",
+                data: {'province_id': province_id},
+                url: "{% url 'customer:get_location' %}",
+                success: function (data) {
+                    // city
+                    $('#id_city option[selected]').html('---------');
+
+                    var city_options = $('#id_city option');
+                    var id_city = $('#id_city')
+                    var citys = data.citys;
+
+                    city_options.remove();
+                    id_city.append('<option value="">---------</option>');
+                    for (var i = 0; i < citys.length; i++) {
+                        var current_city = citys[i];
+                        id_city.append('<option value=' + current_city.id + '>' + current_city.name + '</option>');
+                    }
+                    // district
+                    $('#id_city option[selected]').html('---------');
+
+                    var district_options = $('#id_district option');
+                    var id_district = $('#id_district')
+                    var districts = data.districts;
+
+                    district_options.remove();
+                    id_district.append('<option value="">---------</option>');
+                    for (var i = 0; i < districts.length; i++) {
+                        var current_district = districts[i];
+                        id_district.append('<option value=' + current_district.id + '>' + current_district.name + '</option>');
+                    }
+                }
+            })
+        });
+        $('#id_city').change(function () {
+            var city_id = $('#id_city').val();
+            $.ajax({
+                type: "GET",
+                data: {'city_id': city_id},
+                url: "{% url 'customer:get_location' %}",
+                success: function (data) {
+                    $('#id_city option[selected]').html('---------');
+
+                    var district_options = $('#id_district option');
+                    var id_district = $('#id_district')
+                    var districts = data.districts;
+
+                    district_options.remove();
+                    id_district.append('<option value="">---------</option>');
+                    for (var i = 0; i < districts.length; i++) {
+                        var current_district = districts[i];
+                        id_district.append('<option value=' + current_district.id + '>' + current_district.name + '</option>');
+                    }
+                }
+            })
+        });
+        $(document).ready(function(){
+            var province_id = $('#id_province').val();
+            $.ajax({
+                type: "get",
+                data: {'province_id': province_id},
+                url: "{% url 'customer:get_location' %}",
+                success: function (data) {
+                    // city
+
+                    var city_options = $('#id_city option');
+                    var id_city = $('#id_city')
+                    var citys = data.citys;
+                    var selected_city_id = $('#id_city').val();
+
+                    city_options.remove();
+                    id_city.append('<option value="">---------</option>');
+                    for (var i = 0; i < citys.length; i++) {
+                        var current_city = citys[i];
+                        if (current_city.id==selected_city_id) {
+                            id_city.append('<option selected="selected" value=' + current_city.id + '>' + current_city.name + '</option>');
+                        }
+                        else {
+                            id_city.append('<option value=' + current_city.id + '>' + current_city.name + '</option>');
+                        }
+                    }
+                }
+            })
+            var city_id = $('#id_city').val();
+            $.ajax({
+                type: "get",
+                data: {'city_id': city_id},
+                url: "{% url 'customer:get_location' %}",
+                success: function (data) {
+
+                    var district_options = $('#id_district option');
+                    var id_district = $('#id_district')
+                    var districts = data.districts;
+                    var selected_districts_id = $('#id_district').val();
+
+                    district_options.remove();
+                    id_district.append('<option value="">---------</option>');
+                    for (var i = 0; i < districts.length; i++) {
+                        var current_district = districts[i];
+                        if (current_district.id==selected_districts_id) {
+                            id_district.append('<option selected="selected" value=' + current_district.id + '>' + current_district.name + '</option>');
+                        }
+                        else {
+                            id_district.append('<option value=' + current_district.id + '>' + current_district.name + '</option>');
+                        }
+                    }
+                }
+            })
+        })
+    </script>
+{% endblock %}

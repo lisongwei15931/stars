@@ -1,0 +1,178 @@
+{% extends "customer/safety/account_no_left_nav_base.html" %}
+{% load staticfiles %}
+{% load compress %}
+{%  block title %}蓝图百货--账户安全--修改登录密码{%  endblock title %}
+{% block custom_css %}
+    <link rel="stylesheet" href="{% static "css/account_safety.css" %}" type="text/css">
+{% endblock %}
+{% block onbodyload %}
+
+    <!--账户安全--登录密码body start-->
+    <form action="{% url 'customer:safety-change_login_password' %}" method="post">
+        {% csrf_token %}
+        <div class="account-item-body1 container">
+            <div class="account-item-con" id="content">
+                <div class="account-item-tit">
+                    <a href="{% url 'customer:safety-center' %}">账户安全&nbsp;>&nbsp;</a>
+                    <span>修改登录密码</span>
+                </div>
+                <div class="account-item-matter">
+                    <div class="input-group fix">
+                        <div class="input-group-left right l">
+                            <span class="color-red">*</span>
+                            当前密码：
+                        </div>
+                        <div class="input-group-right l">
+                            <input id='pwd' name='old_pwd' type="text" value="" onfocus="OnfocusFun1(this,'')" onblur="OnBlurFun1(this,'')" class="error"/>
+{#                            <div class="img">#}
+{#                                <img src="{% static "images/register-right.png" %}"/>#}
+{#                            </div>#}
+                            <div id="pwd_err_msg_div_id" class="marked-words marked-words2">{% if old_pwd_err_msg %}{{ old_pwd_err_msg }}{% endif %}</div>
+                        </div>
+                    </div>
+                    <div class="input-group fix">
+                        <div class="input-group-left right l">
+                            <span class="color-red">*</span>
+                            新的密码：
+                        </div>
+                        <div class="input-group-right l">
+                            <input id="pwd0" name='new_pwd' type="text" value="" onfocus="OnfocusFun1(this,'')" onblur="OnBlurFun1(this,'')" onKeyUp="pwStrength(this.value)" onBlur="pwStrength(this.value)"/>
+{#                            <div class="img">#}
+{#                                <img src="{% static "images/register-error.png" %}" />#}
+{#                                <span class="color-red">请输入新密码</span>#}
+{#                            </div>#}
+                            <div id="pwd0_err_msg_div_id" class="marked-words marked-words2"></div>
+                            <div class="sbar-box">
+                                <span class="sbar" id="strength_L" bgcolor="#eee">弱</span>
+                                <span class="sbar" id="strength_M" bgcolor="#eee">中</span>
+                                <span class="sbar" id="strength_H" bgcolor="#eee">强</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group fix">
+                        <div class="input-group-left right l">
+                            <span class="color-red">*</span>
+                            确认新密码：
+                        </div>
+                        <div class="input-group-right l">
+                            <input id="pwd1" type="text" value="" onfocus="OnfocusFun1(this,'')" onblur="OnBlurFun1(this,'')"/>
+                        </div>
+                        <div id="pwd1_err_msg_div_id" class="marked-words marked-words2"></div>
+                    </div>
+                    <div class="center refer refer1">
+                        <input type="submit" onclick="return check_upd_pwd()" value="确认"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <script type="text/javascript" src="{% static "js/safety_pwd.js" %}"></script>
+    <script type="text/javascript">
+        window.onload = function(){
+            $(".footer-menu").find("li").eq(-1).children("span").css("display","none");
+        };
+        //得到焦点触发事件
+        function OnfocusFun1(element,elementvalue)
+        {
+            if(element.value==elementvalue)
+            {
+                element.value="";
+                element.type="password";
+                element.style.color="#343434";
+            }
+        }
+        //离开输入框触发事件
+        function OnBlurFun1(element,elementvalue)
+        {
+            if(element.value=="" || element.value.replace(/\s/g,"")=="")
+            {
+                element.value=elementvalue;
+                element.type="text";
+                element.style.color="#999";
+            }
+        }
+
+    </script>
+    <script type="text/javascript">
+        function CharMode(iN){
+            if (iN>=48 && iN <=57) //数字
+                return 1;
+            if (iN>=65 && iN <=90) //大写
+                return 2;
+            if (iN>=97 && iN <=122) //小写
+                return 4;
+            else
+                return 8;
+        }
+        //bitTotal函数
+        //计算密码模式
+        function bitTotal(num){
+            modes=0;
+            for (i=0;i<4;i++){
+                if (num & 1) modes++;
+                num>>>=1;
+            }
+            return modes;
+        }
+        //返回强度级别
+        function checkStrong(sPW){
+            if (sPW.length<6)
+                return 0; //密码太短，不检测级别
+            Modes=0;
+            for (i=0;i<sPW.length;i++){
+                //密码模式
+                Modes|=CharMode(sPW.charCodeAt(i));
+            }
+            return bitTotal(Modes);
+        }
+
+        //显示颜色
+        function pwStrength(pwd){
+            Dfault_color="#eeeeee";     //默认颜色
+            L_color="#FF0000";      //低强度的颜色，且只显示在最左边的单元格中
+            M_color="#FF9900";      //中等强度的颜色，且只显示在左边两个单元格中
+            H_color="#33CC00";      //高强度的颜色，三个单元格都显示
+            if (pwd==null||pwd==''){
+                Lcolor=Mcolor=Hcolor=Dfault_color;
+            }
+            else{
+                S_level=checkStrong(pwd);
+                switch(S_level) {
+                    case 0:
+                        Lcolor=Mcolor=Hcolor=Dfault_color;
+                        break;
+                    case 1:
+                        Lcolor=L_color;
+                        Mcolor=Hcolor=Dfault_color;
+                        break;
+                    case 2:
+                        Lcolor=Mcolor=M_color;
+                        Hcolor=Dfault_color;
+                        break;
+                    default:
+                        Lcolor=Mcolor=Hcolor=H_color;
+                }
+            }
+            document.getElementById("strength_L").style.background=Lcolor;
+            document.getElementById("strength_M").style.background=Mcolor;
+            document.getElementById("strength_H").style.background=Hcolor;
+            return;
+        }
+        //窗口高度自适应
+        $(document).ready(function() {
+            var wh = $(window).height();
+            var dh = $(document).height();
+            if(wh == dh){
+                $("#content").css({"height": wh-804+374+"px"});
+            } else {
+            }
+        });
+        $(window).resize(function(){
+            var wh = $(window).height();
+            var dh = $(document).height();
+            if(wh == dh){
+                $("#content").css({"height": wh-804+374+"px"});
+            }
+        });
+    </script>
+{% endblock onbodyload %}

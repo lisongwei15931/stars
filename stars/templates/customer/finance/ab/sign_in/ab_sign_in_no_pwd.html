@@ -1,0 +1,31 @@
+{% extends "customer/account_base.html" %}
+{% load public_tags %}
+{% load staticfiles %}
+{% load compress %}
+
+
+{%  block title %}域之为--农行签约--提示{%  endblock title %}
+
+{% block oncontentload %}
+    {{ block.super }}
+        <div class="account-cont-right account-cont-rightarea l">
+            <h4>
+                <span>农行签约</span>
+            </h4>
+            <div class="account-sign">
+                <div class="sign-type fix" style="position: relative;left: -40px;">
+                    <div class="sign-type-img l">
+                        <img src="{% static "images/tishi-1.png" %}"/>
+                    </div>
+                    <div class="sign-type-txt l">
+                        提示：签约前请先设置 “资金密码”
+                    </div>
+                </div>
+                <div class="sign-btn sign-btn-a" >
+                    去&nbsp;&nbsp;&nbsp;&nbsp;<a href="{% url 'customer:safety-validate-payment-update_password' %}">设置</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--农行签约body end-->
+ {% endblock oncontentload %}

@@ -1,0 +1,53 @@
+@charset "utf-8";
+/* CSS Document */
+/*帮助中心*/
+.helpContent{width:1200px; overflow:hidden; margin:0 auto; border-top:2px solid #c00000;}
+.helpLeft{width:219px; overflow:hidden; float:left; padding-top:28px; position:relative;}
+.helpTitle{width:194px; height:50px; line-height:50px; font-size:24px; color:#fff; background-color:#433; padding-left:25px;}
+.heltQp{width:52px; height:51px; text-align:center; line-height:52px; font-size:35px; color:#fff; background:url(../images/help-qipao.png) no-repeat; position:absolute; top:15px; right:18px;}
+.helpTree{width:194px; overflow:hidden; padding-left:25px; margin-top:30px;}
+.helpTree h2{font-size:18px; font-weight:normal; height:20px; line-height:20px; background:url(../images/help-icons.png)0 0 no-repeat; padding-left:30px; margin-bottom:10px; color:#000;}
+.helpTree h2.myStyle{background:url(../images/help-icons.png) 0 -21px no-repeat;}
+.helpTree h2.myInformation{background:url(../images/help-icons.png) 0 -39px no-repeat;}
+.helpTree h2.comProblems{background:url(../images/help-icons.png) 0 -58px no-repeat;}
+ul.helpList{width:164px; overflow:hidden; padding-left:30px;}
+ul.helpList li{height:35px; line-height:35px; font-size:16px; color:#666;}
+ul.helpList li a:link,ul.helpList li a:visited{color:#666;}
+ul.helpList li a:hover{color:#c00;}
+ul.helpList li.current a{color:#c00;}
+
+.helpRight{width:940px; overflow:hidden; float:right; border-left:1px solid #dedede; min-height:1100px; padding:40px 0 100px 40px;}
+.helpRight h1{width:940px; overflow:hidden; font-size:24px; font-weight:normal;}
+.box-block{width:890px; overflow:hidden; background-color:#f8f8f8; padding:20px 25px; font-family:"宋体"; font-size:14px; line-height:1.8em; margin-top:25px;}
+.box-block p{margin-bottom:10px;}
+
+
+
+/*新品上市*/
+.new-title{width:219px; overflow:hidden;}
+.new-title li{width:164px; height:42px; line-height:42px; font-size:16px; padding-left:55px; background-color:#eee; margin-bottom:4px; color:#000; cursor:pointer;}
+.new-title li.current{background-color:#c00; color:#fff;}
+.new-arrival{width:940px; overflow:hidden; display:none;}
+.new-arrival h2{font-weight:normal; color:#333; font-size:16px; margin-bottom:10px;}
+.new-list{min-height:960px; margin-bottom:50px;}
+.new-list dl{width:940px; height:34px; line-height:34px;}
+.new-list dl dt{width:700px; height:34px; float:left; overflow:hidden;}
+.new-list dl dt a:link,.new-list dl dt a:visited{color:#666; font-family:"宋体";}
+.new-list dl dd{width:200px; height:34px; float:right; text-align:right; font-family:"宋体"; color:#999;}
+/*详情*/
+#dt-title li{cursor:default;}
+.dt-helpRight{padding-top:30px; min-height:550px; overflow:hidden;}
+.dt-title{width:940px; overflow:hidden; border-bottom:1px solid #dedede;}
+.back{width:40px; margin-right:20px; height:30px; line-height:30px; float:left;}
+.back a:link,.back a:visited{color:#999;font-family:"宋体";}
+.caption{width:880px; height:20px; line-height:20px; float:left; text-align:center; font-size:16px;}
+.dt-time{line-height:1.8em; text-align:right; color:#999; font-size:14px;}
+.main-wz p{margin-bottom:20px; line-height:2em;}
+
+
+
+
+
+
+
+

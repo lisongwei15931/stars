@@ -1,0 +1,497 @@
+{% extends 'base_stars.html' %}
+{% load staticfiles %}
+{% load thumbnail %}
+{% load currency_filters %}
+{% load purchase_info_tags %}
+{% load widget_tweaks %}
+
+{% block public_css %}
+    {{block.super}}
+    <link rel="stylesheet" href="{% static "css/shopcar.css" %}" type="text/css">
+    <link rel="stylesheet" href="{% static "css/slick.css" %}" type="text/css">
+{% endblock %}
+{% block custom_css %}
+{% endblock %}
+{% block jquery %}
+    {{block.super}}
+    <script type="text/javascript" src="{% static "js/jquery-1.11.1.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/slick.min.js" %}"></script>
+{% endblock %}
+{% block title %}蓝图百货—购物车{% endblock %}
+{% block content %}
+    <div class="shopcar-content-body fix">
+        <!--购物车-content-body-start-->
+        <div class="container fix">
+               <div class="shopclass l" id="shopclass">
+                <ul>
+                    <li>
+                        <h3><a href="#">全部商品分类</a></h3>
+                        <ul>
+                        {% for c in category_list %}
+                            <li class="shopclass-item">
+                                <a class="first-lei" href = "{% url 'catalogue:allproducts' %}?category={{c.name}} ">{{c.name}}</a>
+                                <ul>
+                                {% for cc in c.get_children %}
+                                    <li>
+                                        
+                                        <div class="menu-row fix">
+                                            <div class="menu-left l"><a href = "{% url 'catalogue:allproducts' %}?category={{cc.name}} " style ="color:#000;">{{cc.name}}</a></div>
+                                            <ul class="menu-ul l fix">
+                                            {% for ccc in cc.get_children %}
+                                                <li><a href="{% url 'catalogue:allproducts' %}?category={{ccc.name}} ">{{ccc.name}}</a><span><img src="{% static 'images/shuxian.png' %}"></span></li>
+                                            {% endfor %}
+                                            </ul>
+                                        </div>
+                                    </li>
+                                 {% endfor %}
+                                    <img src="{%static 'images/ad1-nav.jpg' %}" class="menu-img">
+                                </ul>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        <ul class="banner-top l">
+        <li>
+            <a href="{% url 'promotions:brandgather_product' %}">品牌汇</a>
+        </li>
+        <li>
+            <a href="{% url 'promotions:today_new_view' %}">新品汇</a>
+        </li>
+        <li>
+            <a href="{% url 'tradingcenter:trading_center_index' %}">交易大厅</a>
+        </li>
+        <li style="float:left;background-image: none;font-size:16px;border-right:none">
+            <a href="{% url 'helper:helper_index' %}" style="text-decoration: none;">蓝图学院</a>
+        </li>
+        <li class="last-child"> 
+               <div class="open fix">
+                <div class="l">
+                    {% if open_or_close %}
+                    <img src="{% static 'images/open.png' %}"/>
+                    {% else %}
+                    <img src="{%static 'images/close.png' %}"/>
+		            {% endif %}
+                </div>
+                <marquee class="l"scrolldelay="150" direction="left">{{open_close_msg}}</marquee>
+              </div>
+        </li> 
+    </ul>
+        </div>
+        <!--购物车-content-body-con-start-->
+        <div id="basket_content">
+            {% include 'basket/partials/basket_content.html' %}
+        </div>
+        <div class="container list-box1 fix">
+            <div class="title-acct title-acct1 fix">
+                <div class="more-more l">
+                    <span class="look active" id="recommend">更多推荐</span>
+                    <span class="look" id="recent-visit">最近浏览</span>
+                </div>
+                <div class="ye ye1 r">
+                    <span ><img id="prev" src="{% static "images/leftjth.png" %}"/></span>
+                    <span class="rightjt"><img id="next" src="{% static "images/rightjth.png" %}"/></span>
+                </div>
+            </div>
+            <div id="recommend-more" class="slider multiple-items">
+            {% for product in all_recommended_products %}
+                <div class="list-item list-item1 l">
+                    <div class="list-item-img">
+                        {% with image=product.primary_image %}
+                            {% thumbnail image.original "200x200" crop="center" as thumb %}
+                                <a href="{{ product.get_absolute_url }}">
+                                    <img class="thumbnail" src="{{ thumb.url }}" alt="{{ product.get_title }}"/>
+                                </a>
+                            {% endthumbnail %}
+                        {% endwith %}
+                    </div>
+                    <div class="list-item-all">
+                        <div class="list-item-tit">
+                            <br />
+                        </div>
+                        <div class="list-item-infor color-red">
+                            <a href="{{ product.get_absolute_url }}">{{ product.title}}</a>
+                        </div>
+                        <div class="list-item-price fix">
+                            {% purchase_info_for_product request product as session %}
+                            <span class="l">￥{{ product.buy_price }}</span>
+                            <del class="r">￥{{product.stockrecords.first.price_retail}}</del>
+                        </div>
+                        <div class="list-item-addto">
+                            {% comment %}
+                            <form id="add_to_basket_{{ product.id }}_form" action="/basket/add/{{ product.id }}/" method="post" class="add-to-basket">
+                                {% csrf_token %}
+                                <input id="id_quantity" name="quantity" type="hidden" value="1">
+                                <a class="addtocar l add_to_basket" id="add_to_basket_{{ product.id }}">
+                                    加入购物车
+                                </a>
+                            </form>
+                            {% endcomment %}
+                            <a href="{{ product.get_absolute_url }}" class="addtocar l add_to_basket">&nbsp;&nbsp;立即购买</a>
+                            <span class="dis r">
+                                已售：<span>{{product.volume}}</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            </div>
+            <div id="recent-visit-more" class="slider multiple-items2" style="display: none;">
+            {% for product in history_products %}
+                <div class="list-item list-item1 l">
+                    <div class="list-item-img">
+                        {% with image=product.primary_image %}
+                            {% thumbnail image.original "200x200" crop="center" as thumb %}
+                                <a href="{{ product.get_absolute_url }}">
+                                    <img class="thumbnail" src="{{ thumb.url }}" alt="{{ product.get_title }}"/>
+                                </a>
+                            {% endthumbnail %}
+                        {% endwith %}
+                    </div>
+                    <div class="list-item-all">
+                        <div class="list-item-tit">
+                            <br />
+                        </div>
+                        <div class="list-item-infor color-red">
+                            <a href="{{ product.get_absolute_url }}">{{ product.title}}</a>
+                        </div>
+                        <div class="list-item-price fix">
+                            {% purchase_info_for_product request product as session %}
+                            <span class="l">￥{{ product.buy_price }}</span>
+                            <del class="r">￥{{product.stockrecords.first.price_retail}}</del>
+                        </div>
+                        <div class="list-item-addto">
+                            <a href="{{ product.get_absolute_url }}" class="addtocar l add_to_basket">&nbsp;&nbsp;立即购买</a>
+                            <span class="dis r">
+                                已售：<span>{{product.volume}}</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block footer_script %}
+    <script type="text/javascript">
+        //得到焦点触发事件
+        function OnfocusFun(element,elementvalue)
+        {
+            if(element.value==elementvalue)
+            {
+                element.value="";
+                element.style.color="#343434";
+            }
+        }
+        //离开输入框触发事件
+        function OnBlurFun(element,elementvalue)
+        {
+            if(element.value=="" || element.value.replace(/\s/g,"")=="")
+            {
+                element.value=elementvalue;
+                element.style.color="#999";
+            }
+        }
+        //全选，反选
+        function DoCheck()
+        {
+            var ch=document.getElementsByName("choose");
+            if(document.getElementsByName("allChecked")[0].checked==true)
+            {
+                for(var i=0;i<ch.length;i++)
+                {
+                    ch[i].checked=true;
+                }
+            }else{
+                for(var i=0;i<ch.length;i++)
+                {
+                    ch[i].checked=false;
+                }
+            }
+        }
+        function unAllCheck(index){
+//            var len = document.getElementsByName("choose");
+//            var chked;
+//
+//            for(var i=0;i<len.length;i++) {
+//                chked =  len[i].checked;
+//                if (len[i].checked==true){
+//                    document.getElementsByName("allChecked")[0].checked = true;
+//                }
+//            }
+            if(index.checked == false){
+                document.getElementsByName("allChecked")[0].checked = false;
+            }
+        }
+        window.onload = function(){
+            $(".keywords").find("li").eq(-1).children("span").css("display","none");
+            $(".footer-menu").find("li").eq(-1).children("span").css("display","none");
+        };
+        $(function(){
+           
+            $(".shop-check").hover(function(){
+                $(this).css("background","#eee");
+            });
+            //推荐跟浏览历史
+            $(".title-acct1>.more-more>.look").click(function(){
+                $(this).addClass("active");
+                $(this).siblings().removeClass("active");
+                $(".ye").show();
+            });
+            $("#recent-visit").click(function(){
+                $("#recent-visit-more").css("display","block");
+                $("#recommend-more").css("display","none");
+                $(".ye").hide();
+            });
+            $("#recommend").click(function(){
+                //window.location.reload();
+                $("#recommend-more").css("display","block");
+                $("#recent-visit-more").css("display","none");
+            });
+            $(".qty-box>.trim-l").click(function(){
+                var inputVal = $(this).next().val();
+                inputVal--;
+                if(inputVal >= 1){
+                    $(this).next().val(inputVal);
+                    $(this).next().next().attr("src","{% static "images/num+h.png" %}");
+                }else if(inputVal == 0){
+                    $(this).attr("src","{% static "images/num-.png" %}");
+                }
+                product_quantity_check($(this).next());
+            });
+            $(".qty-box>.trim-r").click(function(){
+                var inputVal = $(this).prev().val();
+                var max_num = $(this).next().text();
+                inputVal++;
+                
+                if(inputVal > 1 && inputVal < max_num){
+                    $(this).prev().val(inputVal);
+                    $(this).prev().prev().attr("src","{% static "images/num-h.png" %}");
+                }
+                else if(inputVal == max_num){
+                    $(this).prev().val(inputVal);
+                    $(this).attr("src","{% static "images/num+.png" %}");
+                }else if(inputVal > max_num){
+                	$(this).attr("src","{% static "images/num+.png" %}");
+                }
+                product_quantity_check($(this).prev(),true,max_num);
+            });
+            $(".bid-rate1>.trim-l").click(function(){
+                var inputVal = $(this).next().val();
+                var price_rage = $(this).next().next().next().text();
+                var min_price = parseFloat(price_rage.split('-')[0]);
+                var max_price = parseFloat(price_rage.split('-')[1]);
+                inputVal = inputVal - 0.01;
+                inputVal = Math.round(inputVal*100)/100;
+                if(inputVal > min_price && inputVal<max_price){
+                    $(this).next().val(inputVal.toFixed(2));
+                    $(this).next().next().attr("src","{% static "images/num+h.png" %}");
+                }else if(inputVal == min_price ){
+                    $(this).next().val(inputVal.toFixed(2));
+                    $(this).attr("src","{% static "images/num-.png" %}");
+                }else if(inputVal < min_price ){
+                    $(this).attr("src","{% static "images/num-.png" %}");
+                }
+                product_buy_price_check($(this).next(),min_price,max_price);
+            });
+            $(".bid-rate1>.trim-r").click(function(){
+                var inputVal = parseFloat($(this).prev().val());
+                var price_rage = $(this).next().text();
+                var min_price = parseFloat(price_rage.split('-')[0]);
+                var max_price = parseFloat(price_rage.split('-')[1]);
+                inputVal = inputVal + 0.01;
+                inputVal = Math.round(inputVal*100)/100;
+                if(inputVal > min_price && inputVal <= max_price){
+                    $(this).prev().val(inputVal.toFixed(2));
+                    $(this).prev().prev().attr("src","{% static "images/num-h.png" %}");
+                }else if (inputVal==max_price){
+                	$(this).val(inputVal.toFixed(2));
+                	$(this).attr("src","{% static "images/num+.png" %}");
+                }else if (inputVal>max_price){
+                	$(this).attr("src","{% static "images/num+.png" %}");
+                }
+                product_buy_price_check($(this).prev(),min_price,max_price);
+            });
+            
+            // NAV
+            //全部商品分类
+            $(".shopclass-item").hover(function () {
+                        $(this).next().css("display", "block");
+                        $(".shopclass-item").css("background-color", "#c00000");
+                        $(this).css({"background-color": "#fafafa", "color": "#333"});
+                        $(".first-lei", this).css("color", "#333");
+                    },
+                    function () {
+                        $(".shopclass-item>a").css("color", "#fff");
+                        $(this).css({"background-color": "#c00000", "color": "#fff"});
+                    });
+
+        });
+        function product_quantity_check(product_quantity, quantity_change,max_num) {
+            // var stock_num = parseInt($('#'+product_quantity[0].id+'-stock').html());
+            if (quantity_change != false) {
+                quantity_change = quantity_change||true;
+            }
+            var quantity = parseInt(product_quantity.val());
+            //var add_button = product_quantity.next();
+            //var minus_button = product_quantity.prev();
+            if (isNaN(quantity)) {
+                alert('请填入数字');
+                product_quantity.val(1);
+                //add_button.addClass('active');
+                //minus_button.removeClass('active');
+            }
+            else {
+                product_quantity.val(quantity);
+                
+                if (quantity > max_num) {
+                    alert('超过可购买数量');
+                    product_quantity.val(max_num);
+                    //minus_button.addClass('active');
+                    //add_button.removeClass('active');
+                }
+                
+                if (quantity <= 0) {
+                    alert('请填入大于0的数量');
+                    product_quantity.val(1);
+                    //add_button.addClass('active');
+                    //minus_button.removeClass('active');
+                }
+            }
+            var quantity = parseInt(product_quantity.val());
+            // change backend data
+            var line_id = product_quantity.parent().attr('id').split('_')[1];
+            if (quantity_change) {
+                $.ajax({
+                    type: "GET",
+                    data: {'quantity': product_quantity.val(), 'line_id': line_id},
+                    url: "{% url 'basket:line_quantity_set' %}",
+                    success: function (data) {
+                        return false;
+                    }
+                })
+            }
+            // change total quote
+            var unit_quote = parseInt($('#unit_quote_'+ line_id).val());
+            $('#quote_'+line_id).html(quantity*unit_quote);
+            // one product price
+            var strike_price = parseFloat(product_quantity.parent().next().children().html());
+            var one_product_totoal_price = (quantity * strike_price).toFixed(2);
+            $('#'+product_quantity[0].id+'-price-total').html(one_product_totoal_price);
+            // all product quantity
+            var all_quantity = $('.product_quantity');
+            var total_quantity = 0;
+            for (var i=0;i<all_quantity.length;i++) {
+                total_quantity = total_quantity + parseInt($(all_quantity[i]).val());
+            }
+            $('#quantity-total').html(total_quantity);
+            // all product price
+            var all_total_price = $('.product_total_price');
+            var total_all_price = 0;
+            for (var i=0;i<all_quantity.length;i++) {
+                total_all_price = total_all_price + parseFloat($(all_total_price[i]).html());
+            }
+            $('#price-total').html(total_all_price.toFixed(2));
+
+            /*
+            if (stock_num <= 1) {
+                add_button.removeClass('active');
+                minus_button.removeClass('active');
+            }
+
+            var unit_price = parseFloat($('#'+product_quantity[0].id+'-price-unit').html());
+            var total_price = (unit_price * product_quantity.val()).toFixed(2);
+            $('#'+product_quantity[0].id+'-price-total').html(total_price);
+
+            // all product quantity
+            var all_quantity = $('.product_quantity');
+            var total_quantity = 0;
+            for (var i=0;i<all_quantity.length;i++) {
+                total_quantity = total_quantity + parseInt($(all_quantity[i]).val());
+            }
+            $('#quantity-total').html(total_quantity);
+
+            // all product price
+            var all_total_price = $('.product_total_price');
+            var total_all_price = 0;
+            for (var i=0;i<all_quantity.length;i++) {
+                total_all_price = total_all_price + parseFloat($(all_total_price[i]).html());
+            }
+            $('#price-total').html(total_all_price.toFixed(2));
+            */
+        }
+        /*
+        function product_buy_price_check(product_buy_price,min_price,max_price) {
+            // var stock_num = parseInt($('#'+product_quantity[0].id+'-stock').html());
+            var buy_price = parseFloat(product_buy_price.val());
+            //var add_button = product_buy_price.next();
+            //var minus_button = product_buy_price.prev();
+            if (isNaN(buy_price)) {
+                alert('请填入数字');
+                product_buy_price.val(parseFloat(max_price).toFixed(2));
+                //add_button.addClass('active');
+                //minus_button.removeClass('active');
+            }
+            else {
+                product_buy_price.val(buy_price.toFixed(2));
+                if (buy_price < min_price) {
+                    alert('请填入大于'+min_price+'的价格');
+                    product_buy_price.val(parseFloat(min_price).toFixed(2));
+                    //add_button.addClass('active');
+                    //minus_button.removeClass('active');
+                };
+                
+                if (buy_price > max_price) {
+                    alert('请填入小于'+max_price+'的价格');
+                    product_buy_price.val(parseFloat(max_price).toFixed(2));
+                    //add_button.addClass('active');
+                    //minus_button.removeClass('active');
+                }; 
+            }
+            var line_id = product_buy_price.parent().attr('id').split('_')[1];
+            $.ajax({
+                type: "GET",
+                data: {'buy_price': product_buy_price.val(), 'line_id': line_id},
+                url: "{% url 'basket:line_buy_price_set' %}",
+                success: function (data) {
+                    return false;
+                }
+            })
+            product_quantity_check($('#'+product_buy_price[0].id.replace('buy_price', 'quantity')),false);
+        }
+        */
+        $('.product_quantity').change(function () {
+        	var max_num = $(this).next().next().text();
+            product_quantity_check($(this),true,max_num);
+        });
+        $('.product_buy_price').change(function () {
+        	var price_rage = $(this).next().next().text();
+            var min_price = parseFloat(price_rage.split('-')[0]);
+            var max_price = parseFloat(price_rage.split('-')[1]);
+        	product_buy_price_check($(this),min_price,max_price);
+        });
+        //$('#order_clearing').click(function() {
+        //    $('#basket_formset').submit();
+        //})
+        $('.add_to_basket').click(function() {
+            var form_id = this.id + '_form';
+            $('#'+form_id).submit();
+        });
+        $(document).ready(function(){
+            var product_quantity = $('.product_quantity');
+            if (product_quantity.length>0) {
+                product_quantity_check($(product_quantity[0]));
+            }
+            $('.multiple-items').slick({
+                infinite: true,
+                slidesToShow: 5,
+                slidesToScroll: 1,
+                //arrows: false,
+                nextArrow: '#next',
+                prevArrow: '#prev'
+            });
+        });
+    </script>
+{% endblock %}

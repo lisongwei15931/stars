@@ -1,0 +1,348 @@
+{% extends 'base_stars.html' %}
+{% load staticfiles %}
+
+{% block public_css %}
+    <link rel="stylesheet" href="{% static "css/register.css" %}" type="text/css">
+{% endblock %}
+{% block jquery %}
+    <script type="text/javascript" src="{% static "js/jquery-1.11.1.min.js" %}"></script>
+{% endblock %}
+{% block title %}蓝图百货—注册{% endblock %}
+
+{% block logo %}
+    <div class="register-topbar">
+        <div class="container fix">
+            <div class="register-topbar-left l">
+            <a href="/">
+                <img src="{% static "images/logo1.png" %}" />
+            </a>
+            </div>
+            <div class="register-topbar-right r">
+                欢迎注册
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block content %}
+    <div class="register-body">
+        <div class="container">
+
+            <div class="register-body-top fix">
+                <div class="box l center">
+                    <span class="line line-yellow"></span>
+                    <span class="txt">创建账户</span>
+                    <img src="{% static "images/register-oval1h.png" %}" class="img"/>
+                </div>
+                <div class="box l center">
+                    <span class="line"></span>
+                    <span class="txt">设置身份信息</span>
+                    <img src="{% static "images/register-oval2.png" %}" class="img"/>
+                </div>
+                <div class="box l center">
+                    <span class="line"></span>
+                    <span class="txt">完成注册</span>
+                    <img src="{% static "images/register-oval3.png" %}" class="img"/>
+                </div>
+            </div>
+            <div id='main_form'>
+                {% include 'accounts/partials/register_form.html' %}
+            </div>
+        </div>
+    </div>
+    <!--注册内容end-->
+    <div id="user-agreement-con" style="display: none;">
+        <div class="user-agreement-pupzz"></div>
+        <div class="user-agreement-pupbody">
+            <div class="pupbody-top fix">
+                <div class="pupbody-title l">蓝图百货用户注册协议</div>
+                <div class="pupbody-closebtn r">×</div>
+            </div>
+            <div class="pupbody-content">
+            <p style='text-align: center;'>风险提示书</p>
+<p>尊敬的交易商会员：</p>
+　　<p>宁夏蓝图商品交易市场有限公司（以下简称本市场）为保护交易商利益，提高交易商风险意识，本着为交易商负责的原则，现向您提供《风险提示书》。您在进行商品电子交易时，可能存在一定的风险，因此，您必须认真考虑自己的经济能力是否适合进行商品电子交易。</p>
+　　<p>考虑是否进行商品电子交易时，您应当明确以下几点：</p>
+　　<p>一、您在本市场进行品牌商品现货交易，有可能商品的价格变化与您判断预期有别，致使您的开店摘牌买进后，将可能出现亏损或者无法卖出，您必须承担由此导致的一切损失。</p> 
+　　<p>二、您必须认真阅读并遵守本市场的相关业务规则，如果您无法满足本市场的业务规则所规定的要求，您必须承担由此产生的后果。 </p>
+　　<p>三、由于地震、水灾、火灾等不可抗力因素可能造成您的指令无法成交或者无法全部成交，您必须承担由此导致的损失。</p>
+　　<p>四、所有的交易结果须以闭市之后本市场的结算数据为依据。</p>
+　　<p>五、利用互联网进行商品交易时将存在(但不限于)以下风险，您将承担由此导致的损失：</p>
+
+<p>1．由于无法控制和不可预测的系统故障、设备故障、通讯故障、电力故障、网络故障及其它因素，可能导致交易系统非正常运行甚至瘫痪，使您的交易指令出现延迟、中断、数据错误等情况；</p> 
+<p>2．由于网上交易系统存在被网络黑客和计算机病毒攻击的可能性，由此可能导致交易系统故障，使交易无法进行及行情信息出现错误或延迟；</p>
+<p>3．互联网上的数据传输可能因通信繁忙等原因出现延迟、中断、数据错误或不完全，从而使网上交易出现延迟、中断；</p>
+<p>4．如果您缺乏网上交易经验，可能因操作不当造成交易失败或交易失误；</p>
+<p>5．您的密码失密或被他人盗用。</p>
+
+　　<p>本《风险提示书》无法揭示从事商品电子交易的所有风险和全部情形,故您在入市交易之前，应全面了解商品交易法律法规、本市场交易规则，对自身的经济承受能力、风险控制能力、身体及心理承受能力作出客观判断，对商品交易作仔细的研究。</p>
+           </div>
+            <div class="pupbody-btn center">
+                <a>同意</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block footer_script %}
+    <script type="text/javascript">
+        window.onload = function(){
+            $(".footer-menu").find("li").eq(-1).children("span").css("display","none");
+        };
+        $(document).ready(function(){
+            $("#userAgreement").click(function(){
+                $("#user-agreement-con").css("display","block");
+            });
+            $(".pupbody-closebtn,.pupbody-btn>a").click(function(){
+                $("#user-agreement-con").css("display","none");
+            });
+            $(".pupbody-btn>a").click(function(){
+                $("#id_user_agreement").prop("checked", true);
+            });
+            $("#id_mobile_phone").change(function(){
+                var mobile_phone = $(this).val();
+                $.ajax({
+                    dataType: "json",
+                    url: "{% url 'accounts:check_mobile_phone' %}",
+                    data: {'mobile_phone': mobile_phone},
+                    success: function (result) {
+                        if ($('#get_captcha_button').next()) {
+                            $('.null_phone').remove();
+                        }
+                        if (result.error) {
+                            $('#get_captcha').append('<div class="img null_phone" id="null_phone">&nbsp;<img src="{% static "images/register-error.png" %}"/>&nbsp;<span class="color-red">' + result.error + '</span></div>');
+                        }
+                    },
+                });
+            })
+            $("#id_username").change(function(){
+                var username = $(this).val();
+                $.ajax({
+                    dataType: "json",
+                    url: "{% url 'accounts:check_username' %}",
+                    data: {'username': username},
+                    success: function (result) {
+                        if ($('#id_username').next()) {
+                            $('#id_username').next().remove();
+                        }
+                        if (result.error) {
+                            $('#username').append('<div class="img"><img src="{% static "images/register-error.png" %}"/><span class="color-red">' + result.error + '</span></div>');
+                        }
+                    },
+                });
+            })
+            $("#id_re_password").change(function(){
+                var password = $('#id_password').val();
+                var re_password = $('#id_re_password').val();
+                if ($('#id_re_password').next()) {
+                    $('#id_re_password').next().remove();
+                }
+                if (password!=re_password) {
+                    $('#re_password').append('<div class="img"><img src="{% static "images/register-error.png" %}"/><span class="color-red">' + '两次输入的密码不一致' + '</span></div>');
+                }
+            })
+            $("#id_introducer").change(function(){
+                var introducer = $(this).val();
+                $.ajax({
+                    dataType: "json",
+                    url: "{% url 'accounts:check_introducer' %}",
+                    data: {'introducer': introducer},
+                    success: function (result) {
+                        if ($('#id_introducer').next()) {
+                            $('#id_introducer').next().remove();
+                        }
+                        if (result.error) {
+                            $('#introducer').append('<div class="img"><img src="{% static "images/register-error.png" %}"/><span class="color-red">' + result.error + '</span></div>');
+                        }
+                    },
+                });
+            })
+        });
+        //得到焦点触发事件
+        function OnfocusFun(element,elementvalue)
+        {
+            if(element.value==elementvalue)
+            {
+                element.value="";
+                element.style.color="#343434";
+            }
+        }
+        //离开输入框触发事件
+        function OnBlurFun(element,elementvalue)
+        {
+            if(element.value=="" || element.value.replace(/\s/g,"")=="")
+            {
+                element.value=elementvalue;
+                element.style.color="#999";
+            }
+        }
+        //得到焦点触发事件
+        function OnfocusFun1(element,elementvalue)
+        {
+            if(element.value==elementvalue)
+            {
+                element.value="";
+                element.type="password";
+                element.style.color="#343434";
+            }
+        }
+        //离开输入框触发事件
+        function OnBlurFun1(element,elementvalue)
+        {
+            if(element.value=="" || element.value.replace(/\s/g,"")=="")
+            {
+                element.value=elementvalue;
+                element.type="text";
+                element.style.color="#999";
+            }
+        }
+
+        function time() {
+            if (wait <= 0) {
+                wait = 6;
+                $("#J_getCode_Cover").css("display","block");
+                //document.getElementById("J_getCode").removeAttribute("disabled");
+                $("#J_getCode").css("background-color","#0a8fc7");
+                document.getElementById("J_getCode").innerHTML="重新发送";
+                document.getElementById("J_getCode_Cover").innerHTML="重新发送";
+            } else {
+                $("#J_getCode_Cover").css("display","none");
+                //document.getElementById("J_getCode").setAttribute("disabled", true);
+                $("#J_getCode").css("background-color","#bfbfbf");
+                document.getElementById("J_getCode").innerHTML= "等待（" + wait + "）";
+                wait--;
+                setTimeout(function() {
+                            time()
+                        },
+                        1000)
+            }
+        }
+        $('#J_getCode_Cover').on("click", function () {
+            var phonenum = /^[0-9]{11}$/;
+            var that = $(this);
+            var phone = $("#id_mobile_phone").val();
+            var params = {};
+            
+            if ($(".null_phone")) {
+            	$(".null_phone").remove();
+            }
+            
+            if (!phone) {
+                //alert("手机号码不能为空！");
+                $(".null_phone").remove();
+                var text = '<div class="img null_phone" id="null_phone">\
+                    &nbsp;<img src="{% static "images/register-error.png" %}"/>\
+                    <span class="color-red">手机号不能为空。</span></div>';
+                $("#get_captcha_button").after(text);
+                return;
+            }
+
+            $.ajax({
+                dataType: "json",
+                url: "{% url 'accounts:check_mobile_phone' %}",
+                data: {'mobile_phone': phone},
+                success: function (result) {
+                    
+                    if (result.error) {
+                        $('#get_captcha_button').after('<div class="img null_phone" id ="null_phone">&nbsp;<img src="{% static "images/register-error.png" %}"/>&nbsp;<span class="color-red">' + result.error + '</span></div>');
+                        return;
+                    }
+                    else {
+                        if (!(phone && phonenum.test(phone))) {
+                            alert("手机号码不合法。");
+                            return;
+                        }
+
+                        if (phone) {
+                            params.phone = phone;
+                        }
+
+                        $.ajax({
+                            dataType: "json",
+                            url: "{% url "accounts:send_captcha" %}",
+                            data: params,
+                            success: function (json) {
+                                if (json.result) {
+                                    alert('短信发送成功');
+                                }
+                                else {
+                                    alert('短信发送失败');
+                                }
+                            },
+                            error: function (error) {
+                                alert('短信发送失败');
+                            }
+                        });
+
+                        wait = 60;
+                        if (wait <= 0) {
+                            wait = 60;
+                            $("#J_getCode_Cover").css("display","block");
+                            //document.getElementById("J_getCode").removeAttribute("disabled");
+                            $("#J_getCode").css("background-color","#0a8fc7");
+                            document.getElementById("J_getCode").innerHTML="重新发送";
+                            document.getElementById("J_getCode_Cover").innerHTML="重新发送";
+                        } else {
+                            $("#J_getCode_Cover").css("display","none");
+                            //document.getElementById("J_getCode").setAttribute("disabled", true);
+                            $("#J_getCode").css("background-color","#bfbfbf");
+                            document.getElementById("J_getCode").innerHTML= "等待（" + wait + "）";
+                            wait--;
+                            setTimeout(function() {
+                                        time()
+                                    },
+                                    1000)
+                        }
+                    }
+                },
+            });
+            /*
+            //如果表单里有手机号码输入框，但用户未填写手机号码，则弹窗并中止
+            if (!(phone && phonenum.test(phone))) {
+                alert("无效的手机号码");
+                return;
+            }
+
+            if (phone) {
+                params.phone = phone;
+            }
+
+            $.ajax({
+                dataType: "json",
+                url: "{% url "accounts:send_captcha" %}",
+                data: params,
+                success: function (json) {
+                    if (json.result) {
+                        alert('短信发送成功');
+                    }
+                    else {
+                        alert('短信发送失败');
+                    }
+                },
+                error: function (error) {
+                    alert('短信发送失败');
+                }
+            });
+
+            wait = 60;
+            if (wait <= 0) {
+                wait = 60;
+                $("#J_getCode_Cover").css("display","block");
+                //document.getElementById("J_getCode").removeAttribute("disabled");
+                $("#J_getCode").css("background-color","#0a8fc7");
+                document.getElementById("J_getCode").innerHTML="重新发送";
+                document.getElementById("J_getCode_Cover").innerHTML="重新发送";
+            } else {
+                $("#J_getCode_Cover").css("display","none");
+                //document.getElementById("J_getCode").setAttribute("disabled", true);
+                $("#J_getCode").css("background-color","#bfbfbf");
+                document.getElementById("J_getCode").innerHTML= "等待（" + wait + "）";
+                wait--;
+                setTimeout(function() {
+                            time()
+                        },
+                        1000)
+            }
+            */
+        })
+    </script>
+{% endblock %}

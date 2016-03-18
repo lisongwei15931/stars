@@ -1,0 +1,6 @@
+{% if pickup_apply_pickup_list %}
+    <a href="{% url 'dashboard:pickup-outcome-deal' pk=record.id %}">{{ record.product }}</a>
+{% endif %}
+{% if pickup_apply_express_list %}
+    <a href="{% url 'dashboard:express-outcome-deal' pk=record.id %}">{{ record.product }}</a>
+{% endif %}

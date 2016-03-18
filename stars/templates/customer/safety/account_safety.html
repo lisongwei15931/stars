@@ -1,0 +1,156 @@
+{% extends "customer/account_base.html" %}
+{% load staticfiles %}
+{% load compress %}
+
+{%  block title %}蓝图百货--账户安全{%  endblock title %}
+
+{% block oncontentload %}
+    {{ block.super }}
+    <div class="account-cont-right l">
+        <div class="details details_safety">
+            <div class="title-acct title-acct2 fix">
+                <span class="l">账户安全</span>
+            </div>
+            <div class="security fix">
+                <div class="security-title fix">
+                    <div class="security-title-left l">
+                        安全等级
+                    </div>
+                    <div class="security-title-right l">
+                        <div class="security-title-right-con">
+                            {% widthratio safe_rank.rank 5 100 as width %}
+{#                            {% widthratio 5 5 100 as width %}#}
+                            <div class="progressbar"
+{#                                 style="width: 100%;"#}
+{#                                    style="width: 100%;"#}
+                                 style="width: {{ width }}%;"
+                                 id="progressbar">
+
+                            </div>
+                        </div>
+                        <span class="r" id="grade"></span>
+                    </div>
+                </div>
+                <div class="security-body">
+                    <div class="security-body-con">
+                        <div class="security-body-left l">
+                            登录密码
+                        </div>
+                        <div class="security-body-right l">
+                            <div class="security-content">
+                                <a href="{% url 'customer:safety-change_login_password' %}" class="security-body-lianjie">
+                                    修改
+                                </a>
+                                <span>
+                                    合理结合数字、字母、特殊符号有助于提高登录密码的安全强度
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="security-body-con">
+                        <div class="security-body-left l">
+                            邮箱验证
+                        </div>
+                        <div class="security-body-right l">
+                            <div class="security-content">
+                                {% if not email %}
+                                    <div class="security-body-txt l">
+                                        <a  href="{% url 'customer:safety-validate-mail-update_mail' %}" class="security-body-lianjie">
+                                            绑定邮箱
+                                        </a>
+                                        <span>
+                                            请添加您的邮箱
+                                        </span>
+                                    </div>
+                                {% else %}
+                                    <div class="security-body-txt l">
+                                        <a  href="{% url 'customer:safety-validate-mail-update_mail' %}" class="security-body-lianjie">
+                                            更改邮箱
+                                        </a>
+                                        <span>
+                                            您验证的邮箱：{{ email }}
+                                        </span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="security-body-con">
+                        <div class="security-body-left l">
+                            手机验证
+                        </div>
+                        <div class="security-body-right l">
+                            <div class="security-content">
+                                <a href="{% url 'customer:safety-validate-mobile-update_mobile' %}" class="security-body-lianjie">
+                                    更改手机
+                                </a>
+                                <span>
+                                    修改绑定手机号码
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="security-body-con">
+                        <div class="security-body-left l">
+                            资金密码
+                        </div>
+                        <div class="security-body-right l">
+                            <div class="security-content">
+
+                                <a href="{% url 'customer:safety-validate-payment-update_password' %}" class="security-body-lianjie">
+                                    {% if not payment_pwd.exist %}设置{% else %}修改{% endif %}
+                                </a>
+                                <span>
+                                    为了您的自己安全，使用账户中余额、需输入资金密码
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+{#                    <div class="security-body-con">#}
+{#                        <div class="security-body-left l">#}
+{#                            提货密码#}
+{#                        </div>#}
+{#                        <div class="security-body-right l">#}
+{#                            <div class="security-content">#}
+{##}
+{#                                <a href="{% url 'customer:safety-validate-delivery-update_password' %}" class="security-body-lianjie">#}
+{#                                    {% if not delivery_pwd.exist %}设置{% else %}修改{% endif %}#}
+{#                                </a>#}
+{#                                <span>#}
+{#                                    提货密码用于自提货物密码#}
+{#                                </span>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+
+        window.onload = function(){
+            $(".footer-menu").find("li").eq(-1).children("span").css("display","none");
+            change();
+        };
+        //改变页码
+        $(".page-public>.num").click(function(){
+            $(this).addClass("active");
+            $(this).siblings().removeClass("active");
+        });
+
+        //安全等级进度条变化
+        function change(){
+            var bb = document.getElementById('progressbar').offsetWidth;
+            if (bb >= 385 ){
+                $("#grade").empty().html("强");
+            }
+            if (bb >= 220 && bb< 385 ){
+                $("#grade").empty().html("较强");
+            }
+            if (bb < 220 ){
+                $("#grade").empty().html("弱");
+            }
+        }
+    </script>
+    <!--账户安全body end-->
+{% endblock oncontentload%}

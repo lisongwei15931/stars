@@ -1,0 +1,364 @@
+{% extends 'base_stars.html' %}
+{% load staticfiles %}
+{% load thumbnail %}
+{% load currency_filters %}
+{% load purchase_info_tags %}
+{% load widget_tweaks %}
+
+{% block public_css %}
+    {{block.super}}
+    <link rel="stylesheet" href="{% static "css/pay.css" %}" type="text/css">
+{% endblock %}
+{% block custom_css %}
+{% endblock %}
+{% block jquery %}
+    <script type="text/javascript" src="{% static "js/jquery-1.11.1.min.js" %}"></script>
+    {{block.super}}
+{% endblock %}
+{% block title %}蓝图百货—订单支付{% endblock %}
+{% block content %}
+<div class="contentVisit">
+    <ul class="comTitle fix">
+        <li class="yue-pay {% if not pay_type or pay_type == 'yueue_pay' %}active {% endif %}" >余额支付</li>
+        <li class="weixin-pay {% if pay_type == 'yue_pay' %}active {% endif %}" >微信支付</li>
+        <li class="zhifubao-pay {% if pay_type == 'ali_pay' %}active {% endif %}"  >支付宝支付</li>
+    </ul>
+    <div class="com-border comStyle-yue">
+        <div class="pay-lable">
+            <div class="left">
+                <p class="bold">请您及时付款，以便订单尽快处理！&nbsp;&nbsp;&nbsp;订单号：{{product_order.order_no}}&nbsp;&nbsp;&nbsp;应付金额：<span class="red">￥{{product_order.amount}}</span></p>
+            </div>
+            <div class="right">
+                <p class="blue" style="margin-bottom:0;">订单详情<b class="arr"></b></p>
+            </div>
+        </div>
+        <div class="dd-detail">
+            <p>收货地址：{{product_order.addr}} &nbsp;&nbsp; 收货人：{{product_order.receive_addr.consignee}} {{product_order.receive_addr.mobile_phone}} </p>
+            <p>商品名称：{{product_order.detail}}</p>
+        </div>
+        <script>
+            $(function(){
+                $(".blue").click(function(){
+                    $(".dd-detail").toggle();
+                });
+            })
+        </script>
+        <div class="pay-entry">
+            <form class="fix" action="." method="post">
+                {% csrf_token %}
+                <div class="leftarea l">
+                    <span>资金密码：</span>
+                </div>
+                <div class="rightarea l">
+                    <input type="password" name="pay_pwd"/>
+                    <input type="text" name="price" value="{{product_order.amount}}" style="display:none"/>
+                    <div class="pay-notice">
+                        可用余额：
+                        <span>￥{{user_balance.balance|floatformat:2}}</span>
+                        <a>充值</a>
+                    </div>
+                    <div style="margin-top: 20px;color: red;">
+                        <span>{{ pwd_err_msg|default_if_none:"" }}</span><span>{{ balance_err_msg|default_if_none:"" }}</span>
+                    </div>
+                    <div class="pay-btn">
+                        <input type="submit" value="立即支付"/>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+    <div class="com-border comStyle-weixin" style="display: none">
+        <div class="pay-lable">
+            <div class="left">
+                <p class="bold">请您及时付款，以便订单尽快处理！&nbsp;&nbsp;&nbsp;订单号：{{product_order.order_no}}&nbsp;&nbsp;&nbsp;应付金额：<span class="red">￥{{product_order.amount|floatformat:2}}</span></p>
+                <div id="not_overdue">
+                    <p  style="margin-bottom:0;">距离二维码过期还剩<span class="red" id="remaining_s">0</span>秒，过期后请刷新页面重新获取二维码。</p>
+                </div>
+{#                <div id="overdue" style="visibility: hidden">#}
+                <div id="overdue" style="visibility: visible">
+                    <p id="overdue" style="margin-bottom:0;">二维码已过期，
+                        <span id='refresh_qrcode' style="color:#0088cc; cursor:pointer;">刷新</span>页面重新获取二维码
+                </div>
+
+{#                <p style="margin-bottom:0;">#}
+{#                    距离二维码过期还剩<span class="red">42</span>秒，过期后请刷新页面重新获取二维码。&nbsp;&nbsp;&nbsp;#}
+{#                    二维码已过期，<span style="color:#0088cc; cursor:pointer;">刷新</span>页面重新获取二维码。#}
+{#                </p>#}
+            </div>
+            <div class="right">
+                <p class="blue" style="margin-bottom:0;">订单详情<b class="arr"></b></p>
+            </div>
+        </div>
+        <div class="dd-detail">
+            <p>收货地址：{{product_order.addr}} &nbsp;&nbsp; 收货人：{{product_order.receive_addr.consignee}} {{product_order.receive_addr.mobile_phone}} </p>
+            <p>商品名称：{{product_order.detail}}</p>
+        </div>
+        <script>
+            $(function(){
+                $(".blue").click(function(){
+                    $(".dd-detail").toggle();
+                });
+            })
+        </script>
+        <div class="pay-image">
+            <div class="left">
+                <p class="p1"><img id='qrcode' src="" width="240" height="239"></p>
+                <p class="p2">请使用微信扫一扫&nbsp;&nbsp;扫描二维码支付</p>
+            </div>
+            <div class="right"><img src="{% static "images/pay1.jpg" %}" width="358" height="408"></div>
+        </div>
+    </div>
+    <div class="com-border comStyle-zhifubao" style="display: none">
+        <div class="pay-lable">
+            <div class="left">
+                <p class="bold">请您及时付款，以便订单尽快处理！&nbsp;&nbsp;&nbsp;订单号：{{product_order.order_no}}&nbsp;&nbsp;&nbsp;应付金额：<span class="red">￥{{product_order.amount|floatformat:2}}</span></p>
+            </div>
+
+            <div class="right">
+                <p class="blue" style="margin-bottom:0;">订单详情<b class="arr"></b></p>
+            </div>
+        </div>
+        <div class="dd-detail">
+            <p>收货地址：{{product_order.addr}} &nbsp;&nbsp; 收货人：{{product_order.receive_addr.consignee}} {{product_order.receive_addr.mobile_phone}} </p>
+            <p>商品名称：{{product_order.detail}}</p>
+        </div>
+        <script>
+            $(function(){
+                $(".blue").click(function(){
+                    $(".dd-detail").toggle();
+                });
+            })
+        </script>
+        <div class="pay-entry">
+            <form  action="{% url 'customer:finance-alipay-pay' %}" method="get">
+{#                {% csrf_token %}#}
+                <input name='order_no' type="hidden" value="{{ product_order.order_no }}"  />
+                {% if ali_pay_result == 'failed' %}
+                    <div class="pay-error">
+                        <img src="{%static "images/sign-false.png"%}"/>
+                        <span>提示：支付宝支付遇到错误</span>
+                    </div>
+                {% elif ali_pay_result == 'success' %}
+                  <div class="pay-error">
+                        <img src="{%static "images/sign-true.png"%}"/>
+                        <span>支付宝支付成功</span>
+                    </div>
+                {% endif %}
+
+                {% if ali_pay_result != 'success' %}
+                    <div>
+                        <div class="pay-btn">
+                            <input type="submit" value="立即支付"/>
+                        </div>
+                    </div>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+</div>
+<!--账户安全body end-->
+<!--遮罩 start-->
+<!--<div id="yue-pupzz" >
+    <div class="user-agreement-pupzz"></div>
+    <div class="user-agreement-pupbody">
+        <div class="pupbody-top fix">
+            <div class="pupbody-title l">提示</div>
+            <div class="pupbody-closebtn r">×</div>
+        </div>
+        <div class="pupbody-content">
+            <p>进行余额支付前需先设置资金密码</p>
+        </div>
+        <div class="pupbody-btn center">
+            <a href="#">去设置</a>
+        </div>
+    </div>
+</div>-->
+<!--遮罩 end-->
+{% endblock %}
+{% block footer_script %}
+    <script type="text/javascript">
+    window.onload = function(){
+        $(".footer-menu").find("li").eq(-1).children("span").css("display","none");
+    };
+    $(document).ready(function(){
+        $(".pupbody-closebtn").click(function(){
+            $("#yue-pupzz").css("display","none");
+        });
+    });
+    //得到焦点触发事件
+    function OnfocusFun(element,elementvalue)
+    {
+        if(element.value==elementvalue)
+        {
+            element.value="";
+            element.style.color="#343434";
+        }
+    }
+    //离开输入框触发事件
+    function OnBlurFun(element,elementvalue)
+    {
+        if(element.value=="" || element.value.replace(/\s/g,"")=="")
+        {
+            element.value=elementvalue;
+            element.style.color="#999";
+        }
+    }
+           //加一减一
+       $(".qty-box>.trim-l").click(function(){
+            var inputVal = $(this).next().val();
+            inputVal--;
+            if(inputVal > 1){
+                $(this).next().val(inputVal);
+                $(this).next().next().attr("src","images/num+h.png");
+            }else if(inputVal == 1){
+                $(this).next().val(inputVal);
+                $(this).attr("src","images/num-.png");
+            }
+        });
+        $(".qty-box>.trim-r").click(function(){
+            var inputVal = $(this).prev().val();
+            inputVal++;
+            if(inputVal > 1 && inputVal <= 100){
+                $(this).prev().val(inputVal);
+                $(this).prev().prev().attr("src","images/num-h.png");
+            }if(inputVal == 100){
+                $(this).prev().val(inputVal);
+                $(this).attr("src","images/num+.png");
+            }else if(inputVal > 100){
+                return false;
+            }
+        });
+    //购物车
+    $("#shopcar-li").hover(function () {
+        $(".shopcar-products",this).show();
+
+        $("#shopcar-li>a").css({
+            "background-color": "#fff",
+            "box-shadow": "0 0 3px #666",
+            "color": "#c00000"
+        });
+        $("#border-type").show();
+    }, function () {
+        $(".shopcar-products").hide();
+        $("#shopcar-li>a").css({
+            "background-color": "#ededed",
+            "box-shadow": "none",
+            "color": "#333"
+        });
+        $("#border-type").hide();
+    });
+    //我的收益
+    $("#shouyi-li").hover(function () {
+        $(".shopcar-products",this).show();
+
+        $("#shouyi-li>a").css({
+            "background-color": "#fff",
+            "box-shadow": "0 0 3px #666",
+            "color": "#c00000"
+        });
+        $("#border-type1").show();
+    }, function () {
+        $(".shopcar-products").hide();
+        $("#shouyi-li>a").css({
+            "background-color": "#ededed",
+            "box-shadow": "none",
+            "color": "#333"
+        });
+        $("#border-type1").hide();
+    });
+    var period=0;
+    {% if not pay_type or pay_type == 'yueue_pay' %}
+        $(".comStyle-yue").show();
+        $(".comStyle-weixin,.comStyle-zhifubao").hide();
+    {% elif pay_type == 'wx_pay' %}
+        $(".comStyle-weixin").show();
+        $(".comStyle-yue,.comStyle-zhifubao").hide();
+        if(period==0) {
+            getWxQrCode();
+        }
+    {% elif pay_type == 'ali_pay' %}
+        $(".comStyle-zhifubao").show();
+        $(".comStyle-weixin,.comStyle-yue").hide();
+    {% endif %}
+    //支付方式切换
+    $(".contentVisit ul.comTitle li.yue-pay").click(function(){
+        $(this).addClass("active");
+        $(this).siblings().removeClass("active");
+        $(".comStyle-yue").show();
+        $(".comStyle-weixin,.comStyle-zhifubao").hide();
+    });
+    $(".contentVisit ul.comTitle li.weixin-pay").click(function(){
+        $(this).addClass("active");
+        $(this).siblings().removeClass("active");
+        $(".comStyle-weixin").show();
+        $(".comStyle-yue,.comStyle-zhifubao").hide();
+        if(period==0) {
+            getWxQrCode();
+        }
+    });
+    $(".contentVisit ul.comTitle li.zhifubao-pay").click(function(){
+        $(this).addClass("active");
+        $(this).siblings().removeClass("active");
+        $(".comStyle-zhifubao").show();
+        $(".comStyle-weixin,.comStyle-yue").hide();
+    });
+    $(".contentVisit ul.comTitle li.zhifubao-pay").click(function(){
+        $(this).addClass("active");
+        $(this).siblings().removeClass("active");
+        $(".comStyle-zhifubao").show();
+        $(".comStyle-weixin,.comStyle-yue").hide();
+    });
+    $('#refresh_qrcode').on("click", function () {
+{#        alert('1');#}
+        getWxQrCode();
+    });
+
+        function getWxQrCode() {
+            var params = {'data_format': 'json'};
+
+            $.ajax({
+                dataType: "json",
+                url: "{% url 'customer:finance-wx-pay_home' %}?order_no={{ product_order.order_no }}",
+                data: params,
+                success: function (data) {
+                    if (data.msg)
+                    {
+                        alert(data.msg);
+                    }
+                    else if(data.code==0){
+                        wait=data.remaining_seconds;
+                        period=data.remaining_seconds;
+                        document.getElementById("remaining_s").innerHTML=data.remaining_seconds;
+{#                        document.getElementById("overdue").style.visibility="hidden";#}
+                        document.getElementById("qrcode").src=data.qr_code_url;
+
+                    }
+                },
+                error: function (error) {
+                    alert('支付二维码生成失败');
+                }
+            });
+        }
+
+        wait = period;
+        function clock() {
+            if (wait <= 0) {
+{#                document.getElementById("not_overdue").style.visibility="hidden";#}
+                document.getElementById("overdue").style.visibility="visible";
+{#                $("#J_getCode_Cover").css("display","block");#}
+                //document.getElementById("J_getCode").removeAttribute("disabled");
+                $("#remaining_s").css("background-color","#0a8fc7");
+                document.getElementById("remaining_s").innerHTML="0";
+            } else {
+                //document.getElementById("J_getCode").setAttribute("disabled", true);
+                document.getElementById("remaining_s").innerHTML=wait--;
+{#                setTimeout(function() {#}
+{#                            time()#}
+{#                        },#}
+{#                        1000)#}
+            }
+        }
+    timer = setInterval("clock()", 1000);
+    </script>
+{% endblock %}

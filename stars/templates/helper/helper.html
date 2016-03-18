@@ -1,0 +1,162 @@
+{% extends 'base_stars.html' %}
+{% load staticfiles %}
+{% load thumbnail %}
+{% load currency_filters %}
+{% load purchase_info_tags %}
+{% load widget_tweaks %}
+
+{% block public_css %}
+    {{block.super}}
+    <link rel="stylesheet" href="{% static "css/shopcar.css" %}" type="text/css">
+    <link rel="stylesheet" href="{% static "css/help.css" %}" type="text/css">
+{% endblock %}
+{% block custom_css %}
+{% endblock %}
+{% block jquery %}
+    <script type="text/javascript" src="{% static "js/jquery-1.11.1.min.js" %}"></script>
+    {{block.super}}
+{% endblock %}
+{% block title %}蓝图百货—帮助中心{% endblock %}
+{% block content %}
+
+<!--顶部 end-->
+<div class="helpContent">
+	<div class="helpLeft">
+    	<div class="heltQp">?</div>
+    	<div class="helpTitle">帮助中心</div>
+        <div class="helpTree">
+        	<h2>购物指南</h2>
+            <ul class="helpList">
+            	<li id="zc"><a href=".?help=zc">注册</a></li>
+                <li id="dl"><a href=".?help=dl">登录</a></li>
+                <li id="gm"><a href=".?help=gm">购买流程</a></li>
+                <li id="jh"><a href=".?help=jh">进货流程</a></li>
+                <li id="cs"><a href=".?help=cs">出售流程</a></li>
+                <li id="th"><a href=".?help=th">提货流程</a></li>
+            </ul>
+        </div>
+        <div class="helpTree">
+        	<h2 class="myStyle">支付方式</h2>
+            <ul class="helpList">
+            	<li id="nh_qy"><a href=".?help=nh_qy">农行签约</a></li>
+                <li id="jh_qy"><a href=".?help=jh_qy">建行签约</a></li>
+                <li id="cz_tx"><a href=".?help=cz_tx">充值提现</a></li>
+                <li id="ye_zf"><a href=".?help=ye_zf">余额支付</a></li>
+                <li id="wy_zf"><a href=".?help=wy_zf">网银支付</a></li>
+                <li id="zfb_zf"><a href=".?help=zfb_zf">支付宝支付</a></li>
+                <li id="wx_zf"><a href=".?help=wx_zf">微信支付</a></li>
+            </ul>
+        </div>
+        <div class="helpTree">
+        	<h2 class="myInformation">账户信息</h2>
+            <ul class="helpList">
+            	<li id="zh_aq"><a href=".?help=zh_aq">账户安全</a></li>
+                <li id="sh_dz"><a href=".?help=sh_dz">收货地址</a></li>
+                <li id="th_dz"><a href=".?help=th_dz">提货点</a></li>
+                <li id="jy_jl"><a href=".?help=jy_jl">交易记录</a></li>
+            </ul>
+        </div>
+        <div class="helpTree">
+        	<h2 class="comProblems">常见问题</h2>
+            <ul class="helpList">
+            	<li id="wt_1"><a href=".?help=wt_1">常见类型1</a></li>
+                <li id="wt_2"><a href=".?help=wt_2">常见类型2</a></li>
+                <li id="wt_3"><a href=".?help=wt_3">常见类型3</a></li>
+            </ul>
+        </div>
+    </div>
+    {% if help == 'zc' %}
+        <div class="helpRight">
+    	    <h1>注册</h1>
+  		    <div class="box-block">
+        	    <p>1、进入蓝图百货首页，点击左上角注册或是右上角免费注册。</p>
+        	    <p><img src= "{% static 'images/helper/regist-1.jpg' %}" /></p>
+            </div>
+            <div class="box-block">
+                <p>2、进入创建账户页面，填写完信息后，勾选我已阅读并同意 《蓝图百货用户协议》，点击下一步</p>
+                <p><img src="{% static 'images/helper/regist-2.jpg' %}" /></p>
+            </div>
+            <div class="box-block">
+                <p>3、进入创建账户页面，设置本人信息，也可以直接跳过此步。</p>
+                <p><img src="{% static 'images/helper/regist-3.jpg' %}" /></p>
+            </div>
+            <div class="box-block">
+                <p>3、恭喜你成功完成了注册，点击立即体验快去体验蓝图百货带给你的惊喜吧。</p>
+                <p><img src="{% static 'images/helper/regist-4.jpg' %}" /></p>
+            </div>
+        </div>
+    {% elif help == 'dl' %}
+        <div class="helpRight">
+            <h1>登录</h1>
+            <div class="box-block">
+                <p>1、点击登录字样跳转到登录页面，输入注册时设置的用户名和密码登录</p>
+                <p><img src="{% static 'images/helper/login-help01.jpg' %}" /></p>
+            </div>
+        </div>
+    {% elif help == 'nh_qy' %}
+        <div class="helpRight">
+            <h1>农行签约</h1>
+            <div class="box-block">
+                <p>1、第一步，设置资金密码（执行农行签约需先设置此项），以便支付时使用</p>
+                <p><img src="{% static 'images/helper/qianyue-help01.jpg' %}" /></p>
+                <p>2、第二步，执行签约流程，*为必填项，其他为选填项，信息填好后点击下一步</p>
+                <p><img src="{% static 'images/helper/qianyue-help02.jpg' %}" /></p>
+                <p>3、签约成功，开启愉快的购物之旅</p>
+                <p><img src="{% static 'images/helper/qianyue-help02.jpg' %}" /></p>
+                <p>3、签约失败，返回查看，重复第二步的操作</p>
+                <p><img src="{% static 'images/helper/qianyue-help02.jpg' %}" /></p>
+            </div>
+        </div>
+    {% elif help == 'wx_zf' %}
+        <div class="helpRight">
+            <h1>微信支付</h1>
+            <div class="box-block">
+                <p>1、选择微信支付，跳转到微信支付页面，微信支付页面会出现微信支付的二维码，用户需打开自己的微信，点击发现找到扫一扫，扫描二维码即可进行微信支付，二维码有时间限制，请尽快支付，如果二维码过期，可点击刷新按钮重新获取二维码，点击页面内的订单详情，可以看到购买的订单信息。</p>
+                <p><img src="{% static 'images/helper/weixin.jpg' %}" /></p>
+            </div>
+        </div>
+    {% elif help == 'sh_dz' %}
+        <div class="helpRight">
+            <h1>收货地址</h1>
+            <div class="box-block">
+                <p>1、我的账户-提货点页面，如果您选择的是货运，在此页面可以设置自己的收货地址，经常用到的收货地址可以设置为默认收货地址，点击新建收货地址可以添加更多的收货地址。</p>
+                <p><img src="{% static 'images/helper/shouhuoaddr.png' %}" /></p>
+            </div>
+            <div class="box-block">
+                <p>2、点击新建收货地址,进入新页面，在此页面填写完收货人信息后点击保存收货地址即可。</p>
+                <p><img src="{% static 'images/helper/huo_addr.jpg' %}" /></p>
+            </div>
+        </div>
+    {% elif help == 'th_dz' %}
+        <div class="helpRight">
+            <h1>提货点</h1>
+            <div class="box-block">
+                <p>1、我的账户-提货点页面，如果您选择的是自提，在此页面可以选择距离自己较近，提货比较方便的自提点，经常用到的自提点可以设置为默认自提点，点击新建自提地址可以选择更多的自提点。</p>
+                <p><img src="{% static 'images/helper/zitidian.png' %}" /></p>
+            </div>
+            <div class="box-block">
+                <p>2、点击新建自提地址后，进入新页面，选择自己所在区域检索到所在区域内的自提点，然后选择自己想要的自提点，点击保存自提点即可。经常用到的自提点也可以设置为默认自提点。</p>
+                <p><img src="{% static 'images/helper/zi_addr.jpg' %}" /></p>
+            </div>
+        </div>
+    {% elif help == 'jy_jl' %}
+        <div class="helpRight">
+    	    <h1>交易记录</h1>
+  		    <div class="box-block">
+        	    <p>1、我的账户-交易记录页面，在此页面可以查询自己的交易情况，可以按照关键字，时间，交易方式进搜索，可以按照商品名称和成交时间进行排序。每页最多有20条记录。</p>
+        	    <p><img src="{% static 'images/helper/jiaoyi.png' %}" /></p>
+      	    </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block footer_script %}
+{{ block.super }}
+    <script>
+        $(function(){
+           var id = {{help}};
+            $(id).addClass('current');
+        });
+    </script>
+{% endblock %}

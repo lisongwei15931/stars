@@ -1,0 +1,396 @@
+{% extends "customer/account_base.html" %}
+{% load public_tags %}
+{% load staticfiles %}
+{% load compress %}
+
+
+{%  block title %}蓝图百货--账户资产{%  endblock title %}
+
+{% block oncontentload %}
+    {{ block.super }}
+
+    <div class="account-cont-right l fix">
+            <div class="income fix">
+                <a class="avata center l">
+                    <img src="{% static "images/avatarbg.png" %}" class="avata-img"/>
+                    <img src="{% static "images/banner-01.jpg" %}"/>
+                </a>
+                <div class="txt l">
+                    <p>账户：{{ user.name }}                   {% if user.is_verified %}
+                            <a class="certified"><img src="{% static "images/certified.png" %}"/></a>
+                        {% else %}
+                            <a class="uncertified"><img src="{% static "images/uncertified.png" %}"/></a>
+                        {% endif %}
+                    </p>
+                    <P class="fund">
+                        <span>ID：{{user.fund_acc_id}}</span>
+                    </P>
+                </div>
+                <div class="income-des r">
+                    <div class="l">
+                        <img src="{% static "images/jinbi.png" %}"/>
+                    </div>
+                    <div class="l">
+                        <p>昨日收益：<span style="color: #00dd88;">￥{{ assets_summary.yesterday_income | floatformat:2 }}</span></p>
+                        <p>累计收益：<span style="color: #ffc000;">￥{{ assets_summary.total_income | floatformat:2 }}</span></p>
+                        <p>账户余额：<span style="color: #ff0000;">￥{{ assets_summary.balance | floatformat:2 }}</span></p>
+                    </div>
+                    <div class="zhanghu l">
+                        <a href="{% url 'customer:finance-ab-withdraw' %}" >提现</a>
+                        <a href="{% url 'customer:finance-ab-recharge' %}" class="zhanghu1">充值</a>
+                    </div>
+
+                </div>
+            </div>
+            <div class="asset-details fix">
+                <div class="tzxx-table3">
+                    <table>
+                        <thead>
+                            <tr>
+                                <td>期初资金</td>
+                                <td>当日收入</td>
+                                <td>当日支出</td>
+                                <td>冻结</td>
+                                <td>可用资金</td>
+                                <td>可提现资金</td>
+                                <td>商品增值</td>
+                                <td>最新市值</td>
+                                <td>资产总值</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ assets_summary.today_beginning_balance | floatformat:2 }}</td>
+                                <td>{{ assets_summary.today_income | floatformat:2 }}</td>
+                                <td>{{ assets_summary.today_expenditure | floatformat:2 }}</td>
+                                <td>{{ assets_summary.locked_sum | floatformat:2 }}</td>
+                                <td>{{ assets_summary.drawable_num | floatformat:2 }}</td>
+                                <td>{{ assets_summary.usable_num | floatformat:2 }}</td>
+                                <td>{{ assets_summary.market_increment | floatformat:2 }}</td>
+                                <td>{{ assets_summary.market_cap | floatformat:2 }}</td>
+                                <td>{{ assets_summary.total_assets | floatformat:2 }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="details details_assets fix" style="padding-bottom: 35px;">
+                <input type="hidden" value="{{ flag|default_if_none:1 }}" id="tab_flag" name="flag" />
+                <div class="title-acct title-acct2 fix">
+                    <span class="l {% if flag != 2 %}active {% endif %}" id="income-statement">收支明细</span>
+                    <span class="l {% if flag == 2 %}active {% endif %}" id="frozen-fund">冻结资金</span>
+                    <ul class="accTitle accTitle1 l">
+                        <li>起止日期：<input type="text" id="start_date" class="time" {% if start_date  %}value={{ start_date }}{% endif %} onClick="WdatePicker()">&nbsp;-&nbsp;<input id="end_date" type="text" {% if end_date  %}value={{ end_date }}{% endif %} class="time" onClick="WdatePicker()"/>
+                        </li>
+                        <li><input type="submit" value="确认" onclick="click_start_end()" /></li>
+                    </ul>
+                    <div class="r jilu-more" style="display: inline-block;">
+                        <a href="?{% if flag %}flag={{ flag }}&{% endif %}period_type=1_month">最近1个月</a>
+                        <a href="?{% if flag %}flag={{ flag }}&{% endif %}period_type=3_month">3个月</a>
+                        <a href="?{% if flag %}flag={{ flag }}&{% endif %}period_type=1_year">1年</a>
+                    </div>
+                </div>
+                <div class="dynamic r">
+                    每页{{ income_history.row_per_page }}条&nbsp;&nbsp;&nbsp;共<span style="color: #ff0000;">{{ income_history.total_num }}</span>条信息
+                </div>
+                <div class="tzxx-table tzxx-table1 l fix income-statement {% if flag != 2 %}active {% endif %}"
+                     style="{% if flag == 2 %}display: none;{% else %} display:block;{% endif %}position: relative;">
+{#                     style="{% if flag == 2 %}display: none;{% else %}active; display:block;{% endif %}">#}
+                    <table>
+                        <thead>
+                            <tr>
+                                <td>时间</td>
+                                <td>名称|交易</td>
+                                <td>类型</td>
+                                <td style="text-align:center;">金额</td>
+                                <td>对方</td>
+                                <td>状态</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ele in income_history.income_list_1 %}
+                            <tr>
+                                <td>{{ ele.modified_date|date:"Y.m.d" }} {{ ele.modified_time|time:"H:i" }}</td>
+                                <td>
+                                    {% if ele.trade_type == 5 or ele.trade_type == 8 or ele.trade_type == 9 %}
+                                        {% if ele.product %}
+                                            {{ ele.product.title }}
+                                        {% endif %}
+                                    {% elif ele.trade_type == 13 %}
+                                        {{ ele.pickup_detail_id }}
+                                    {% elif ele.trade_type == 1 %}
+                                        充值
+                                    {% elif ele.trade_type == 2  %}
+                                        提现
+                                    {% elif ele.trade_type == 15 %}
+                                        出售
+                                    {% endif %}
+                                </td>
+                                <td>{% if ele.trade_type == 5 %}购买
+                                    {% elif ele.trade_type == 8 %}进货
+                                    {% elif ele.trade_type == 9 %}出售
+                                    {% elif ele.trade_type == 12 %}提货
+                                    {% elif ele.trade_type == 15 %}手续费
+                                    {% endif %}
+                                </td>
+                                {% if ele.trade_type == 1 or ele.trade_type == 4 or ele.trade_type == 7 or ele.trade_type == 9 or ele.trade_type == 11 or ele.trade_type == 13 or ele.trade_type == 14 %}
+                                <td style="color: #00dd88;text-align:right;" >+{{ ele.price|floatformat:2 }}&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                                {% elif ele.trade_type == 2 or ele.trade_type == 3 or ele.trade_type == 5 or ele.trade_type == 6 or ele.trade_type == 8 or ele.trade_type == 10 or ele.trade_type == 12 or ele.trade_type == 15%}
+                                <td style="color: #ff0000;text-align:right;" >-{{ ele.price|floatformat:2 }}&nbsp;&nbsp;&nbsp;&nbsp;</td>    
+                                {% endif %}
+                                
+                                <td>
+{#                                {{ ele.money_bank }}---------#}
+                                    {% if ele.money_bank_id  %}
+                                    {{ ele.money_bank_id.bank_name }}&nbsp; 尾号 {{ ele.money_bank_id.bank_account|slice:"-4:"  }}
+
+                                    {% endif %}
+                                </td>
+                                <td>
+{#                                    {{ ele.status }}-{{ ele.trade_type }}#}
+                                    {% if ele.status == 2 %}
+                                        {% if ele.trade_type == 5 or ele.trade_type == 8 or ele.trade_type == 9 %}交易
+                                        {% elif ele.trade_type == 12 %}提货
+                                        {% endif %}成功
+                                    {% elif ele.status == 1 %}进行中
+                                    {% elif ele.status == 3 %}失败
+                                    {% else %}{% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+{#                    <div class="pagination">#}
+{#                        <span class="step-links">#}
+{#                            {% if income_history.income_list.has_previous %}#}
+{#                                <a href="?flag=1&page={{ income_history.income_list.previous_page_number }}">previous</a>#}
+{#                            {% endif %}#}
+{##}
+{#                            <span class="current">#}
+{#                                Page {{ income_history.income_list.number }} of {{ income_history.income_list.paginator.num_pages }}.#}
+{#                            </span>#}
+{##}
+{#                            {% if income_history.income_list.has_next %}#}
+{#                                <a href="?flag=1&page={{ income_history.income_list.next_page_number }}">next</a>#}
+{#                            {% endif %}#}
+{#                        </span>#}
+{#                    </div>#}
+                    <div class="page-public center" >
+                        <a class="txt" id="first" href="?flag=1&{% if period_cond %}{{ period_cond }}&{% endif %}page=1">首页</a>
+
+                        {% if income_history.income_list.has_previous %}
+                            <a class="txt" id="prev" href="?flag=1&{% if period_cond %}{{ period_cond }}&{% endif %}page={{ income_history.income_list.previous_page_number }}">上一页</a>
+                        {% endif %}
+
+{#                        <a class="num" style="display: none;" id="firstpage">1</a>#}
+{#                        <a class="num">2</a>#}
+{#                        <a class="num active">3</a>#}
+{#                        <a class="num">4</a>#}
+{#                        <a class="num">5</a>#}
+{#                        <a class="num">6</a>#}
+{#                        <span>……</span>#}
+
+                        {% for i in income_history.page_enum %}
+                            <a class="num {% if i == income_history.income_list.number%} active {% endif %}"
+                               href="?flag=1&{% if period_cond %}{{ period_cond }}&{% endif %}page={{ i }}">
+                                {{ i }}
+                            </a>
+                            {% if forloop.last %}
+
+                                {% if i|add:1 < income_history.page_count%}
+                                    <span>
+                                        ……
+                                    </span>
+                                {% endif %}
+                                {% if i < income_history.page_count %}
+                                   <a class="num {% if i == income_history.income_list.number%} active {% endif %} "
+        {#                               {% if i == income_history.income_list.page.number%}active{% endif %}#}
+                                       href="?flag=1&{% if period_cond %}{{ period_cond }}&{% endif %}page={{ income_history.page_count }}">
+                                        {{ income_history.page_count }}
+                                    </a>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+
+{#                        <a class="num" id="lastpage">{{ income_history.page_count  }}</a>#}
+                        {% if income_history.income_list.has_next %}
+                            <a class="txt" id="next" href="?flag=1&{% if period_cond %}{{ period_cond }}&{% endif %}page={{ income_history.income_list.next_page_number }}">下一页</a>
+                        {% endif %}
+                        <a class="txt" id="last" href="?flag=1&{% if period_cond %}{{ period_cond }}&{% endif %}page={{ income_history.page_count }}">尾页</a>
+
+                        共<span>{{ income_history.page_count }}</span>页
+                        <span>到第<input id="user_page_idx" type="text" value="" onblur="on_change_page_idx(1)" />页</span>
+                        <a id="by_user_page_idx" class="txt" >
+                            确认
+                        </a>
+                    </div>
+                </div>
+{#            冻结#}
+                <div class="tzxx-table tzxx-table1 l fix frozen-fund {% if flag == 2 %}active  {% endif %}"
+                     style="{% if flag != 2 %}display: none;{% else %} display:block;{% endif %}">
+{#                     style="{% if flag != 2 %}display: none;{% else %}active; display:block;{% endif %}">#}
+                    <table>
+                        <thead>
+                            <tr>
+                                <td>时间</td>
+                                <td>名称|交易</td>
+                                <td>类型</td>
+                                <td style="text-align:center">金额</td>
+                                <td>对方</td>
+                                <td>状态</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ele in income_history.income_list_2 %}
+                            <tr>
+                                <td>{{ ele.modified_date|date:"Y.m.d" }} {{ ele.modified_time|time:"H:i" }}</td>
+                                <td>
+                                    {% if ele.trade_type == 1 or ele.trade_type == 2%}
+                                        {{ ele.product_title|default_if_none:"" }}
+                                    {% else %}
+                                        {{ ele.pickup_detail_id|default_if_none:"" }}
+                                    {% endif %}
+                                </td>
+                                <td>{% if ele.trade_type == 1 %}购买
+                                    {% elif ele.trade_type == 2 %}进货
+                                    {% elif ele.trade_type == 10 %}提货
+                                    {% endif %}
+                                </td>
+                                <td style="color: #ff0000;text-align:right;">
+                                        {% if ele.total > 0 %}-{% endif %}{{ ele.total }}
+                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                </td>
+                                <td>
+
+                                </td>
+                                <td>
+                                    {% if ele.trade_type == 1 or ele.trade_type == 2%}
+                                        {% if ele.status == 1 %}
+                                            待成交
+                                        {% elif ele.status == 2 %}部分成交
+                                        {% endif %}
+                                    {% else %}
+                                        冻结
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+{#                    <div class="pagination">#}
+{#                        <span class="step-links">#}
+{#                            {% if income_history.income_list.has_previous %}#}
+{#                                <a href="?flag=2&page={{ income_history.income_list.previous_page_number }}">previous</a>#}
+{#                            {% endif %}#}
+{##}
+{#                            <span class="current">#}
+{#                                Page {{ income_history.income_list.number }} of {{ income_history.income_list.paginator.num_pages }}.#}
+{#                            </span>#}
+{##}
+{#                            {% if income_history.income_list.has_next %}#}
+{#                                <a href="?flag=2&page={{ income_history.income_list.next_page_number }}">next</a>#}
+{#                            {% endif %}#}
+{#                        </span>#}
+{#                    </div>#}
+                    <div class="page-public center">
+                        <a class="txt" id="first" href="?flag=2&{% if period_cond %}{{ period_cond }}&{% endif %}page=1">首页</a>
+
+                        {% if income_history.income_list.has_previous %}
+                            <a class="txt" id="prev" href="?flag=2&{% if period_cond %}{{ period_cond }}&{% endif %}page={{ income_history.income_list.previous_page_number }}">上一页</a>
+                        {% endif %}
+
+{#                        <a class="num" style="display: none;" id="firstpage">1</a>#}
+{#                        <a class="num">2</a>#}
+{#                        <a class="num active">3</a>#}
+{#                        <a class="num">4</a>#}
+{#                        <a class="num">5</a>#}
+{#                        <a class="num">6</a>#}
+{#                        <span>……</span>#}
+
+                        {% for i in income_history.page_enum %}
+                            <a class="num {% if i == income_history.income_list.number%} active {% endif %}"
+{#                               {% if i == income_history.income_list.page.number%}active{% endif %}#}
+                               href="?flag=2&{% if period_cond %}{{ period_cond }}&{% endif %}page={{ i }}">
+                                {{ i }}
+                            </a>
+                            {% if forloop.last %}
+
+                                {% if i|add:1 < income_history.page_count%}
+                                    <span>
+                                        ……
+                                    </span>
+                                {% endif %}
+                                {% if i < income_history.page_count %}
+                                   <a class="num"
+        {#                               {% if i == income_history.income_list.page.number%}active{% endif %}#}
+                                       href="?flag=2&{% if period_cond %}{{ period_cond }}&{% endif %}page={{ income_history.page_count }}">
+                                        {{ income_history.page_count }}
+                                    </a>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+
+{#                        <a class="num" id="lastpage">{{ income_history.page_count  }}</a>#}
+                        {% if income_history.income_list.has_next %}
+                            <a class="txt" id="next" href="?flag=2&{% if period_cond %}{{ period_cond }}&{% endif %}page={{ income_history.income_list.next_page_number }}">下一页</a>
+                        {% endif %}
+                        <a class="txt" id="last" href="?flag=2&{% if period_cond %}{{ period_cond }}&{% endif %}page={{ income_history.page_count }}">尾页</a>
+
+                        共<span>{{ income_history.page_count }}</span>页
+                        <span>到第<input id="user_page_idx" type="text" value="" onblur="on_change_page_idx(2)" />页</span>
+                        <a id="by_user_page_idx" class="txt" >
+                            确认
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <script type="text/javascript">
+        var tab_flag = {{ flag }};
+//        收支明细/冻结资金切换
+        $("#income-statement").click(function(){
+            tab_flag=1;
+            $("#income-statement").addClass("active");
+            $("#frozen-fund").removeClass("active");
+            $(".frozen-fund").css("display","none");
+            $(".income-statement").css("display","block");
+
+            href_param = "?flag=1"
+            window.location.href=href_param
+        });
+        $("#frozen-fund").click(function(){
+            tab_flag=2;
+            $("#frozen-fund").addClass("active");
+            $("#income-statement").removeClass("active");
+            $(".income-statement").css("display","none");
+            $(".frozen-fund").css("display","block");
+
+            href_param = "?flag=2"
+            window.location.href=href_param
+        });
+
+
+        function on_change_page_idx(flag)
+        {
+            var page_idx = document.getElementById("user_page_idx").value
+
+            document.getElementById("by_user_page_idx").href='?flag='+flag+'{% if period_cond %}&{{ period_cond }}{% endif %}&page='+page_idx
+        }
+
+        function click_start_end()
+        {
+            var start_date = document.getElementById("start_date").value
+            var end_date = document.getElementById("end_date").value
+            flag = document.getElementById("tab_flag").value;
+            href_param = "?flag="+tab_flag + "&period_type=start-end"
+            if (start_date) {
+                href_param += '&start_date='+start_date
+            }
+            if (end_date) {
+                href_param += '&end_date='+end_date
+            }
+            window.location.href=href_param
+        }
+</script>
+{% endblock oncontentload %}

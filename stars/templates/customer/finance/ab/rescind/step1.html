@@ -1,0 +1,225 @@
+{% extends "customer/account_base.html" %}
+{% load public_tags %}
+{% load staticfiles %}
+{% load compress %}
+
+
+{%  block title %}蓝图百货--农行签约--解除{%  endblock title %}
+{% block oncontentload %}
+    {{ block.super }}
+{#<form class="account-sign-form account-sign-form1 fix" action="{% url 'customer:finance-ab-rescind_contract' %}" method="post">#}
+    <div class="account-cont-right account-cont-rightarea l fix">
+        <h4>
+            <span style="position: relative;top: -3px;">农行签约</span>
+            <img src="{% static "images/yiqianyue.jpg" %}"/>
+        </h4>
+{#        <form class="account-sign-form account-sign-form1 fix" action="{% url 'customer:finance-ab-rescind_contract' %}" method="post">#}
+            <ul class="unbundling unbundling1">
+
+                <li class="fix">
+                    <div class="unbundling-left">
+                        用户名：
+                    </div>
+                    <div class="unbundling-right">
+                        <div class="sign-term">{{ username }}</div>
+                    </div>
+                </li>
+                <li class="fix">
+                    <div class="unbundling-left">
+                        用户ID：
+                    </div>
+                    <div class="unbundling-right">
+                        <div class="sign-term">{{ inst_fund_acc }}</div>
+                    </div>
+                </li>
+                <li class="fix">
+                    <div class="unbundling-left">
+                        签约银行：
+                    </div>
+                    <div class="unbundling-right">
+                        <div class="sign-term">中国农业银行</div>
+                    </div>
+                </li>
+                <li class="fix">
+                    <div class="unbundling-left">
+                        银行户名：
+                    </div>
+                    <div class="unbundling-right">
+                        <div class="sign-term">{{ client_name }}</div>
+                    </div>
+                </li>
+                <li class="fix">
+                    <div class="unbundling-left">
+                        银行卡号：
+                    </div>
+                    <div class="unbundling-right">
+                        <div class="sign-term">{{ bank_account }}</div>
+                    </div>
+                </li>
+                <li class="fix">
+                    <div class="unbundling-left">
+                        账户类型：
+                    </div>
+                    <div class="unbundling-right">
+                        <div class="sign-term">0 - 本行账户</div>
+                    </div>
+                </li>
+                <li class="fix">
+                    <div class="unbundling-left">
+                        币种：
+                    </div>
+                    <div class="unbundling-right">
+                        <div class="sign-term">0 - 人民币</div>
+                    </div>
+                </li>
+                <li class="fix">
+                    <div class="unbundling-left">
+                        客户类型：
+                    </div>
+                            {% if cert_type == 0 or cert_type == None or cert_type == ''%}
+                                <div class="sign-term">0 - 个人</div>
+                            {% else %}
+                                <div class="sign-term">1 - 对公账户</div>
+                            {% endif %}
+                </li>
+                <li class="fix">
+                    <div class="unbundling-left">
+                        证件类型：
+                    </div>
+                    <div class="unbundling-right">
+                         {% if cert_type == 0 or cert_type == None or cert_type == ''%}
+                                <div class="sign-term">0 - 身份证</div>
+                            {% else %}
+                                <div class="sign-term">1 - 组织机构代码</div>
+                            {% endif %}
+                    </div>
+                </li>
+                <li class="fix">
+                    <div class="unbundling-left">
+                        证件号：
+                    </div>
+                    <div class="unbundling-right">
+                        <div class="sign-term">{{ cert_id }}</div>
+                    </div>
+                </li>
+
+            </ul>
+            <ul class="unbundling">
+                <li class="fix">
+                    <div class="unbundling-left">
+                        区域：
+                    </div>
+                    <div class="unbundling-right">
+                        <div class="sign-term">0 - 本地</div>
+                    </div>
+                </li>
+                <li class="fix">
+                    <div class="unbundling-left">
+                        国籍：
+                    </div>
+                    <div class="unbundling-right">
+                        <div class="sign-term">CHN - 中国</div>
+                    </div>
+                </li>
+                <li class="fix">
+                    <div class="unbundling-left">
+                        传真：
+                    </div>
+                    <div class="unbundling-right">
+                        <div class="sign-term">{{ fax_no|default_if_none:'' }}</div>
+                    </div>
+                </li>
+                <li class="fix">
+                    <div class="unbundling-left">
+                        电话号码：
+                    </div>
+                    <div class="unbundling-right">
+                        <div class="sign-term">{{ tel_no|default_if_none:'' }}</div>
+                    </div>
+                </li>
+                <li class="fix">
+                    <div class="unbundling-left">
+                        手机：
+                    </div>
+                    <div class="unbundling-right">
+                        <div class="sign-term">{{ mobile|default_if_none:'' }}</div>
+                    </div>
+                </li>
+                <li class="fix">
+                    <div class="unbundling-left">
+                        电子邮件：
+                    </div>
+                    <div class="unbundling-right">
+                        <div class="sign-term">{{ email|default_if_none:'' }}</div>
+                    </div>
+                </li>
+{#                <li class="fix">#}
+{#                    <div class="unbundling-left">#}
+{#                        省份：#}
+{#                    </div>#}
+{#                    <div class="unbundling-right">#}
+{#                        <div class="sign-term">0 - 北京</div>#}
+{#                    </div>#}
+{#                </li>#}
+{#                <li class="fix">#}
+{#                    <div class="unbundling-left">#}
+{#                        城市：#}
+{#                    </div>#}
+{#                    <div class="unbundling-right">#}
+{#                        <div class="sign-term">0 - 北京</div>#}
+{#                    </div>#}
+{#                </li>#}
+                <li class="fix">
+                    <div class="unbundling-left">
+                        客户地址：
+                    </div>
+                    <div class="unbundling-right">
+                        <div class="sign-term">{{ address |default_if_none:'' }}</div>
+                    </div>
+                </li>
+                <li class="fix">
+                    <div class="unbundling-left">
+                        邮政编码：
+                    </div>
+                    <div class="unbundling-right">
+                        <div class="sign-term">{{ postcode|default_if_none:'' }}</div>
+                    </div>
+                </li>
+                <li class="fix">
+                    <div class="unbundling-left">
+                        开户银行：
+                    </div>
+                    <div class="unbundling-right">
+                        <div class="sign-term">中国农业银行</div>
+                    </div>
+                </li>
+{#                <li class="fix">#}
+{#                    <div class="unbundling-left">#}
+{#                        开户行分行：#}
+{#                    </div>#}
+{#                    <div class="unbundling-right">#}
+{#                        <div class="sign-term"></div>#}
+{#                    </div>#}
+{#                </li>#}
+                <li class="fix">
+                    <div class="unbundling-left">
+                        备注：
+                    </div>
+                    <div class="unbundling-right">
+                        <div class="sign-term sign-term1">{{ user_comment|default_if_none:'' }}</div>
+                    </div>
+                </li>
+            </ul>
+{#            <div class="sign-btn">#}
+{#            <div class="sign-rescind_1 l">#}
+            <div class="sign-btn sign-btn1">
+{#                <a href="{% url 'customer:finance-ab-rescind_contract' %}">解除绑定</a>#}
+                 <input type="button" value="解除绑定" onclick="location.href='{% url 'customer:finance-ab-rescind_contract' %}'"/>
+{#                <input type="submit" value="解除绑定"/>#}
+            </div>
+{#        </form>#}
+    </div>
+</div>
+
+<!--农行签约body end-->
+ {% endblock oncontentload %}

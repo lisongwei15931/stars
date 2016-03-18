@@ -1,0 +1,2 @@
+{% load django_tables2 %}
+<a href="{% url 'dashboard:ad-rolling_ad' pk=record.pk %}{% querystring %}">{{ value }}</a>

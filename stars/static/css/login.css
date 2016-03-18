@@ -1,0 +1,91 @@
+@charset "utf-8";
+.logo .welcome{
+    color: #666;
+    font-size: 24px;
+    padding-top: 30px;
+}
+.logo-p{
+    border-bottom: #c00000 solid 2px;
+    *margin-bottom: 10px;
+}
+.login-content-body{
+    margin-top: 5px;
+    height: 500px;
+    background-image: url("../images/login-ad.jpg");
+    position: relative;
+    z-index: 2;
+}
+.login-content-body a.login-ad{
+    width: 1200px;
+    height: 500px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 3;
+}
+.login-content-body .login-form{
+    width: 462px;
+    color: #999;
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 4;
+}
+.login-content-body .login-form .login-f{
+    border: #eee solid 2px;
+    background-color: #fff;
+    margin: 65px 60px 55px 70px;
+    padding: 25px 25px 0;
+    height: 355px;
+}
+.login-f .login-f-title{
+    font-size: 14px;
+    color: #666;
+}
+.login-f .login-f-box-r{
+    position: relative;
+    z-index: 3;
+    margin-top: 24px;
+}
+.login-f .login-f-box-r .login-f-txtstyle{
+    padding: 14px 0 14px 60px;
+    width: 216px;
+    border: #ededed solid 1px;
+    color: #999;
+}
+.login-f .login-f-box-r img{
+    position: absolute;
+    top: 10px;
+    left: 15px;
+    z-index: 4;
+}
+.login-f .login-notice{
+    color: #c00000;
+    position: absolute;
+    top: 280px;
+}
+.login-f .login-f-check{
+    margin-top: 15px;
+    margin-bottom: 40px;
+    height: 13px;
+    line-height: 13px;
+}
+.login-f .login-f-check .check-box span{
+    position: relative;
+    top: -2px;
+}
+.login-f .login-f-btn{
+    padding: 13px 0;
+    width: 278px;
+    color: #fff;
+    font-size: 16px;
+    background-color: #c00000;
+    cursor: pointer;
+    border: none;
+}
+.login-f .login-f-txt{
+    margin-top: 40px;
+}
+.login-f .login-f-txt a{
+    margin-left: 10px;
+}

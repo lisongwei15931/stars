@@ -1,0 +1,119 @@
+{% load staticfiles %}
+{% load i18n %}
+{% load thumbnail %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;">
+<meta content="yes" name="apple-mobile-web-app-capable">
+<meta content="black" name="apple-mobile-web-app-status-bar-style">
+<meta name="format-detection" content="telephone=no">
+<meta name="Keywords" content="">
+<meta name="description" content="蓝图百货"> 
+
+{% block public_css %}
+<link type="text/css" href="{% static 'css/mobile/phonelt-home.css' %}" rel="stylesheet" charset="gbk" />
+<link type="text/css" href="{% static 'css/mobile/reset.css' %}" rel="stylesheet" charset="gbk" />
+{% endblock %}
+
+{% block jquery %}
+<script type="text/javascript" src="{% static 'js/jquery-1.11.1.min.js' %}"></script>
+{% endblock %}
+
+{% block title %}
+<title> 蓝图百货 - 手机版 </title>
+{% endblock %}
+
+</head>
+
+<body>
+<div class="wrap">
+	<div class="floor koubei">
+   		<div class="title"><h2>口碑甄选</h2><span><img src="{% static 'images/mobile/icon_01.png' %}" width="55" height="25" /></span></div>
+		<!--#测试商品id: 217,129,198,143,252,102  -->
+		{% if device == '2' %}
+		<div class="show">
+           	<div class="bigAd adList"><a href="#" onclick="window.interface.openDetail('217')"><img src="{% static 'images/mobile/ad1.jpg' %}" width="100%"/></a></div>
+            <div class="adList"><a href="#" onclick="window.interface.openDetail('129')"><img src="{% static 'images/mobile/ad2.jpg' %}" width="100%" /></a></div>
+            <div class="adList"><a href="#" class="lastAd" onclick="window.interface.openDetail('198')"><img src="{% static 'images/mobile/ad3.jpg' %}" width="100%" /></a></div>
+            <div class="bigAd adList"><a href="#" onclick="window.interface.openDetail('143')"><img src="{% static 'images/mobile/ad4.jpg' %}" width="100%" /></a></div>
+            <div class="adList"><a href="#" onclick="window.interface.openDetail('252')"><img src="{% static 'images/mobile/ad5.jpg' %}" width="100%" /></a></div>
+            <div class="adList"><a href="#" class="lastAd" onclick="window.interface.openDetail('102')"><img src="{% static 'images/mobile/ad6.jpg' %}" width="100%" /></a></div>
+       </div>
+       {% else %}
+         {% if device == '1' %}
+            <div class="show">
+           	<div class="bigAd adList"><a href="product_detail:217" ><img src="{% static 'images/mobile/ad1.jpg' %}" width="100%"/></a></div>
+            <div class="adList"><a href="product_detail:129" ><img src="{% static 'images/mobile/ad2.jpg' %}" width="100%" /></a></div>
+            <div class="adList"><a href="product_detail:198" class="lastAd"><img src="{% static 'images/mobile/ad3.jpg' %}" width="100%" /></a></div>
+            <div class="bigAd adList"><a href="product_detail:143" ><img src="{% static 'images/mobile/ad4.jpg' %}" width="100%" /></a></div>
+            <div class="adList"><a href="product_detail:252" ><img src="{% static 'images/mobile/ad5.jpg' %}" width="100%" /></a></div>
+            <div class="adList"><a href="product_detail:102" class="lastAd" ><img src="{% static 'images/mobile/ad6.jpg' %}" width="100%" /></a></div>
+            </div>   
+         {% else %}
+            <div class="show">
+           	<div class="bigAd adList"><a href="#" onclick="window.interface.openDetail('217')"><img src="{% static 'images/mobile/ad1.jpg' %}" width="100%"/></a></div>
+            <div class="adList"><a href="#" onclick="window.interface.openDetail('129')"><img src="{% static 'images/mobile/ad2.jpg' %}" width="100%" /></a></div>
+            <div class="adList"><a href="#" class="lastAd" onclick="window.interface.openDetail('198')"><img src="{% static 'images/mobile/ad3.jpg' %}" width="100%" /></a></div>
+            <div class="bigAd adList"><a href="#" onclick="window.interface.openDetail('143')"><img src="{% static 'images/mobile/ad4.jpg' %}" width="100%" /></a></div>
+            <div class="adList"><a href="#" onclick="window.interface.openDetail('252')"><img src="{% static 'images/mobile/ad5.jpg' %}" width="100%" /></a></div>
+            <div class="adList"><a href="#" class="lastAd" onclick="window.interface.openDetail('102')"><img src="{% static 'images/mobile/ad6.jpg' %}" width="100%" /></a></div>
+            </div>
+         {% endif %}
+       {% endif %}
+	</div>
+    <div class="line-ad"><a href="#"><img src="{% static 'images/mobile/line-ad1.jpg' %}" width="100%" /></a></div>
+    <div class="floor new">
+   		<div class="title"><h2>新品上市</h2><span><img src="{% static 'images/mobile/icon_02.png' %}" width="55" height="25" /></span></div>
+		<div class="show">
+           	<div class="adList" style="float:left;"><a href="#"><img id="ad1" src="{% static 'images/mobile/ad7.jpg' %}" width="100%"/></a></div>
+            <div class="adList" style="float:right;"><a href="#"><img id="ad2" src="{% static 'images/mobile/ad9.jpg' %}" width="100%" /></a></div>
+            <div class="adList" style="float:right;"><a href="#" class="lastAd"><img id="ad3" src="{% static 'images/mobile/ad10.jpg' %}" width="100%" /></a></div>
+            <div class="adList" style="float:right;"><a href="#"><img id="ad4" src="{% static 'images/mobile/ad11.jpg' %}" width="100%" /></a></div>
+            <div class="adList" style="float:left;"><a href="#"><img src="{% static 'images/mobile/ad12.jpg' %}" width="100%" /></a></div>
+            <div class="adList" style="float:right;"><a href="#"><img src="{% static 'images/mobile/ad13.jpg' %}" width="100%" /></a></div>
+            <div class="adList" style="float:left;"><a href="#"><img src="{% static 'images/mobile/ad14.jpg' %}" width="100%" /></a></div>
+            <div class="adList" style="float:right;"><a href="#"><img src="{% static 'images/mobile/ad15.jpg' %}" width="100%" /></a></div>
+       </div>
+	</div>
+    <div class="line-ad"><a href="#"><img src="{% static 'images/mobile/line-ad2.jpg' %}" width="100%" /></a></div>
+    <div class="floor new">
+   		<div class="title"><h2>主推热卖</h2><span><img src="{% static 'images/mobile/icon_03.png' %}" width="55" height="25" /></span></div>
+		<div class="show">
+           	<div class="adList" style="overflow:hidden;"><a href="#"><img src="{% static 'images/mobile/ad16.jpg' %}" width="100%"/></a></div>
+            <div class="adList"><a href="#"><img src="{% static 'images/mobile/ad17.jpg' %}" width="100%" /></a></div>
+            <div class="adList th-list"><a href="#"><img src="{% static 'images/mobile/ad18.jpg' %}" width="100%" /></a></div>
+            <div class="adList th-list"><a href="#"><img src="{% static 'images/mobile/ad19.jpg' %}" width="100%" /></a></div>
+            <div class="adList th-list"><a href="#"><img src="{% static 'images/mobile/ad20.jpg' %}" width="100%" /></a></div>
+            <div class="adList th-list"><a href="#"><img src="{% static 'images/mobile/ad21.jpg' %}" width="100%" /></a></div>
+            <div class="adList th-list"><a href="#"><img src="{% static 'images/mobile/ad22.jpg' %}" width="100%" /></a></div>
+            <div class="adList th-list"><a href="#"><img src="{% static 'images/mobile/ad23.jpg' %}" width="100%" /></a></div>
+       </div>
+	</div>
+    <div class="line-ad"><a href="#"><img src="{% static 'images/mobile/line-ad3.jpg' %}" width="100%" /></a></div>
+    <div class="floor new">
+   		<div class="title"><h2>火热促销</h2><span><img src="{% static 'images/mobile/icon_04.png' %}" width="55" height="25" /></span></div>
+		<div class="show">
+           	<div class="adList"><a href="#"><img src="{% static 'images/mobile/ad24.jpg' %}" width="100%"/></a></div>
+            <div class="adList"><a href="#"><img src="{% static 'images/mobile/ad25.jpg' %}" width="100%" /></a></div>
+            <div class="adList th-list"><a href="#"><img src="{% static 'images/mobile/ad26.jpg' %}" width="100%" /></a></div>
+            <div class="adList th-list"><a href="#"><img src="{% static 'images/mobile/ad27.jpg' %}" width="100%" /></a></div>
+            <div class="adList th-list"><a href="#"><img src="{% static 'images/mobile/ad28.jpg' %}" width="100%" /></a></div>
+            <div class="adList"><a href="#"><img src="{% static 'images/mobile/ad29.jpg' %}" width="100%" /></a></div>
+            <div class="adList"><a href="#"><img src="{% static 'images/mobile/ad30.jpg' %}" width="100%" /></a></div>
+       </div>
+	</div>
+    <div class="line-ad"><a href="#"><img src="{% static 'images/mobile/line-ad4.jpg' %}" width="100%" /></a></div>
+</div>
+<script type="text/javascript">
+$(function(){
+	$(window).load(function(){$("#ad1").height($("#ad2").height()+$("#ad3").height()+$("#ad4").height()+2);$(".koubei .show div a img").height($(".koubei .show div:last a img").height())});
+	$(window).resize(function(){$("#ad1").height($("#ad2").height()+$("#ad3").height()+$("#ad4").height()+2);$(".koubei .show div a img").height($(".koubei .show div:last a img").height())});
+	});
+	/*function changeHeight(){
+		$("#ad1").height($("#ad2").height()+$("#ad3").height()+$("#ad4").height()+2);
+	}*/
+</script>
+</body>
+</html>

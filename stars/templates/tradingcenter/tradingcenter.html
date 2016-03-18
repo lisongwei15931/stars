@@ -1,0 +1,1503 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<head>
+    <title>蓝图百货-交易大厅</title>
+    <link rel="stylesheet" href="{% static "css/jquery.multiselect.css" %}">
+    <link rel="stylesheet" href="{% static "jqGrid/css/ui.jqgrid.css" %}">
+    <link rel="stylesheet" href="{% static "jqGrid/css/ui.multiselect.css" %}">
+    <link rel="stylesheet" href="{% static "jquery-ui/jquery-ui.min.css" %}">
+    <link rel="stylesheet" href="{% static "css/trading.css" %}">
+
+    <style type="text/css">
+        .ui-tabs .ui-tabs-panel {
+            padding: 2px 0;
+        }
+        .button.right.ui-state-default { 
+            margin-top: 3px;
+            height: 32px; }
+        .button.orange.ui-state-default { 
+	        background: #F58400;
+	        border-radius: 3px;
+	        border: 0;
+	        margin-top: 3px;
+	        height: 32px; }
+	    .button.orange.ui-state-hover { background: #b86300; }
+        .button.orange.ui-state-active { background: #b86300; }
+        .ui-multiselect.column_chooser{
+            color: white;
+            border:none;
+            width:10px;
+            float:right;
+            margin-top: 3px;
+            border-radius: 3px;
+            background-color: #242424;
+            height: 32px;
+        }
+        .ui-multiselect-menu.column_chooser {
+            height:520px;
+            background-color: #242424;
+        }
+    </style>
+    
+    <!--script src="https://js.pusher.com/3.0/pusher.min.js"></script-->
+    
+    <script type="text/javascript" src="{% static "js/jquery-1.11.1.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "jquery-ui/jquery-ui.min.js" %}"></script>
+    
+    <script type="text/javascript" src="{% static "jqGrid/js/ui.multiselect.js" %}"></script>
+    <script type="text/javascript" src="{% static "jqGrid/js/jquery.jqGrid.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "jqGrid/js/grid.locale-cn.js" %}"></script>
+    <script type="text/javascript" src="{% static "jqGrid/js/jquery.contextmenu.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/jquery.multiselect.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/jquery.multiselect.zh-cn.js" %}"></script>
+    
+    <script>
+        /*Pusher.log = function(message) {
+          if (window.console && window.console.log) {
+            window.console.log(message);
+          }
+        };*/
+    </script>
+    <script>  
+        current_row_id = '';
+        var current_tab = 1;
+        function test_add(){
+        	$('# > tbody:last-child').append("<tr><td>sdf</td>"+
+        			"<td>vvvv</td></tr>");
+        }
+        //搜索商品
+		function searchproduct(){
+			var keyWords = $('#keyWords').val();
+			var category = $('#category_list').val();
+			//全部商品标签内搜索功能
+			if(current_tab == 1 || current_tab == 0){
+				$("#jqGrid").jqGrid('setGridParam', {
+				      url :  "{% url "tradingcenter:trading_center_data" %}?keyWords="+keyWords+"&category="+category,
+				      datatype:'json', page:1
+				    }).trigger("reloadGrid");
+			}
+			//有进货权标签内搜索功能
+			if(current_tab == 3){
+                $("#buy_right").jqGrid('setGridParam', {
+                      url :  "{% url "tradingcenter:trading_center_buy_right_data" %}?keyWords="+keyWords+"&category="+category,
+                      datatype:'json', page:1
+                    }).trigger("reloadGrid");
+            }
+			//有出售权标签内搜索功能
+            if(current_tab == 4){
+                $("#sale_right").jqGrid('setGridParam', {
+                      url :  "{% url "tradingcenter:trading_center_sale_right_data" %}?keyWords="+keyWords+"&category="+category,
+                      datatype:'json', page:1
+                    }).trigger("reloadGrid");
+            }
+            //新品标签内搜索功能
+            if(current_tab == 2){
+                $("#new_product").jqGrid('setGridParam', {
+                      url :  "{% url "tradingcenter:trading_center_new_product_data" %}?keyWords="+keyWords+"&category="+category,
+                      datatype:'json', page:1
+                    }).trigger("reloadGrid");
+            }
+          //自选标签内搜索功能
+            if(current_tab == 5){
+                $("#self_pick").jqGrid('setGridParam', {
+                      url:"{% url "tradingcenter:trading_center_self_pick_data" %}?keyWords="+keyWords+"&category="+category,
+                      datatype:'json', page:1
+                    }).trigger("reloadGrid");
+            }
+		}
+        //设置当前标签
+		function set_cur_tab(tab_id){
+			current_tab=tab_id;
+			$('#category_list').val("").change();
+			$('#keyWords').val("");
+		}
+		//标签设置
+        function set_column(tab_id){
+            alert(tab_id);
+        }
+        //打开购买窗口
+        function open_buy_dialog(){
+        	$('#trading_table > tbody').children().each(function(e){$(this).remove()});
+        	$('#deal_err_msg').html('');
+        	if(current_tab == 1){
+                var grid = $("#jqGrid");
+            }
+            if(current_tab == 3){
+                var grid = $("#buy_right");
+            }
+            if(current_tab == 4){
+                var grid = $("#sale_right");
+            }
+            if(current_tab == 2){
+                var grid = $("#new_product");
+            }
+            if(current_tab == 5){
+                var grid = $("#self_pick");
+            }
+            var rowKey = grid.jqGrid('getGridParam','selarrrow');
+            if(rowKey.length>0){
+            	var postdata = JSON.stringify(rowKey);
+                $.ajax({
+                    cache: true,
+                    type: "POST",
+                    url:"{% url "tradingcenter:get_selected_products_info" %}?type=buy",
+                    data:{products:rowKey,csrfmiddlewaretoken:'{{ csrf_token }}'},// 你的formid
+                    async: false,
+                    error: function(e) {
+                        alert(e.responseText);
+                    },
+                    success: function(data) {
+                    	for(var i=0;i<data.length;i++){
+                    		var total_price = (data[i].product_price*data[i].max_buy_num).toFixed(2);
+                    		var quote = data[i].quote*data[i].max_buy_num;
+                    		var bid_price = data[i].bid_price?data[i].bid_price:"-";
+                    		var ask_price = data[i].ask_price?data[i].ask_price:"-";
+                    		var net_change = data[i].net_change?data[i].net_change:"-";
+                    		var net_change_rise = data[i].net_change_rise?data[i].net_change_rise:"-";
+                    		var closing_price = data[i].closing_price?data[i].closing_price:"-";
+                    		var strike_price = data[i].strike_price?data[i].strike_price:"-";
+                    		var display = i==0?"block":"none";
+	                    	$('#trading_table > tbody:last-child').append("<tr><td width='70px'>"+data[i].upc+"</td>"+
+                   			"<td width='230px'>"+
+	                        "<a href='"+data[i].product_url+"' target='_blank' style='max-width:250px'>"+data[i].name+"</a>"+
+	                        "</td>"+
+	                        "<td width='67px'>"+strike_price+"</td>"+
+	                        "<td width='100px'>"+data[i].price_range[0]+"~"+data[i].price_range[1]+"</td>"+
+	                        "<input name='product_id' type='hidden' value="+data[i].id+" />"+
+	                        "<input name='product_name' type='hidden' value="+data[i].name+" />"+
+	                        "<input name='max_price' type='hidden' value="+data[i].product_price+" />"+
+	                        "<td class='repledge' width='100px'>"+
+	                        "<img src='{% static 'images/jiaoyi-.png' %}' class='jiaoyiSubtract l'/>"+
+	                        "<input name='price' type='text' class='price_value l' value="+data[i].product_price+" />"+
+	                        "<img src='{% static 'images/jiaoyi+.png' %}' class='jiaoyiAdd l'/>"+
+                            "</td>"+
+	                        "<td width='60px' style='position: relative;left: 5px;'>"+data[i].max_buy_num+"</td>"+
+	                        "<td class='repledge' width='80px' style='position: relative;left: 8px;'>"+
+	                        "<img src='{% static 'images/jiaoyi-.png' %}' class='jiaoyiSubtractnum l'/>"+
+	                        "<input name='num' type='text' class='buy_num l' value="+data[i].max_buy_num+" />"+
+	                        "<img src='{% static 'images/jiaoyi+.png' %}' class='jiaoyiAddnum l'/>"+
+	                        "</td>"+
+	                        "<td width='80px'>"+total_price+"</td>"+
+	                        "<td width='40px'><a class='delrow'>删除</a></td>"+
+	                        "</tr>");
+	                    	$("#buy_dialog_bottom").before("<div class='trend jinhuo-div' style='display: "+display+";'>"+
+                                "<h4>"+data[i].name+"</h4>"+
+                                "<ul class='fix'>"+
+                                    "<li>买价：<span>"+bid_price+"</span></li>"+
+                                    "<li>卖价：<span>"+ask_price+"</span></li>"+
+                                    "<li>涨跌：<span>"+net_change+"</span></li>"+
+                                    "<li>涨幅：<span>"+net_change_rise+"</span></li>"+
+                                    "<li>昨收：<span>"+closing_price+"</span></li>"+
+                                    "<li>最新：<span>"+strike_price+"</span></li>"+
+                                    "<li>持有：<span>"+data[i].hold_quantity+"</span></li>"+
+                                    "<li>均价：<span>"+data[i].overage_unit_price+"</span></li>"+
+                                    "<li>增值：<span>"+data[i].increase+"</span></li>"+
+                                    "<li>配额比：<span>"+data[i].quote+"</span></li>"+
+                                    "<li>持有进货权：<span>"+data[i].quote_quantity+"</span></li>"+
+                                "</ul>"+
+                                "<div class='tendency-chart'>"+
+                                    "<img height='200px' width='240px' src='"+data[i].primary_image+"'/>"+
+                                "</div>"+
+                            "</div>");
+                    	}
+                    	$(".delrow").click(function(){
+                    		$(this).parent().parent().remove();
+                        });
+                    	
+                    	$("#trading_table tr").each(function(index){
+                            $(this).mouseover(function(){
+                            	console.log(index)
+                                $(".trend").hide();
+                                $(".jinhuo-div:eq("+index+")").show();
+                            })
+                        });
+                    	
+                    	$(".jiaoyiSubtract").click(function(){
+                            var inputVal = parseFloat($(this).next().val());
+                            var inputVal = inputVal - 0.01;
+                            var inputVal = Math.round(inputVal*100)/100;
+                            if(inputVal >= 0){
+                                $(this).next().val(inputVal.toFixed(2));
+                                var num_val = $(this).parent().next().next().children('input').val();
+                                $(this).parent().next().next().next().html((inputVal*num_val).toFixed(2));
+                            }
+                        });
+                    	$(".price_value").keyup(function(){
+                    		var inputVal = $(this).val();
+                    		$(this).val(inputVal.replace(/[^\d.]/g,''));
+                    		if(inputVal >= 0){
+                                var num_val = $(this).parent().next().next().children('input').val();
+                                $(this).parent().next().next().next().html((inputVal*num_val).toFixed(2));
+                            }
+                    	});
+                    	$(".price_value").blur(function(){
+                    		var inputVal = $(this).val();
+                    		if(inputVal==""){
+                    			$(this).val($(this).parent().prev().val());
+                    			var num_val = $(this).parent().next().next().children('input').val();
+                                $(this).parent().next().next().next().html((inputVal*num_val).toFixed(2));
+                    		}
+                    	});
+                        $(".jiaoyiAdd").click(function(){
+                            var inputVal = parseFloat($(this).prev().val());
+                            var inputVal = inputVal + 0.01;
+                            var inputVal = Math.round(inputVal*100)/100;
+                            if(inputVal >= 0){
+                                $(this).prev().val(inputVal.toFixed(2));
+                                var num_val = $(this).parent().next().next().children('input').val();
+                                $(this).parent().next().next().next().html((inputVal*num_val).toFixed(2));
+                            }
+                        });
+                        $(".jiaoyiSubtractnum").click(function(){
+                            var inputVal = $(this).next().val();
+                            inputVal--;
+                            if(inputVal >= 0){
+                                $(this).next().val(inputVal);
+                                var price_val = $(this).parent().prev().prev().children('input').val();
+                                $(this).parent().next().html((price_val*inputVal).toFixed(2));
+                                //var quote = $(this).parent().next().next().attr("class");
+                                //$(this).parent().next().next().html(quote*inputVal);
+                            }
+                        });
+                        $(".buy_num").keyup(function(){
+                            var inputVal = $(this).val();
+                            $(this).val(inputVal.replace(/[^\d.]/g,''));
+                            $(this).val(inputVal.replace(/\D/g,''));
+                            if(inputVal >= 0){
+                            	var price_val = $(this).parent().prev().prev().children('input').val();
+                                $(this).parent().next().html((price_val*inputVal).toFixed(2));
+                                //var quote = $(this).parent().next().next().attr("class");
+                                //$(this).parent().next().next().html(quote*inputVal);
+                            }
+                        });
+                        $(".buy_num").blur(function(){
+                            var inputVal = $(this).val();
+                            if(inputVal==""){
+                                $(this).val(0);
+                                var price_val = $(this).parent().prev().prev().children('input').val();
+                                $(this).parent().next().html((price_val*inputVal).toFixed(2));
+                            }
+                        });
+                        $(".jiaoyiAddnum").click(function(){
+                            var inputVal = $(this).prev().val();
+                            inputVal++;
+                            if(inputVal >= 0){
+                                $(this).prev().val(inputVal);
+                                var price_val = $(this).parent().prev().prev().children('input').val();
+                                $(this).parent().next().html((price_val*inputVal).toFixed(2));
+                                //var quote = $(this).parent().next().next().attr("class");
+                                //$(this).parent().next().next().html(quote*inputVal);
+                            }
+                        });
+                        $( "#sale-dialog" ).dialog( "close" );
+                        $( "#factory_sale-dialog" ).dialog( "close" );
+                        $( "#buy-dialog" ).dialog( "open" );
+                        event.preventDefault();
+                    }
+                });
+            }else{
+                alert("请至少选择一个商品");
+            }
+        }
+      //打开出售窗口
+        function open_sale_dialog(){
+            $('#sale_table > tbody').children().each(function(e){$(this).remove()});
+            $('#sale_err_msg').html('');
+            if(current_tab == 1){
+                var grid = $("#jqGrid");
+            }
+            if(current_tab == 3){
+                var grid = $("#buy_right");
+            }
+            if(current_tab == 4){
+                var grid = $("#sale_right");
+            }
+            if(current_tab == 2){
+                var grid = $("#new_product");
+            }
+            if(current_tab == 5){
+                var grid = $("#self_pick");
+            }
+            var rowKey = grid.jqGrid('getGridParam','selarrrow');
+            if(rowKey.length>0){
+                var postdata = JSON.stringify(rowKey);
+                $.ajax({
+                    cache: true,
+                    type: "POST",
+                    url:"{% url "tradingcenter:get_selected_products_info" %}?type=sale",
+                    data:{products:rowKey,csrfmiddlewaretoken:'{{ csrf_token }}'},// 你的formid
+                    async: false,
+                    error: function(e) {
+                        alert(e.responseText);
+                    },
+                    success: function(data) {
+                        for(var i=0;i<data.length;i++){
+                            var total_price = (data[i].product_price*data[i].max_buy_num).toFixed(2);
+                            var quote = data[i].quote*data[i].max_buy_num;
+                            var bid_price = data[i].bid_price?data[i].bid_price:"-";
+                            var ask_price = data[i].ask_price?data[i].ask_price:"-";
+                            var net_change = data[i].net_change?data[i].net_change:"-";
+                            var net_change_rise = data[i].net_change_rise?data[i].net_change_rise:"-";
+                            var closing_price = data[i].closing_price?data[i].closing_price:"-";
+                            var strike_price = data[i].strike_price?data[i].strike_price:"-";
+                            var display = i==0?"block":"none";
+                            $('#sale_table > tbody:last-child').append("<tr><td width='70px'>"+data[i].upc+"</td>"+
+                            "<td width='250px'>"+
+                            "<a href='"+data[i].product_url+"' target='_blank' style='max-width:250px'>"+data[i].name+"</a>"+
+                            "</td>"+
+                            "<td width='67px'>"+strike_price+"</td>"+
+                            "<td width='100px'>"+data[i].price_range[0]+"~"+data[i].price_range[1]+"</td>"+
+                            "<input name='product_id' type='hidden' value="+data[i].id+" />"+
+                            "<input name='product_name' type='hidden' value="+data[i].name+" />"+
+                            "<input name='max_price' type='hidden' value="+data[i].product_price+" />"+
+                            "<td class='repledge' width='100px'>"+
+                            "<img src='{% static 'images/jiaoyi-.png' %}' class='jiaoyiSubtract l'/>"+
+                            "<input name='price' type='text' class='price_value l' value="+data[i].product_price+" />"+
+                            "<img src='{% static 'images/jiaoyi+.png' %}' class='jiaoyiAdd l'/>"+
+                            "</td>"+
+                            "<td width='60px' style='position: relative;left: 5px;'>"+data[i].max_buy_num+"</td>"+
+                            "<td class='repledge' width='80px' style='position: relative;left: 8px;'>"+
+                            "<img src='{% static 'images/jiaoyi-.png' %}' class='jiaoyiSubtractnum l'/>"+
+                            "<input name='num' type='text' class='buy_num l' value="+data[i].max_buy_num+" />"+
+                            "<img src='{% static 'images/jiaoyi+.png' %}' class='jiaoyiAddnum l'/>"+
+                            "</td>"+
+                            "<td width='80px'>"+total_price+"</td>"+
+                            "<td width='40px'><a class='delrow'>删除</a></td>"+
+                            "</tr>");
+                            $("#sale_dialog_bottom").before("<div class='trend sale-jinhuo-div' style='display: "+display+";'>"+
+                            "<h4>"+data[i].name+"</h4>"+
+                            "<ul class='fix'>"+
+                                "<li>买价：<span>"+bid_price+"</span></li>"+
+                                "<li>卖价：<span>"+ask_price+"</span></li>"+
+                                "<li>涨跌：<span>"+net_change+"</span></li>"+
+                                "<li>涨幅：<span>"+net_change_rise+"</span></li>"+
+                                "<li>昨收：<span>"+closing_price+"</span></li>"+
+                                "<li>最新：<span>"+strike_price+"</span></li>"+
+                                "<li>持有：<span>"+data[i].hold_quantity+"</span></li>"+
+                                "<li>均价：<span>"+data[i].overage_unit_price+"</span></li>"+
+                                "<li>增值：<span>"+data[i].increase+"</span></li>"+
+                                "<li>配额比：<span>"+data[i].quote+"</span></li>"+
+                                "<li>可出售量：<span>"+data[i].max_buy_num+"</span></li>"+
+                            "</ul>"+
+                            "<div class='tendency-chart'>"+
+                                "<img height='200px' width='240px' src='"+data[i].primary_image+"'/>"+
+                            "</div>"+
+                        "</div>");
+                        }
+                        $(".delrow").click(function(){
+                            $(this).parent().parent().remove();
+                        });
+                        $("#sale_table tr").each(function(index){
+                            $(this).mouseover(function(){
+                                console.log(index)
+                                $(".trend").hide();
+                                $(".sale-jinhuo-div:eq("+index+")").show();
+                            })
+                        });
+                        $(".jiaoyiSubtract").click(function(){
+                            var inputVal = parseFloat($(this).next().val());
+                            var inputVal = inputVal - 0.01;
+                            var inputVal = Math.round(inputVal*100)/100;
+                            if(inputVal >= 0){
+                                $(this).next().val(inputVal.toFixed(2));
+                                var num_val = $(this).parent().next().next().children('input').val();
+                                $(this).parent().next().next().next().html((inputVal*num_val).toFixed(2));
+                            }
+                        });
+                        $(".price_value").keyup(function(){
+                            var inputVal = $(this).val();
+                            $(this).val(inputVal.replace(/[^\d.]/g,''));
+                            if(inputVal >= 0){
+                                var num_val = $(this).parent().next().next().children('input').val();
+                                $(this).parent().next().next().next().html((inputVal*num_val).toFixed(2));
+                            }
+                        });
+                        $(".price_value").blur(function(){
+                            var inputVal = $(this).val();
+                            if(inputVal==""){
+                                $(this).val($(this).parent().prev().val());
+                                var num_val = $(this).parent().next().next().children('input').val();
+                                $(this).parent().next().next().next().html((inputVal*num_val).toFixed(2));
+                            }
+                        });
+                        $(".jiaoyiAdd").click(function(){
+                            var inputVal = parseFloat($(this).prev().val());
+                            var inputVal = inputVal + 0.01;
+                            var inputVal = Math.round(inputVal*100)/100;
+                            if(inputVal >= 0){
+                                $(this).prev().val(inputVal.toFixed(2));
+                                var num_val = $(this).parent().next().next().children('input').val();
+                                $(this).parent().next().next().next().html((inputVal*num_val).toFixed(2));
+                            }
+                        });
+                        $(".jiaoyiSubtractnum").click(function(){
+                            var inputVal = $(this).next().val();
+                            inputVal--;
+                            if(inputVal >= 0){
+                                $(this).next().val(inputVal);
+                                var price_val = $(this).parent().prev().prev().children('input').val();
+                                $(this).parent().next().html((price_val*inputVal).toFixed(2));
+                                //var quote = $(this).parent().next().next().attr("class");
+                                //$(this).parent().next().next().html(quote*inputVal);
+                            }
+                        });
+                        $(".buy_num").keyup(function(){
+                            var inputVal = $(this).val();
+                            $(this).val(inputVal.replace(/[^\d.]/g,''));
+                            $(this).val(inputVal.replace(/\D/g,''));
+                            if(inputVal >= 0){
+                                var price_val = $(this).parent().prev().prev().children('input').val();
+                                $(this).parent().next().html((price_val*inputVal).toFixed(2));
+                                //var quote = $(this).parent().next().next().attr("class");
+                                //$(this).parent().next().next().html(quote*inputVal);
+                            }
+                        });
+                        $(".buy_num").blur(function(){
+                            var inputVal = $(this).val();
+                            if(inputVal==""){
+                                $(this).val(0);
+                                var price_val = $(this).parent().prev().prev().children('input').val();
+                                $(this).parent().next().html((price_val*inputVal).toFixed(2));
+                            }
+                        });
+                        $(".jiaoyiAddnum").click(function(){
+                            var inputVal = $(this).prev().val();
+                            inputVal++;
+                            if(inputVal >= 0){
+                                $(this).prev().val(inputVal);
+                                var price_val = $(this).parent().prev().prev().children('input').val();
+                                $(this).parent().next().html((price_val*inputVal).toFixed(2));
+                                //var quote = $(this).parent().next().next().attr("class");
+                                //$(this).parent().next().next().html(quote*inputVal);
+                            }
+                        });
+                        $( "#buy-dialog" ).dialog( "close" );
+                        $( "#factory_sale-dialog" ).dialog( "close" );
+                        $( "#sale-dialog" ).dialog( "open" );
+                        event.preventDefault();
+                    }
+                });
+            }else{
+                alert("请至少选择一个商品");
+            }
+        }
+        //购买提交
+        function submit_buy(){
+        	var buy_info=new Array();
+        	var err_msg = new Array();
+        	$('#trading_table tbody').children().each(function(e){
+        		console.log(1111);
+        		var one_info = new Array(3);
+        		one_info[0] = $(this).find('input[name="product_id"]').val();
+        		one_info[1] = $(this).find('input[name="price"]').val();
+        		one_info[2] = $(this).find('input[name="num"]').val();
+        		if(one_info[2]==0){
+        			product_name = $(this).find('input[name="product_name"]').val();
+        			var msg = product_name+"数量为0,请删除或修改数量";
+        			err_msg.push(msg);
+        		}else{
+	        		buy_info.push(one_info);
+        		}
+        	});
+        	if(buy_info.length>0 && err_msg.length==0){
+        		$.ajax({
+                    cache: true,
+                    type: "POST",
+                    url:"{% url "tradingcenter:multiple_deal" %}?type=buy",
+                    data:{"buy_info[]":buy_info,csrfmiddlewaretoken:'{{ csrf_token }}'},// 你的formid
+                    async: false,
+                    error: function(e) {
+                    	alert(e.responseText);
+                    },
+                    success: function(data) {
+                    	if(data.status=="err"){
+                    		for(var i=0;i<data.msg.length;i++){
+                    			$('#deal_err_msg').html('');
+                    			$('#deal_err_msg').append("<div>"+data.msg[i]+"</div>");
+                    		}
+                    	}else if(data.status=="suc"){
+                    		$( "#buy-dialog" ).dialog( "close" );
+                    	}
+                    }
+                })
+        	}else if(err_msg.length>0){
+        		$('#deal_err_msg').html('');
+        		for(var i=0;i<err_msg.length;i++){
+	        		$('#deal_err_msg').append("<div>"+err_msg[i]+"</div>");
+        		}
+        	}else{
+        		$('#deal_err_msg').html('');
+        	}
+        	
+        }
+        //出售提交
+        function submit_sale(){
+            var buy_info=new Array();
+            var err_msg=new Array();
+            $('#sale_table tbody').children().each(function(e){
+                var one_info = new Array(3);
+                one_info[0] = $(this).find('input[name="product_id"]').val();
+                one_info[1] = $(this).find('input[name="price"]').val();
+                one_info[2] =$(this).find('input[name="num"]').val();
+                if(one_info[2]==0){
+                    product_name = $(this).find('input[name="product_name"]').val();
+                    var msg = product_name+"数量为0,请删除或修改数量";
+                    err_msg.push(msg);
+                }else{
+                    buy_info.push(one_info);
+                }
+            });
+            if(buy_info.length>0 && err_msg.length==0){
+                $.ajax({
+                    cache: true,
+                    type: "POST",
+                    url:"{% url "tradingcenter:multiple_deal" %}?type=sale",
+                    data:{"buy_info[]":buy_info,csrfmiddlewaretoken:'{{ csrf_token }}'},// 你的formid
+                    async: false,
+                    error: function(e) {
+                        alert(e.responseText);
+                    },
+                    success: function(data) {
+                        if(data.status=="err"){
+                        	$('#sale_err_msg').html('');
+                            for(var i=0;i<data.msg.length;i++){
+                                $('#sale_err_msg').append("<div>"+data.msg[i]+"</div>");
+                            }
+                        }else if(data.status=="suc"){
+                            $( "#sale-dialog" ).dialog( "close" );
+                        }
+                    }
+                })
+            }else if(err_msg.length>0){
+                $('#sale_err_msg').html('');
+                for(var i=0;i<err_msg.length;i++){
+                    $('#sale_err_msg').append("<div>"+err_msg[i]+"</div>");
+                }
+            }else{
+            	$('#sale_err_msg').html('');
+            }
+            
+        }
+        $(document).ready(function () {
+        	//栏目设置功能
+        	$("#setcolumn").multiselect({
+        		click: function(event, ui){
+                    var grid1 = $("#jqGrid");
+                    var grid2 = $("#buy_right");
+                    var grid3 = $("#sale_right");
+                    var grid4 = $("#new_product");
+                    var grid5 = $("#self_pick");
+                    if(ui.checked==true){
+	                    grid1.jqGrid('showCol', ui.value);
+	                    grid2.jqGrid('showCol', ui.value);
+	                    grid3.jqGrid('showCol', ui.value);
+	                    grid4.jqGrid('showCol', ui.value);
+	                    grid5.jqGrid('showCol', ui.value);
+                    }else{
+                    	grid1.jqGrid('hideCol', ui.value);
+                    	grid2.jqGrid('hideCol', ui.value);
+                    	grid3.jqGrid('hideCol', ui.value);
+                    	grid4.jqGrid('hideCol', ui.value);
+                    	grid5.jqGrid('hideCol', ui.value);
+                    }
+                    grid1.jqGrid('setGridWidth', screen.width-1);
+        		},
+        		header: false,	
+        		classes : "column_chooser",
+        		minWidth: '75',
+        		height:'520',
+        	}); 
+        	<!-- 类别选择功能 -->
+        	$("#category_list").change(function(){
+        		searchproduct();
+        	});
+        	<!-- 搜索按钮绑定回车事件 -->
+			$('#keyWords').bind('keypress',function(event){
+			    if(event.keyCode == "13")   
+			    {
+			        searchproduct();
+			    }
+			});
+            <!-- 初始化jqueryui的tabs,button.dialog -->
+            $( "#tabs" ).tabs();
+            $( ".button" ).button();
+            $( "#dialog" ).dialog({
+                autoOpen: false,
+                width: 400,
+                buttons: [
+                    {
+                        text: "Ok",
+                        click: function() {
+                            commitdata();
+                            $( this ).dialog( "close" );
+                        }
+                    },
+                    {
+                        text: "Cancel",
+                        click: function() {
+                            $( this ).dialog( "close" );
+                        }
+                    }
+                ]
+            });
+            $( "#buy-dialog" ).dialog({
+                autoOpen: false,
+                width: 1100,
+                modal:true
+            });
+            $( "#sale-dialog" ).dialog({
+                autoOpen: false,
+                width: 1100,
+                modal:true
+            });
+            $( "#factory_sale-dialog" ).dialog({
+                autoOpen: false,
+                width: 400,
+                buttons: [
+                    {
+                        text: "Ok",
+                        click: function() {
+                        	factory_commission_sale();
+                            $( this ).dialog( "close" );
+                        }
+                    },
+                    {
+                        text: "Cancel",
+                        click: function() {
+                            $( this ).dialog( "close" );
+                        }
+                    }
+                ]
+            });
+            $( "#dialog-link" ).click(function( event ) {
+                $( "#dialog" ).dialog( "open" );
+                event.preventDefault();
+            });
+            $( "#column-chooser-link" ).click(function( event ) {
+                $("#jqGrid").jqGrid('columnChooser');
+                event.preventDefault();
+            });
+            $( "#buy-link" ).click(function( event ) {
+            	{% if open_or_close %}
+	            	{% if user.is_authenticated %}
+	            	if(current_tab == 1){
+		            	var grid = $("#jqGrid");
+	            	}
+	            	if(current_tab == 3){
+	            		var grid = $("#buy_right");
+	                }
+	                if(current_tab == 4){
+	                	var grid = $("#sale_right");
+	                }
+	                if(current_tab == 2){
+	                	var grid = $("#new_product");
+	                }
+	                if(current_tab == 5){
+	                	var grid = $("#self_pick");
+	                }
+	                var rowKey = grid.jqGrid('getGridParam','selarrrow');
+	                if(rowKey.length==1){
+		                window.open('redirect-to-buy/'+rowKey[0], '_blank');
+	                }else if(rowKey.length==0){
+	                	alert('请选择一个商品')
+	                }else{
+	                	alert('只能选择一个商品')
+	                }
+	                {% else %}
+	            	alert('请先登录');
+	                {% endif %}
+                {% else %}
+                alert('已闭市,请在开市时操作');
+                {% endif %}
+                
+            });
+            $( "#deal-link" ).click(function( event ) {
+            	{% if open_or_close %}
+	            	{% if user.is_authenticated %}
+					open_buy_dialog();
+	                {% else %}
+	                alert('请先登录')
+	                {% endif %}
+                {% else %}
+                alert('已闭市,请在开市时操作')
+                {% endif %}
+            });
+            $( "#sale-link" ).click(function( event ) {
+            	{% if open_or_close %}
+	            	{% if user.is_authenticated %}
+	            	open_sale_dialog();
+	                {% else %}
+	                alert('请先登录')
+	                {% endif %}
+                {% else %}
+                alert('已闭市,请在开市时操作')
+                {% endif %}
+            });
+            $( "#factory_sale-link" ).click(function( event ) {
+            	$( "#buy-dialog" ).dialog( "close" );
+            	$( "#sale-dialog" ).dialog( "close" );
+                $( "#factory_sale-dialog" ).dialog( "open" );
+                event.preventDefault();
+            });
+
+            function commitdata(){
+                $.ajax({
+                    cache: true,
+                    type: "POST",
+                    url:"{% url "tradingcenter:receive_data" %}",
+                    data:$('#dialogForm').serialize(),// 你的formid
+                    async: false,
+                    error: function(request) {
+                        alert("错误");
+                    },
+                    success: function(data) {
+                        console('传输成功');
+                    }
+                });
+            }
+            function commission_buy(){
+            	$.ajax({
+                    cache: true,
+                    type: "POST",
+                    url:"{% url "commission:commission_buy_test" %}",
+                    data:$('#commission_buy_form').serialize(),// 你的formid
+                    async: false,
+                    error: function(e) {
+                    	alert(e.responseText);
+                    },
+                    success: function(data) {
+                    	console.log('传输成功');
+                    }
+                });
+            }
+            function commission_sale(){
+                $.ajax({
+                    cache: true,
+                    type: "POST",
+                    url:"{% url "commission:commission_sale_test" %}",
+                    data:$('#commission_sale_form').serialize(),// 你的formid
+                    async: false,
+                    error: function(e) {
+                    	alert(e.responseText);
+                    },
+                    success: function(data) {
+                        console.log('传输成功');
+                    }
+                });
+            }
+            function factory_commission_sale(){
+                $.ajax({
+                    cache: true,
+                    type: "POST",
+                    url:"{% url "commission:factory_commission_sale" %}",
+                    data:$('#factory_sale_form').serialize(),// 你的formid
+                    async: false,
+                    error: function(e) {
+                        alert(e.responseText);
+                    },
+                    success: function(data) {
+                        console.log('传输成功');
+                    }
+                });
+            }
+
+            <!-- 连接pusher并绑定相关频道事件 -->
+            function updategrid(id,colname,newdata){
+                $("#jqGrid").jqGrid('setCell',id,colname,newdata,{background:'red'});
+                setTimeout("$('#jqGrid').jqGrid('setCell',"+id+",'"+colname+"','',{background:''});",500);
+                $("#new_product").jqGrid('setCell',id,colname,newdata,{background:'red'});
+                setTimeout("$('#new_product').jqGrid('setCell',"+id+",'"+colname+"','',{background:''});",500);
+                $("#buy_right").jqGrid('setCell',id,colname,newdata,{background:'red'});
+                setTimeout("$('#buy_right').jqGrid('setCell',"+id+",'"+colname+"','',{background:''});",500);
+                $("#sale_right").jqGrid('setCell',id,colname,newdata,{background:'red'});
+                setTimeout("$('#sale_right').jqGrid('setCell',"+id+",'"+colname+"','',{background:''});",500);
+                $("#self_pick").jqGrid('setCell',id,colname,newdata,{background:'red'});
+                setTimeout("$('#self_pick').jqGrid('setCell',"+id+",'"+colname+"','',{background:''});",500);
+            }
+            
+            /*var pusher = new Pusher('e666e112da02614bfea7', {
+                encrypted: true
+            });
+            var random_channel = pusher.subscribe('random_channel');
+            random_channel.bind('randomupdate', function(data) {
+                updategrid(data.message.id,data.message.name,data.message.value);
+            });
+            var push_channel = pusher.subscribe('push_channel');
+            push_channel.bind('pushupdate', function(data) {
+            	for(var i =0;i<data.length;i++){
+            		updategrid(data[i][0],data[i][1],data[i][2])
+            	}
+            });
+            push_channel.bind('pushadd', function(data) {
+            	$("#jqGrid").jqGrid('addRowData',data.id,data)
+            });*/
+
+
+            <!-- 生成表格 -->
+            function emptyformater(cellValue, options, rowdata, action) {
+                if (cellValue == ""){
+                    return "-";
+                }
+                if (cellValue == null || cellValue == 'null'){
+                    return "-";
+                }else{
+                	return cellValue;
+                }
+            }
+            function updownformater(cellValue, options, rowdata, action) {
+            	if(cellValue>0){
+                    cellValue = '<span style="color:#ff3232">+'+cellValue+'</span>'
+                }else if(cellValue<0){
+                    cellValue = '<span style="color:#50f850">'+cellValue+'</span>'
+                }else if(cellValue == "0"){
+                    cellValue = "0";
+                }else if (cellValue == null || cellValue == 'null'){
+                    cellValue = "-";
+                }else{
+                	cellValue = "-";
+                }
+                return cellValue;
+            }
+            function percentformater(cellValue, options, rowdata, action) {
+            	if(cellValue>0){
+            		cellValue = '<span style="color:#ff3232">+'+cellValue+'%</span>'
+            	}else if(cellValue<0){
+            		cellValue = '<span style="color:#50f850">'+cellValue+'%</span>'
+            	}else if(cellValue == "0"){
+            		cellValue =  "0";
+            	}else if (cellValue == null || cellValue == 'null'){
+                	cellValue = "-";
+            	}else{
+                	cellValue = "-";
+                }
+                return cellValue;
+            }
+            function linkformater(cellValue, options, rowdata, action) {
+            	return "<a class='name_link' href='"+rowdata.URL+"' target='_blank'>"+cellValue+"</a>";
+            }
+            //所有商品表格
+            $("#jqGrid").jqGrid({
+                url: "{% url "tradingcenter:trading_center_data" %}",
+                datatype: "json",
+                colModel: [
+                    { label: '序号', name: 'id', width: 5 , sorttype:'int', hidden:true, align:"left", frozen: true},
+                    { label: 'URL', name: 'url', width: 5 , sorttype:'string', hidden:true, align:"left", frozen: true},
+                    { label: '代码', name: 'product_symbol', width: 15 , align:"left", frozen: true, sorttype:'string'},
+                    { label: '名称', name: 'product_name', width: 35 , align:"left", frozen: true, sorttype:'string',formatter: linkformater},
+                    { label: '最新价', name: 'strike_price', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '涨跌', name: 'net_change', width: 10 , sorttype:"float",align:"center",formatter: updownformater},
+                    { label: '涨跌幅', name: 'net_change_rise', width: 10 , sorttype:"string",align:"center",formatter: percentformater},
+                    { label: '买价', name: 'bid_price', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '卖价', name: 'ask_price', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '买量', name: 'bid_vol', width: 10 , sorttype:"int",align:"center",formatter: emptyformater},
+                    { label: '卖量', name: 'ask_vol', width: 10 , sorttype:"int",align:"center",formatter: emptyformater},
+                    { label: '开盘', name: 'opening_price', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '昨收', name: 'closing_price', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '最高价', name: 'high', width: 10, sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '最低价', name: 'low', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '成交量', name: 'volume', width: 10 , sorttype:"int",align:"center",formatter: emptyformater},
+                    { label: '成交额', name: 'total', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '市值', name: 'market_capitalization', width: 10 ,hidden:true, sorttype:"string",align:"center",formatter: emptyformater},
+                ],
+                width:screen.width-1,
+                height:screen.height-275,
+                loadonce:true,
+                multiselect: true,
+                multiboxonly: true,
+                rowNum: 999999,
+                gridComplete: initContextMenu
+            });
+            //有进货权表格
+            $("#buy_right").jqGrid({
+                url: "{% url "tradingcenter:trading_center_buy_right_data" %}",
+                datatype: "json",
+                colModel: [
+                    { label: '序号', name: 'id', width: 5 , sorttype:'int', hidden:true, align:"left", frozen: true},
+                    { label: 'URL', name: 'url', width: 5 , sorttype:'string', hidden:true, align:"left", frozen: true},
+                    { label: '代码', name: 'product_symbol', width: 15 , align:"left", frozen: true, sorttype:'string'},
+                    { label: '名称', name: 'product_name', width: 35 , align:"left", frozen: true, sorttype:'string',formatter: linkformater},
+                    { label: '最新价', name: 'strike_price', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '涨跌', name: 'net_change', width: 10 , sorttype:"float",align:"center",formatter: updownformater},
+                    { label: '涨跌幅', name: 'net_change_rise', width: 10 , sorttype:"string",align:"center",formatter: percentformater},
+                    { label: '买价', name: 'bid_price', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '卖价', name: 'ask_price', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '买量', name: 'bid_vol', width: 10 , sorttype:"int",align:"center",formatter: emptyformater},
+                    { label: '卖量', name: 'ask_vol', width: 10 , sorttype:"int",align:"center",formatter: emptyformater},
+                    { label: '开盘', name: 'opening_price', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '昨收', name: 'closing_price', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '最高价', name: 'high', width: 10, sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '最低价', name: 'low', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '成交量', name: 'volume', width: 10 , sorttype:"int",align:"center",formatter: emptyformater},
+                    { label: '成交额', name: 'total', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '市值', name: 'market_capitalization', width: 10 , hidden:true, sorttype:"string",align:"center",formatter: emptyformater},
+                ],
+                width:screen.width-1,
+                height:screen.height-298,
+                loadonce:true,
+                multiselect: true,
+                multiboxonly: true,
+                rowNum: 999999
+            });
+            //有出售权表格
+            $("#sale_right").jqGrid({
+                url: "{% url "tradingcenter:trading_center_sale_right_data" %}",
+                datatype: "json",
+                colModel: [
+                    { label: '序号', name: 'id', width: 5 , sorttype:'int', hidden:true, align:"left", frozen: true},
+                    { label: 'URL', name: 'url', width: 5 , sorttype:'string', hidden:true, align:"left", frozen: true},
+                    { label: '代码', name: 'product_symbol', width: 15 , align:"left", frozen: true, sorttype:'string'},
+                    { label: '名称', name: 'product_name', width: 35 , align:"left", frozen: true, sorttype:'string',formatter: linkformater},
+                    { label: '最新价', name: 'strike_price', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '涨跌', name: 'net_change', width: 10 , sorttype:"float",align:"center",formatter: updownformater},
+                    { label: '涨跌幅', name: 'net_change_rise', width: 10 , sorttype:"string",align:"center",formatter: percentformater},
+                    { label: '买价', name: 'bid_price', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '卖价', name: 'ask_price', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '买量', name: 'bid_vol', width: 10 , sorttype:"int",align:"center",formatter: emptyformater},
+                    { label: '卖量', name: 'ask_vol', width: 10 , sorttype:"int",align:"center",formatter: emptyformater},
+                    { label: '开盘', name: 'opening_price', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '昨收', name: 'closing_price', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '最高价', name: 'high', width: 10, sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '最低价', name: 'low', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '成交量', name: 'volume', width: 10 , sorttype:"int",align:"center",formatter: emptyformater},
+                    { label: '成交额', name: 'total', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '市值', name: 'market_capitalization', width: 10 , hidden:true, sorttype:"string",align:"center",formatter: emptyformater},
+                ],
+                width:screen.width-1,
+                loadonce:true,
+                height:screen.height-298,
+                multiselect: true,
+                multiboxonly: true,
+                rowNum: 999999
+            });
+            //新品表格
+            $("#new_product").jqGrid({
+                url: "{% url "tradingcenter:trading_center_new_product_data" %}",
+                datatype: "json",
+                colModel: [
+                    { label: '序号', name: 'id', width: 5 , sorttype:'int', hidden:true, align:"left", frozen: true},
+                    { label: 'URL', name: 'url', width: 5 , sorttype:'string', hidden:true, align:"left", frozen: true},
+                    { label: '代码', name: 'product_symbol', width: 15 , align:"left", frozen: true, sorttype:'string'},
+                    { label: '名称', name: 'product_name', width: 35 , align:"left", frozen: true, sorttype:'string',formatter: linkformater},
+                    { label: '最新价', name: 'strike_price', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '涨跌', name: 'net_change', width: 10 , sorttype:"float",align:"center",formatter: updownformater},
+                    { label: '涨跌幅', name: 'net_change_rise', width: 10 , sorttype:"string",align:"center",formatter: percentformater},
+                    { label: '买价', name: 'bid_price', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '卖价', name: 'ask_price', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '买量', name: 'bid_vol', width: 10 , sorttype:"int",align:"center",formatter: emptyformater},
+                    { label: '卖量', name: 'ask_vol', width: 10 , sorttype:"int",align:"center",formatter: emptyformater},
+                    { label: '开盘', name: 'opening_price', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '昨收', name: 'closing_price', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '最高价', name: 'high', width: 10, sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '最低价', name: 'low', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '成交量', name: 'volume', width: 10 , sorttype:"int",align:"center",formatter: emptyformater},
+                    { label: '成交额', name: 'total', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '市值', name: 'market_capitalization', width: 10 , hidden:true, sorttype:"string",align:"center",formatter: emptyformater},
+                ],
+                width:screen.width-1,
+                loadonce:true,
+                height:screen.height-298,
+                multiselect: true,
+                multiboxonly: true,
+                rowNum: 999999
+            });
+            //自选表格
+            $("#self_pick").jqGrid({
+                url: "{% url "tradingcenter:trading_center_self_pick_data" %}",
+                datatype: "json",
+                colModel: [
+                    { label: '序号', name: 'id', width: 5 , sorttype:'int', hidden:true, align:"left", frozen: true},
+                    { label: 'URL', name: 'url', width: 5 , sorttype:'string', hidden:true, align:"left", frozen: true},
+                    { label: '代码', name: 'product_symbol', width: 15 , align:"left", frozen: true, sorttype:'string'},
+                    { label: '名称', name: 'product_name', width: 35 , align:"left", frozen: true, sorttype:'string',formatter: linkformater},
+                    { label: '最新价', name: 'strike_price', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '涨跌', name: 'net_change', width: 10 , sorttype:"float",align:"center",formatter: updownformater},
+                    { label: '涨跌幅', name: 'net_change_rise', width: 10 , sorttype:"string",align:"center",formatter: percentformater},
+                    { label: '买价', name: 'bid_price', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '卖价', name: 'ask_price', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '买量', name: 'bid_vol', width: 10 , sorttype:"int",align:"center",formatter: emptyformater},
+                    { label: '卖量', name: 'ask_vol', width: 10 , sorttype:"int",align:"center",formatter: emptyformater},
+                    { label: '开盘', name: 'opening_price', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '昨收', name: 'closing_price', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '最高价', name: 'high', width: 10, sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '最低价', name: 'low', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '成交量', name: 'volume', width: 10 , sorttype:"int",align:"center",formatter: emptyformater},
+                    { label: '成交额', name: 'total', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '市值', name: 'market_capitalization', width: 10 , hidden:true, sorttype:"string",align:"center",formatter: emptyformater},
+                ],
+                width:screen.width-1,
+                loadonce:true,
+                height:screen.height-298,
+                multiselect: true,
+                multiboxonly: true,
+                rowNum: 999999,
+            });
+            <!--给表格绑定右键菜单-->
+            function initContextMenu() {
+            	//绑定右键菜单
+                $(".jqgrow", "#jqGrid").contextMenu('contextMenu', {
+                    bindings: {
+                        'add_self_pick': function (t) {
+                        	{% if user.is_authenticated %}
+                            add_self_pick();
+                            {% else %}
+                            alert('请先登录')
+                            {% endif %}
+                        },
+                        'go_to_buy': function (t) {
+                        	go_to_buy();
+                        },
+                
+                    },
+                    onContextMenu: function (e, menu) {
+                    	var rowId = e.target.parentElement.id;
+                    	$("#jqGrid").resetSelection();
+                        $("#jqGrid").setSelection(rowId);
+                        return true;
+                    }
+                });
+                //绑定右键菜单
+                $("#self_pick").contextMenu('contextMenu1', {
+                    bindings: {
+                        'remove_self_pick': function (t) {
+                        	{% if user.is_authenticated %}
+                            remove_self_pick();
+                            {% else %}
+                            alert('请先登录')
+                            {% endif %}
+                        }
+                    },
+                    onContextMenu: function (event, menu) {
+                        return true;
+                    }
+                });
+                //鼠标滑过事件
+                //$('#jqGrid').mouseover(function(e) {
+                //    var rowId = e.target.parentElement.id;
+                //    console.log('You rolled over ' + rowId);
+                //  });
+
+                function add_self_pick() {
+                    var grid = $("#jqGrid");
+                    var rowKey = grid.jqGrid('getGridParam','selarrrow');
+                    if(rowKey.length>0 && rowKey[0]){
+                    	var postdata = JSON.stringify(rowKey);
+                        $.ajax({
+                            cache: true,
+                            type: "POST",
+                            url:"{% url "tradingcenter:add_self_pick" %}",
+                            data:{products:rowKey,csrfmiddlewaretoken:'{{ csrf_token }}'},// 你的formid
+                            async: false,
+                            error: function(e) {
+                                alert(e.responseText);
+                            },
+                            success: function(data) {
+                                console.log('传输成功');
+                            }
+                        });
+                        //grid.delGridRow(rowKey);
+                    }else{
+                        alert("请选择一个商品");
+                    }
+                }
+                
+                function go_to_buy() {
+                	var grid = $("#jqGrid");
+                    var rowKey = grid.jqGrid('getGridParam','selarrrow');
+                    window.open('redirect-to-buy/'+rowKey[0], '_blank');
+                }
+                
+                function remove_self_pick() {
+                    var grid = $("#self_pick");
+                    var rowKey = grid.jqGrid('getGridParam','selarrrow');
+                    if (rowKey.length>0) {
+                        var postdata = JSON.stringify(rowKey);
+                        $.ajax({
+                            cache: true,
+                            type: "POST",
+                            url:"{% url "tradingcenter:remove_self_pick" %}",
+                            data:{products:rowKey,csrfmiddlewaretoken:'{{ csrf_token }}'},// 你的formid
+                            async: false,
+                            error: function(e) {
+                                alert(e.responseText);
+                            },
+                            success: function(data) {
+                            	while(rowKey.length>0){
+                            		$("#self_pick").jqGrid("delRowData",rowKey[0]);
+                            	}
+                                console.log('传输成功');
+                            }
+                        });
+                    }
+                    else {
+                        alert("请选择一个商品");
+                    }
+                }
+
+                $('.ui-th-column:contains("代码")').css('text-align','left');
+                $('.ui-th-column:contains("名称")').css('text-align','left');
+            }
+
+            //wait message from the server.
+            pomelo.on('onMsg', function(data) {
+
+                var json_data = eval("(" + data.message + ")");
+
+                if(json_data.task == "update"){
+                    for(var i =0;i<json_data.data.length;i++){
+                    	if(json_data.data[i][0]==""){
+                    		if(json_data.data[i][1]=="total_num"){
+                    			$('#total_num').html(json_data.data[i][2])
+                    		}else if(json_data.data[i][1]=="total_price"){
+                    			var total_price = parseFloat(json_data.data[i][2]);
+                    			if(total_price>10000){
+                    				total_price = (total_price/10000).toFixed(2)+"万";
+                    			} 
+                    			$('#total_price').html(total_price);
+                    		}
+                    	}else{
+                    	    updategrid(json_data.data[i][0],json_data.data[i][1],json_data.data[i][2])
+                    	}
+                    }
+                } else if(json_data.task == "add"){
+                    $("#jqGrid").jqGrid('addRowData',data.id,data)
+                }else if(json_data.task == "changemoney"){
+                	if(json_data.data[0]=={{user.id}}){
+               		   $("#user_balance").html(json_data.data[1]);
+               	    }   
+                }
+
+            });
+
+            //update user list
+            pomelo.on('onLeave', function(data) {
+                
+            });
+
+
+            //handle disconect message, occours when the client is disconnect with servers
+            pomelo.on('disconnect', function(reason) {
+                //TODO
+            });
+
+            // TODO
+            var username = getUid();
+
+            //query entry of connection
+            queryEntry(username, function(host, port) {
+                pomelo.init({
+                    host: host,
+                    port: port,
+                    log: true
+                }, function() {
+                    var route = "connector.entryHandler.enter";
+                    pomelo.request(route, {
+                        uid: username
+                    }, function(data) {
+
+                        console.log(data);
+
+                        if(data.error) {
+                            showError(ERROR_SERVER);
+                            return;
+                        }
+                        
+                    });
+                });
+            });
+        });
+    
+    </script>
+
+    <script type="text/javascript" src="{% static "js/lib/build/build.js" %}" ></script>
+    <script type="text/javascript">require('boot');</script> 
+    <script type="text/javascript" src="{% static "js/client.js" %}"></script>
+    <script>
+        //获取浏览器页面可见高度和宽度
+        var _PageHeight = document.documentElement.clientHeight,
+                _PageWidth = document.documentElement.clientWidth;
+        //计算loading框距离顶部和左部的距离（loading框的宽度为215px，高度为61px）
+        var _LoadingTop = _PageHeight > 61 ? (_PageHeight - 61) / 2 : 0,
+                _LoadingLeft = _PageWidth > 215 ? (_PageWidth - 215) / 2 : 0;
+        //在页面未加载完毕之前显示的loading Html自定义内容
+        var _LoadingHtml = '<div id="loadingDiv" style="position:absolute;left:0;width:100%;height:' + _PageHeight + 'px;top:0;background:#000;z-index:10000;"><div style="position: absolute; cursor1: wait; left: ' + _LoadingLeft + 'px; top:' + _LoadingTop + 'px; width: auto; height: 120px; line-height: 120px;margin: auto; padding-left: 50px;color: #696969;font-size: 24px; font-family:\'Microsoft YaHei\';">正在加载中，请稍候</div></div>';
+        //呈现loading效果
+        document.write(_LoadingHtml);
+
+        //window.onload = function () {
+        //    var loadingMask = document.getElementById('loadingDiv');
+        //    loadingMask.parentNode.removeChild(loadingMask);
+        //};
+
+        //监听加载状态改变
+        document.onreadystatechange = completeLoading;
+
+        //加载状态为complete时移除loading效果
+        function completeLoading() {
+            if (document.readyState == "complete") {
+                var loadingMask = document.getElementById('loadingDiv');
+                loadingMask.parentNode.removeChild(loadingMask);
+            }
+        }
+    </script>
+</head>
+<body style="margin:0px;padding:0px;overflow-y:hidden">
+<div >
+    <div class="tradinghall-top fix" style="overflow:hidden;">
+        <div class="trading-logobar fix">
+            <div class="trading-logobar-left l fix">
+                <div class="logobar-img l">
+                    <a href="{% url 'promotions:home' %}">
+                        <img  src="{% static "images/logo.png" %}"/>
+                    </a>
+                </div>
+                <div class="logobar-notice l">
+                    <a href="{% url 'promotions:home' %}">
+                        返回首页
+                    </a>
+                    <div>
+                       {{open_close_msg}}
+                    </div>
+                </div>
+            </div>
+            <div class="trading-logobar-right r">
+                <ul class="fix">
+                    {% if user.is_authenticated %}
+                    <li>{{user}}</li>
+                    {% else %}
+                    <li><a href="{% url "accounts:login" %}">登录</a></li>
+                    <li><a href="{% url "accounts:register" %}">注册</a></li>
+                    {% endif %}
+                    <li><a href="{% url 'customer:stock' %}">我的存货</a></li>
+                    <li><a href="{% url 'customer:assets' %}">我的资产</a></li>
+                    {% if user.is_authenticated %}
+                    <li>可用金额：<span id="user_balance">{{ user_balance.balance | floatformat:2 }}</span>元</li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div id="tabs" style="padding:0; border:0;">
+        <ul style="padding-top:0;padding-left:0; border-bottom:0;" id="select-qqq">
+            <li class="qqq" id="slect-gray" style="margin-left:10px" onclick="javascript:set_cur_tab('1')"><a href="#tabs-1">所有商品</a></li>
+            <li class="qqq" onclick="javascript:set_cur_tab('2')"><a href="#tabs-2">一周新品</a></li>
+            <li class="qqq" onclick="javascript:set_cur_tab('3')"><a href="#tabs-3">有进货权商品</a></li>
+            <li class="qqq" onclick="javascript:set_cur_tab('4')"><a href="#tabs-4">有出售权商品</a></li>
+            <li class="qqq" onclick="javascript:set_cur_tab('5')"><a href="#tabs-5">自选板块</a></li>
+            <div style="float:right;">
+                <button id="buy-link" class="button orange" style=" color:#FFF; float:left; margin-right:50px;">购买</button>
+                <button id="deal-link" class="button orange" style=" color:#FFF; float:left; margin-right:5px;">进货</button>
+                <button id="sale-link" class="button orange" style="color:#FFF;float:left; margin-right:5px;">出售</button>
+                <button id="factory_sale-link" class="button orange" style="color:#FFF;float:left; margin-right:50px;">商家出售</button>
+                <select id='setcolumn' multiple="multiple">
+                    <option value="product_symbol" selected="selected">代码</option>
+                    <option value="product_name" selected="selected">名称</option>
+                    <option value="strike_price" selected="selected">最新价</option>
+                    <option value="net_change" selected="selected">涨跌</option>
+                    <option value="net_change_rise" selected="selected">涨跌幅</option>
+                    <option value="bid_price" selected="selected">买价</option>
+                    <option value="ask_price" selected="selected">卖价</option>
+                    <option value="bid_vol" selected="selected">买量</option>
+                    <option value="ask_vol" selected="selected">卖量</option>
+                    <option value="opening_price" selected="selected">开盘</option>
+                    <option value="closing_price" selected="selected">昨收</option>
+                    <option value="high" selected="selected">最高价</option>
+                    <option value="low" selected="selected">最低价</option>
+                    <option value="volume" selected="selected">成交量</option>
+                    <option value="total" selected="selected">成交额</option>
+                    <option value="market_capitalization">市值</option>
+                </select>
+                <div class="titlebar-right r fix">
+                    <div class="titlebar-searchbox l">
+                        <select name="product_category" id="category_list" style="width:85px;line-height:26px">
+                            <option class="category_list_option" value="">全部</option>
+                            {% for category in categorys %}
+								<option class="category_list_option" value="{{category.id}}">{{category.name}}</option>
+								{% for cate in category.get_children %}
+								    <option class="category_list_option" value="{{cate.id}}">　{{cate.name}}</option>
+								        {% for c in cate.get_children %}
+								            <option class="category_list_option" value="{{c.id}}">　　{{c.name}}</option>
+								        {% endfor %}
+								{% endfor %}
+                            {% endfor %}
+						</select>
+                        <input id="keyWords" type="text" placeholder="商品编号/商品名称" class="sousuo"/>
+                        <input id="searchbutton" type="button" class="sousuo-btn" onclick="javascript:searchproduct()"/>
+                    </div>
+                </div>
+            </div>
+            
+            
+        </ul>
+        <script>
+            $(function(){
+                $("#tabs ul li").click(function(){
+                    $(this).attr('id',"slect-gray").siblings().removeAttr("id");
+                }); 
+            })
+        </script>
+        <div id="tabs-1">
+            <table id="jqGrid" style="margin-bottom:35px"></table>
+            <div id="pager"></div>
+        </div>
+        <div id="tabs-2">
+            <table id="new_product" style="margin-bottom:35px"></table>
+        </div>
+        <div id="tabs-3">
+            <table id="buy_right" style="margin-bottom:35px"></table>
+        </div>
+        <div id="tabs-4">
+            <table id="sale_right" style="margin-bottom:35px"></table>
+        </div>
+        <div id="tabs-5">
+            <table id="self_pick" style="margin-bottom:35px"></table>
+        </div>
+    </div>
+    <div class="tradinghall-bottom right" style="position:fixed;z-index:999;bottom:0;width:100%;">
+        <span>成交总量</span>&nbsp;&nbsp;
+        <span id="total_num">{{total_num}}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+        <span>成交总额</span>&nbsp;&nbsp;
+        <span id="total_price" style="margin-right:20px;">{{total_price}}</span>
+    </div>
+</div>
+<div id="dialog" title="Dialog Title">
+    <form id="dialogForm">
+      {% csrf_token %}
+      <div>名称:<input type="text" name="name" value="1" id="a" /></div>
+      <div>数量:<input type="text" name="num" value="2" id="b" /></div>
+    </form>
+</div>
+<div id="buy-dialog" title="进货">
+    <div class="jiaoyi-up l">
+        <div class="trading-table">
+            <table style="position: absolute;top: 0;left: 0;width: 780px; text-align: center;z-index: 20;">
+		        <thead>
+		        <tr>
+		            <td width="70px">商品编号</td>
+		            <td width="250px">商品名称</td>
+		            <td width="67px">最新价(元)</td>
+		            <td width="100px">价格区间</td>
+		            <td width="100px">买入价(元)</td>
+		            <td width="60px">可进货量</td>
+		            <td width="80px">数量</td>
+		            <td width="80px">金额(元)</td>
+		            <td width="40px">操作</td>
+		        </tr>
+		        </thead>
+		    </table>
+            <table id="trading_table" style="margin-top: 28px;margin-right: 30px;">
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+        <div id="deal_err_msg">
+        </div>
+        <div class="settlement fix">
+            <div class="settlement-infor fix">
+                <div class="r">
+                    总价（不含运费包装费）：<span>￥600</span>&nbsp;&nbsp;&nbsp;元
+                </div>
+                <div class="r">
+                    已选择<span>6</span>件商品&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                </div>
+            </div>
+            <div class="settlement-mima fix">
+                <div class="r">
+                    <a class="tender" onclick="javascript:submit_buy();return false;">提交</a>
+                    <a class="cancel">取消</a>
+                </div>
+                <div class="ii r">
+                    <input type="text" class="ii-input" onfocus="OnfocusFun1(this,'')" onblur="OnBlurFun1(this,'')"/>
+                </div>
+                <div class="r">
+                    请输入资金密码：
+                </div>
+            </div>
+            <div class="trading-notice">
+                <img src="{% static "images/jiaoyi-notice.png" %}"/>
+                <span>余额不足，请</span>
+                <a>充值</a>
+            </div>
+        </div>
+        <div id="buy_dialog_bottom" style="display:none"></div>
+    </div>
+</div>
+<div id="sale-dialog" title="出售">
+    <div class="jiaoyi-up l">
+        <div class="sale-table">
+            <table style="position: absolute;top: 0;left: 0;width: 780px; text-align: center;margin-right: 30px;">
+                <thead>
+                <tr>
+                    <td width="70px">商品编号</td>
+                    <td width="250px">商品名称</td>
+                    <td width="67px">最新价(元)</td>
+                    <td width="100px">价格区间</td>
+                    <td width="100px">出售价(元)</td>
+                    <td width="60px">可出售量</td>
+                    <td width="80px">数量</td>
+                    <td width="80px">金额(元)</td>
+                    <td width="40px">操作</td>
+                </tr>
+                </thead>
+            </table>
+            <table id="sale_table" style="margin-top: 28px;margin-right: 30px;">
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+        <div id="sale_err_msg">
+        </div>
+        <div class="settlement fix">
+            <div class="settlement-infor fix">
+                <div class="r">
+                    总价（不含运费包装费）：<span>￥600</span>&nbsp;&nbsp;&nbsp;元
+                </div>
+                <div class="r">
+                    已选择<span>6</span>件商品&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                </div>
+            </div>
+            <div class="settlement-mima fix">
+                <div class="r">
+                    <a class="tender" onclick="javascript:submit_sale();return false;">提交</a>
+                    <a class="cancel">取消</a>
+                </div>
+                <div class="ii r">
+                    <input type="text" class="ii-input" onfocus="OnfocusFun1(this,'')" onblur="OnBlurFun1(this,'')"/>
+                </div>
+                <div class="r">
+                    请输入资金密码：
+                </div>
+            </div>
+            <div class="trading-notice">
+                <img src="{% static "images/jiaoyi-notice.png" %}"/>
+                <span>余额不足，请</span>
+                <a>充值</a>
+            </div>
+        </div>
+        <div id="sale_dialog_bottom" style="display:none"></div>
+    </div>
+</div>
+
+<div id="factory_sale-dialog" title="商家卖货">
+    <form id="factory_sale_form">
+      {% csrf_token %}
+      {{ commission_sale_form.as_p }}
+    </form>
+</div>
+<div class="contextMenu" id="contextMenu" style="display:none; width:400px;">
+    <ul class="contextMenu-ul">
+        <li id="add_self_pick">
+            <span class="right-click" style="font-size:100%;">加入自选</span>
+        </li>
+        <li class="right-click" id="go_to_buy">
+            <span style="font-size:100%;">详情</span>
+        </li>
+    </ul>
+</div>
+<div class="contextMenu1" id="contextMenu1" style="display:none; width:400px;">
+    <ul class="contextMenu-ul">
+        <li id="remove_self_pick">
+            <span style="font-size:100%;">移出自选板块</span>
+        </li>
+    </ul>
+</div>
+</body>

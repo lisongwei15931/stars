@@ -1,0 +1,5 @@
+{% load django_tables2 %}
+{% load i18n %}
+ <a class="btn btn-info" href="{% url 'dashboard:businessproduct-update-pk' pk=record.id %}{% querystring %}">编辑</a>
+ <a class="btn btn-default" href="{% url 'dashboard:businessproduct-delete' pk=record.id %}{% querystring %}">删除</a>
+

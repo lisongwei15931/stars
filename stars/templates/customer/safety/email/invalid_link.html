@@ -1,0 +1,23 @@
+{% extends "customer/safety/account_no_left_nav_base.html" %}
+{% load staticfiles %}
+{% load compress %}
+
+{%  block title %}蓝图百货--账户安全-链接失效{%  endblock title %}
+
+{% block onbodyload %}
+    <!--账户安全--邮箱body start-->
+        <div class="account-item-body1 container fix">
+        <div class="account-item-con" id="content">
+            <div class="account-item-tit">
+                <a href="{% url 'customer:safety-center' %}">账户安全&nbsp;>&nbsp;</a>
+                <span>链接失效</span>
+            </div>
+            <div class="account-item-matter account-item-matter1">
+                <img src="{% static "images/sub-false.png" %} "/>
+                <span>链接失效</span>
+
+            </div>
+        </div>
+    </div>
+    <!--账户安全--邮箱body end-->
+{% endblock %}

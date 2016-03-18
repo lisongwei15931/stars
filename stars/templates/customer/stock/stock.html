@@ -1,0 +1,258 @@
+{% extends "customer/account_base.html" %}
+{% load staticfiles %}
+{% load compress %}
+
+{% block custom_css %}<link rel="stylesheet" href="{% static "css/account2.css" %}" type="text/css">{% endblock %}
+{% block title %}蓝图百货--我的账户--我的存货{% endblock title %}
+
+{% block oncontentload %}
+    {{ block.super }}
+    <div class="account-cont-right account-cont-right1 l">
+        <div class="details" id="detailMy">
+            <div class="title-acct title-acct2 fix">
+                <span class="l">我的存货</span>
+            </div>
+            <ul class="accTitle">
+                <form action="." method="get">
+                    <li style="width:180px;">关键字：<input type="text" name="search_keyword" class="keyWords" value="{{ search_keyword }}"/></li>
+                    <li style="width:550px;">
+                    <p style="float:left; height:23px; line-height:23px;">成交方式：</p>
+                    <div id="barWrap">
+                        <input id="c_type" type="button" value="" class="bargin">
+                        <ul class="bargin_box">
+                            <li><input type="checkbox" id="buy_checkbox" name="search_buy" style="vertical-align:middle; margin-right:4px;" />购买</li>
+                            <li><input type="checkbox" id="stock_checkbox" name="search_stock" style="vertical-align:middle; margin-right:5px"/>进货</li>
+                        </ul>
+                    </div>
+                    <input type="submit" value="搜索" style="width:42px; height:23px; line-height:21px; text-align:center; background-color:#c00000; border:0; color:#fff; cursor:pointer; margin-left:5px;"/>	
+
+                    </li>
+                </form>
+                <li style="width:200px">排序：&nbsp;<a {% if order == 'ascending' %}href="?sort_key=product_name&order=descending{{ order_extra_link_key }}" {% if sort_key == 'product_name' %}class="current down"{% endif %}{% else %}href="?sort_key=product_name&order=ascending{{ order_extra_link_key }}" {% if sort_key == 'product_name' %}class="current up"{% endif %}{% endif %} >商品名称</a>&nbsp;<a  {% if order == 'ascending' %}href="?sort_key=strike_price&order=descending{{ order_extra_link_key }}" {% if sort_key == 'strike_price' %}class="current down"{% endif %}{% else %}href="?sort_key=strike_price&order=ascending{{ order_extra_link_key }}" {% if sort_key == 'strike_price' %}class="current up"{% endif %}{% endif %} >最新价</a></li>
+            </ul>
+            <div style="text-align:right; color:#999; margin-bottom:10px;">每页20条&nbsp;共<span style="color:#c00000;">{{ data_number }}</span>条信息</div>
+            <table class="myBox" cellpadding="0"  cellspacing="0">
+                <tr style="background-color:#eee;">
+                    <!--<th width="50"><input type="checkbox" id="selectAll" class="selectAll" style=" vertical-align:middle; margin-right:3px;"/>全选</th>-->
+                    <th width="65">商品编号</th>
+                    <th width="167">商品名称</th>
+                    <th width="60">成交方式</th>
+                    <th width="55">成本价</th>
+                    <th width="70">最新价</th>
+                    <th width="60">商品余量</th>
+                    <th width="55">可卖量</th>
+                    <th width="50">可提量</th>
+                    <th width="75">剩余进货权</th>
+                    <th width="45">增值</th>
+                    <th width="60">增值比例</th>
+                    <th width="50">市值</th>
+                    <th width="">操作</th>
+                </tr>
+                {% for data in stock_buy_list %}
+                <tr>
+                    <!--<td class="firstTd"><input type="checkbox" class="user_product_id" style=" vertical-align:middle; margin-right:6px;" value="{{ data.id }}"/>{{ forloop.counter0|add:'1' }}</td>-->
+                    <td>{{ data.product.upc }}</td>
+                    <td>{{ data.product.title }}</td>
+                    {% if data.trade_type == 1 %}
+                        <td>购买</td>
+                    {% else %}
+                        <td>进货</td>
+                    {% endif %}
+                    <td>{{ data.overage_unit_price|floatformat:2 }}</td>
+                    <td>{{ data.strike_price|floatformat:2 }}</td>
+                    <td id="{{ data.product.id }}_eq">{{ data.quantity }}</td>
+                    {% if data.trade_type == 1 %}
+                        <td>—</td>
+                    {% else %}
+                        <td>{{ data.can_sale_quantity }}</td>
+                    {% endif %}
+                    <td>{{ data.can_pickup_quantity }}</td>
+                    {% if data.trade_type == 2 and data.quote_quantity == 0 %}
+                        <td>—</td>
+                    {% else %}
+                        <td>{{ data.quote_quantity }}</td>
+                    {% endif %}
+                    {% if data.trade_type == 1 %}
+                        <td>—</td>
+                        <td>—</td>
+                    {% else %}
+                        <td>{{ data.added_value|floatformat:2 }}</td>
+                        <td>{{ data.added_value_ratio }}%</td>
+                    {% endif %}
+                    {% if data.trade_type == 1 %}
+                        <td>—</td>
+                    {% else %}
+                        <td>{{ data.market_price|floatformat:2 }}</td>
+                    {% endif %}
+                    <td class="operate"><span class="pickup_one" product="{{ data.id }}">提货</span><span>{% if data.trade_type == 2 %}出售{% else %}进货{% endif %}</span></td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <!--<td></td>-->
+                    <td>合计</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>{{ total_added_value|floatformat:2 }}</td>
+                    <td></td>
+                    <td></td>
+                    <td class="operate"></td>
+                </tr>
+            </table>
+            <!--<div class="selectAll2"><span class="firstSpan"><input type="checkbox" class="selectAll" style="vertical-align:middle; margin-right:3px;"/>全选</span><span id="pickup_all" onclick="javascript:pickup_product();return false;">提货</span><span>进货</span><span>出售</span></div>-->
+            <!--翻页-->
+            <div class="page-public center" id="pageList">
+                <a href="?page=1{{ page_extra_link_key }}"class="txt" id="first">首页</a>
+                {% if stock_buy_list.has_previous %}
+                <a class="txt" href="?page={{ stock_buy_list.previous_page_number }}{{ page_extra_link_key }}" id="prev">上一页</a>
+                {% endif %}
+                {% for page_number in stock_buy_list.paginator.page_range %}
+                {% ifequal page_number  stock_buy_list.number %}
+                    <a class="num active" href="?page={{ page_number }}{{ page_extra_link_key }}">{{ page_number }}</a>
+                {% else %}
+                    <a class="num" href="?page={{ page_number }}{{ page_extra_link_key }}">{{ page_number }}</a>
+                {% endifequal %}
+                {% endfor %}
+                {% if stock_buy_list.has_next %}
+                <a class="txt" href="?page={{ stock_buy_list.next_page_number }}{{ page_extra_link_key }}" id="next">下一页</a>
+                {% endif %}
+                <a class="txt" id="last" href="?page=-1">尾页</a>共<span>{{ stock_buy_list.paginator.num_pages }}</span>页
+                到第<input id="page_num" type="text" value="{{ stock_buy_list.number }}" style="vertical-align:middle; line-height:28px;"/>页
+                <a class="txt" onclick="javascript:change_page();return false;" href="#">确认</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block index_script %}
+{{block.super}}
+{% endblock %}
+
+{% block footer_extra_script %}
+    <script type="text/javascript">
+        String.prototype.replaceAll = function(reallyDo, replaceWith, ignoreCase) {  
+            if (!RegExp.prototype.isPrototypeOf(reallyDo)) {  
+                return this.replace(new RegExp(reallyDo, (ignoreCase ? "gi": "g")), replaceWith);  
+            } else {  
+                return this.replace(reallyDo, replaceWith);  
+            }  
+        }
+        window.onload = function(){
+            $(".footer-menu").find("li").eq(-1).children("span").css("display","none");
+        };
+        function change_page(){
+		    page = $('#page_num').val();
+		    window.location.href = "?page="+page+"{{ page_extra_link_key }}".replaceAll('&amp;', '&');
+        }
+        function pickup_product(){
+            user_product_id_checked = $('.user_product_id:checked');
+            user_product_id_list = new Array();
+            for (var i=0;i<user_product_id_checked.length;i++) {
+                var user_product_id = $(user_product_id_checked[i]).val();
+                user_product_id_list.push(user_product_id);
+            }
+            $.ajax({
+                type: "GET",
+                data: {'user_product_id_list': user_product_id_list},
+                url: "{% url 'customer:pickup_set' %}",
+                success: function (data) {
+                    if (data.result) {
+                        window.location.href = "{% url 'customer:pickup_apply' %}"
+                    }
+                    else {
+                        alert('没有选中任何存货。')
+                    }
+                }
+            })
+        }
+        $('.pickup_one').click(function() {
+            var user_product_id = $(this).attr('product');
+            user_product_id_list = new Array();
+            user_product_id_list.push(user_product_id);
+            $.ajax({
+                type: "GET",
+                data: {'user_product_id_list': user_product_id_list},
+                url: "{% url 'customer:pickup_set' %}",
+                success: function (data) {
+                    if (data.result) {
+                        window.location.href = "{% url 'customer:pickup_apply' %}"
+                    }
+                    else {
+                        alert('没有选中任何存货。')
+                    }
+                }
+            })
+        })
+        $(function(){
+			//全选
+			$(".selectAll").click(function(){
+				if($(this).prop("checked")){//如果选中
+                    $(".myBox tr td input").prop("checked",true)	
+                    $(".selectAll").prop("checked",true)	
+				}else{// 如果取消
+                    $(".myBox tr td input").prop("checked",false)	
+                    $(".selectAll").prop("checked",false)	
+				}
+				});
+			$(".bargin_box li input").prop("checked",false);
+			//成交方式
+			//点击button的时候，显示ul
+			$(".bargin").click(function(){
+                $(".bargin_box").show();
+            });
+				//选中改变值，将选中的值添加给button按钮进行显示
+            $(".bargin_box input").click(function(){
+                var val="";//用于记录选中的值
+                var isAll=true;//默认是全选中
+                $(".bargin_box li input").each(function(){//便利每一个checkbox
+                    if($(this).prop("checked")){
+                        val=val+$(this).parent("li").text()+",";//拼接所有的值
+                    }
+                    else {
+                        isAll=false;//如果有任何一个checkbox没有选中，那么就不是全部
+                    }
+                });
+                if(val.length>0) val=val.substring(0,val.length-1);//如果有选择的值，去掉最后一个逗号
+                if(isAll){
+                    $(".bargin").val("全部");
+                }
+                else {
+                    $(".bargin").val(val);
+                }
+            });
+            //需要保留的代码
+            document.onclick = function (event)  
+            {     
+                var e = event || window.event;  
+                var elem = e.srcElement||e.target;  
+                      
+                while(elem)  
+                {   
+                    if(elem.id == "barWrap")  
+                    {  
+                        return;  
+                    }  
+                    elem = elem.parentNode;       
+                }  
+                //隐藏div的方法  
+                $(".bargin_box").hide(); 
+            }
+            if ('{{ search_buy }}') {
+                $('#buy_checkbox').prop('checked', true); 
+                $('#c_type')[0].value = '购买';
+            }
+            if ('{{ search_stock }}') {
+                $('#stock_checkbox').prop('checked', true); 
+                $('#c_type')[0].value = '进货';
+            }
+            if ('{{ search_buy }}' && '{{ search_stock }}') {
+                $('#c_type')[0].value = '全部';
+            }
+        })
+    </script>
+{% endblock %}

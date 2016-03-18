@@ -1,0 +1,60 @@
+{% extends 'base_stars.html' %}
+{% load staticfiles %}
+
+{% block public_css %}
+    <link rel="stylesheet" href="{% static "css/register.css" %}" type="text/css">
+{% endblock %}
+{% block jquery %}
+<script type="text/javascript" src="{% static "js/jquery-1.11.1.min.js" %}"></script>
+{% endblock %}
+
+{% block title %}蓝图百货—忘记密码{% endblock %}
+
+{% block logo %}
+    <div class="register-topbar">
+        <div class="container fix">
+            <div class="register-topbar-left l">
+            <a href="/">
+                <img src="{% static "images/logo1.png" %}" />
+            </a>
+            </div>
+            <div class="register-topbar-right r">
+                忘记密码
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+   <div class="register-body register-body1">
+        <div class="container">
+            <div class="register-body-top fix">
+                <div class="box l center">
+                    <span class="line"></span>
+                    <span class="txt">验证账户</span>
+                    <img src="{% static "images/register-oval1.png" %}" class="img"/>
+                </div>
+                <div class="box l center">
+                    <span class="line"></span>
+                    <span class="txt">设置新密码</span>
+                    <img src="{% static "images/register-oval2.png" %}" class="img"/>
+                </div>
+                <div class="box l center">
+                    <span class="line line-yellow"></span>
+                    <span class="txt">完成修改</span>
+                    <img src="{% static "images/register-oval3h.png" %}" class="img"/>
+                </div>
+            </div>
+            <div class="register-body-content">
+                <div class="finish-txt2 center">
+                    <img src="{% static 'images/sub-success.png' %}"/>
+                    <span>登录密码修改成功!</span>
+                    <div class="re-login">
+                        {{ user.username }},您的密码已经修改成功！现在去&nbsp;&nbsp;<a href="{% url 'accounts:login' %}" style = "color:#0088cc">登录</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

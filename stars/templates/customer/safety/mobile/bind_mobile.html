@@ -1,0 +1,177 @@
+{% extends "customer/safety/account_no_left_nav_base.html" %}
+{% load staticfiles %}
+{% load compress %}
+
+{%  block title %}蓝图百货--账户安全--修改手机{%  endblock title %}
+{% block custom_css %}
+    <link rel="stylesheet" href="{% static "css/account_safety.css" %}" type="text/css">
+{% endblock %}
+{% block onbodyload %}
+    <form action="{% url 'customer:safety-validate-mobile-valid_bind_mobile' %}" method="post">
+        {% csrf_token %}
+        <!--账户安全--邮箱body start-->
+        <div class="account-item-body1 container">
+            <div class="account-item-con" id="content">
+                <div class="account-item-tit">
+                    <a href="{% url 'customer:safety-center' %}">账户安全&nbsp;>&nbsp;</a>
+                    <span>修改手机</span>
+                </div>
+                <div class="account-item-matter account-item-matter1">
+                    <div class="input-group input-group1 fix">
+                        <div class="input-group-left right l">
+                            <span class="color-red">*</span>
+                            请输入新手机号：
+                        </div>
+                        <div class="input-group-right l">
+                            <input id="new_mobile" name="new_mobile" type="text" value="{{ new_mobile|default:'' }}" onfocus="OnfocusFun(this,'')" onblur="OnBlurFun(this,'')"/>
+{#                            <div class="img">#}
+{#                                <img src="{% static "images/register-right.png"%}" />#}
+{#                            </div>#}
+                            <div id="mobile_err_msg_div_id" class="marked-words marked-words2">
+                                    {% if mobile_err_msg %}{{ mobile_err_msg }}{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group input-group2 fix">
+                        <div class="input-group-left right l">
+                            <span class="color-red">*</span>
+                            请输入验证码：
+                        </div>
+                        <div class="input-group-right l">
+                            <input type="text" id='vcode' name="vcode" value="{{ vcode|default:'' }}" onfocus="OnfocusFun(this,'')" onblur="OnBlurFun(this,'')"/>
+                            <div class="get-code">
+                                <span class="send" id="J_getCode">点击获取验证码</span>
+                                <div class="send send-cover" id="J_getCode_Cover" onclick="time()">点击获取验证码</div>
+                            </div>
+                        </div>
+                    </div>
+                        <div class="input-group input-group3 fix">
+                            <div class="input-group-right center">
+                                <div id="vcode_err_msg_div_id" class="marked-words marked-words2">
+                                    {% if vcode_err_msg %}{{ vcode_err_msg }}{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                     <div class="center refer refer1">
+                        <input type="submit" onclick= "return check_input()" value="确认" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--账户安全--邮箱body end-->
+
+    <script type="text/javascript">
+        function check_input() {
+            var v = document.getElementById("vcode").value;
+            var flag = true;
+            if(v == "") {
+                $("#vcode_err_msg_div_id").html("请输入验证码");
+                flag = false;
+            } else {
+                $("#vcode_err_msg_div_id").html("");
+            }
+            new_mobile = $("#new_mobile").val();
+           //如果表单里有手机号码输入框，new_mobile，则弹窗并中止
+            var phonenum = /^1[3|4|5|7|8][0-9]{9}$/;
+            if (!(new_mobile && phonenum.test(new_mobile))) {
+                $("#mobile_err_msg_div_id").html("请输入有效的11位手机号码");
+                flag = false;
+            } else {
+                $("#mobile_err_msg_div_id").html("");
+            }
+            return flag;
+        }
+
+        //窗口高度自适应
+        $(document).ready(function() {
+            var wh = $(window).height();
+            var dh = $(document).height();
+            if(wh == dh){
+                $("#content").css({"height": wh-804+374+"px"});
+            } else {
+            }
+        });
+        $(window).resize(function(){
+            var wh = $(window).height();
+            var dh = $(document).height();
+            if(wh == dh){
+                $("#content").css({"height": wh-804+374+"px"});
+            }
+        });
+    </script>
+    <script type="text/javascript">
+        var period=10;
+        function time() {
+
+            if (wait <= 0) {
+                wait = period;
+                $("#J_getCode_Cover").css("display","block");
+                //document.getElementById("J_getCode").removeAttribute("disabled");
+                $("#J_getCode").css("background-color","#0a8fc7");
+                document.getElementById("J_getCode").innerHTML="重新发送";
+                document.getElementById("J_getCode_Cover").innerHTML="重新发送";
+            } else {
+                $("#J_getCode_Cover").css("display","none");
+                //document.getElementById("J_getCode").setAttribute("disabled", true);
+                $("#J_getCode").css("background-color","#bfbfbf");
+                document.getElementById("J_getCode").innerHTML= wait + "S";
+                wait--;
+                setTimeout(function() {
+                            time()
+                        },
+                        1000)
+            }
+        }
+
+
+        $('#J_getCode_Cover').on("click", function () {
+            var params = {};
+            new_mobile = $("#new_mobile").val();
+           //如果表单里有手机号码输入框，new_mobile，则弹窗并中止
+            var phonenum = /^1[3|4|5|7|8][0-9]{9}$/;
+            if (!(new_mobile && phonenum.test(new_mobile))) {
+                alert("无效的手机号码");
+                return;
+            }
+
+            params.new_mobile = new_mobile;
+            $.ajax({
+                dataType: "json",
+                url: "{% url "customer:safety-validate-mobile-send_mobile_code" %}?event=2",
+                data: params,
+                success: function (data) {
+                    if (data.msg)
+                    {
+                        alert(data.msg);
+                    }
+                    else {
+                        alert('短信发送成功');
+                    }
+                },
+                error: function (error) {
+                    alert('短信发送失败');
+                }
+            });
+
+            wait = period;
+            if (wait <= 0) {
+                wait = period;
+                $("#J_getCode_Cover").css("display","block");
+                //document.getElementById("J_getCode").removeAttribute("disabled");
+                $("#J_getCode").css("background-color","#0a8fc7");
+                document.getElementById("J_getCode").innerHTML="重新发送";
+                document.getElementById("J_getCode_Cover").innerHTML="重新发送";
+            } else {
+                $("#J_getCode_Cover").css("display","none");
+                //document.getElementById("J_getCode").setAttribute("disabled", true);
+                $("#J_getCode").css("background-color","#bfbfbf");
+                document.getElementById("J_getCode").innerHTML= "等待（" + wait + "）";
+                wait--;
+                setTimeout(function() {
+                            time()
+                        },
+                        1000)
+            }
+        })
+    </script>
+{% endblock %}

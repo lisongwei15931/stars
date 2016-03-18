@@ -1,0 +1,21 @@
+{% load django_tables2 %}
+{% load i18n %}
+<div class="btn-toolbar">
+    {% if record.status == '1' %}
+        <div class="btn-group">
+            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="true">
+                {% trans "Actions" %}
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu pull-right">
+                <li>
+                    <a href="{% url 'dashboard:business-storeincome-deal' pk=record.id %}{% querystring %}">审核</a>
+                </li>
+            </ul>
+        </div>
+    {% else %}
+        <li>
+            <span>目前不能审核</span>
+        </li>
+    {% endif %}
+</div>

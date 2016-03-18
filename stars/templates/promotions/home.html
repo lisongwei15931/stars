@@ -1,0 +1,419 @@
+{% extends "base_stars.html" %}
+{% load i18n %}
+{% load staticfiles %}
+{% load currency_filters %}
+{% load purchase_info_tags %}
+{% load thumbnail %}
+{% block public_css %}
+        <link rel="stylesheet" href="{% static "css/index.css" %}" type="text/css">
+{% endblock %}
+{% block custom_js %}
+{{block.super}}
+    <script type="text/javascript" src="{% static "js/slider.js" %}"></script>
+<script>
+
+        //分类nav
+        $(function(){
+            $(".shopclass-item").hover(
+                    function(){
+                        $(".shopclass-item-row").css("display","none");
+                        $(this).next().css("display","block");
+                        $(".shopclass-item").css("background-color","#c00000");
+                        $(this).css({"background-color":"#fafafa","color":"#333"});
+                        $(".shopclass-item>dt>a").css("color","#fff");
+                        $("a",this).css("color","#333");
+                    },
+                    function(){
+                        $(".shopclass-item-row").css("display","none");
+                        $(".shopclass-item>dt>a").css("color","#fff");
+                        $(this).css({"background-color":"#c00000","color":"#fff"});
+                    })
+            $(".shopclass-item-row").hover(function(){
+                        $(this).css("display","block");
+                        $(this).prev().css({"background-color":"#fafafa","color":"#333"});
+                        $(this).prev().children().children().css("color","#333");
+                    },function(){
+                        $(this).css("display","none");
+                        $(".shopclass-item").css({"background-color":"#c00000","color":"#fff"});
+                        $(this).prev().children().children().css("color","#fff");
+                    }
+            );
+          //公告 动态
+            $(".niceList:first").show().siblings(".niceList").hide();
+            $(".dynamic-tit li").hover(function(){
+                $(this).addClass("current").siblings().removeClass("current");
+                var index=$(this).index();
+                $(".niceList").eq(index).show().siblings(".niceList").hide();
+            });
+        });
+        
+
+</script>
+{% endblock %}
+
+{% block custom_css %}
+<style type ="text/css">
+ 
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container fix">
+
+   <div class="shopclass l">
+        <h3><a id = "lpa" href="#">全部商品分类 </a></h3>
+        <div class="shopclass-show">
+        {% for c in category_list %}
+            <dl class="shopclass-item">
+                <dt><a href="{% url 'catalogue:allproducts' %}?category={{c.name}} ">{{c.name}}</a></dt>
+            </dl>
+            <div class="shopclass-item-row">
+            {% for cc in c.get_children %}
+                <div class="item-type fix fix ">
+                    <div class="item-con-left l right">
+                        <a href ="{% url 'catalogue:allproducts' %}?category={{cc.name}} ">{{cc.name}}</a>
+                    </div>
+                    <div class="item-con-right l">
+                        <ul class="productname">
+                        {% for ccc in cc.get_children %}
+                            <li>
+                            <a href="{% url 'catalogue:allproducts' %}?category={{ccc.name}} ">
+                            {{ccc.name}}
+                            </a>{% if forloop.last %}<span></span>
+                            {% else %}<span class='pad-span'>|</span>{% endif %}
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+             {% endfor %}
+
+                <div class="item-ad">
+                    <a><img src="{% static "images/ad1-nav.jpg" %} "/></a>
+                </div>
+            </div>
+          {% endfor %}  
+        </div>
+    </div>
+    <ul class="banner-top l">
+        <li>
+            <a href="{% url 'promotions:brandgather_product' %}">品牌汇</a>
+        </li>
+        <li>
+            <a href="{% url 'promotions:today_new_view' %}">新品汇</a>
+        </li>
+        <li>
+            <a href="{% url 'tradingcenter:trading_center_index' %}">交易大厅</a>
+        </li>
+        <li style="float:left;background-image: none;font-size:16px;border-right:none">
+            <a href="{% url 'helper:helper_index' %}" style="text-decoration: none;">蓝图学院</a>
+        </li>
+        <li class="last-child"> 
+               <div class="open fix">
+                <div class="l">
+                    {% if open_or_close %}
+                    <img src="{% static 'images/open.png' %}"/>
+                    {% else %}
+                    <img src="{%static 'images/close.png' %}"/>
+		            {% endif %}
+                </div>
+                <marquee class="l"scrolldelay="150" direction="left">{{open_close_msg}}</marquee>
+              </div>
+        </li>
+    </ul>
+</div>
+            <div class="container fix" style="position: relative;z-index: 1;">
+               <!--banner start-->
+                <div class="banner l">
+                    <div id="banner_tabs" class="flexslider">
+                        <ul class="slides">
+                            {% for ad in rolling_ad_list %}
+                                <li>
+                                    {% if forloop.first %}
+                                        <a title="" target="_blank" href="{{ ad.link_url }}">
+                                            <img alt="" src="{{ad.image.url}}">
+                                        </a>
+                                    {% else %}
+                                        <a title="" href="{{ ad.link_url }}">
+                                            <img alt="" src="{{ad.image.url}}">
+                                        </a>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        <ul class="flex-direction-nav">
+                            <li><a class="flex-prev" href="javascript:;">Previous</a></li>
+                            <li><a class="flex-next" href="javascript:;">Next</a></li>
+                        </ul>
+                        <ol id="bannerCtrl" class="flex-control-nav flex-control-paging">
+                            {% for ad in rolling_ad_list %}
+                                {% if forloop.first %}
+                                    <li class="active"><a href="{{ ad.link_url }}" ></a></li>
+                                {% else %}
+                                    <li><a href="{{ ad.link_url }}"></a></li>
+                                {% endif %}
+                            {% endfor %}
+                        </ol>
+                    </div><!--slider end-->
+                </div>
+                        <div class="instruction l">
+                <div class="instruction-a">
+                    <a href ="{% url 'tradingcenter:trading_center_index' %}">免费开店</a>
+                    <a href ="{% url 'accounts:register' %}">免费注册</a>
+                </div>
+                <div class="new-arrival">
+                    <h4 class="fix">
+                        <b class="l">新品上市</b>
+                        <a class="r" href="{% url 'promotions:news_product'%}?flag=3">更多&nbsp;>></a>
+                    </h4>
+                    <ul>
+                        {% for item in news_product%}
+                        <li><a href="{% url 'promotions:news_product_detail' pk=item.id%}">{{ item.title }}</a></li>
+                        {%endfor%}
+                    </ul>
+                </div>
+                <div class="instruction-dynamic">
+                    <ul class="dynamic-tit fix">
+                        <li  class="current"><a href="{% url 'promotions:news_product'%}?flag=2">公告</a></li>
+                        <li><a href="{% url 'promotions:news_product'%}?flag=4">购物须知</a></li>
+                    </ul>
+                    <ul class="proList niceList">
+                        {% for item in notice%}
+                        <li><a href="{% url 'promotions:news_product_detail' pk=item.id%}">{{ item.title }}</a></li>
+                        {%endfor%}
+                    </ul>
+                    <ul class="proList niceList">
+                        {% for item in buy_know%}
+                        <li><a href="{% url 'promotions:news_product_detail' pk=item.id%}">{{ item.title }}</a></li>
+                        {%endfor%}
+                    </ul>
+                </div>
+            </div>
+        </div>
+<!--首页-content-body-start-->
+     <div class="container">
+            <!--广告展示-->
+            <div class="Newad-goods fix">
+             {% for ad in index_ad_list %}
+                <div class="Newad-goods-img">
+                 {% with image=ad.image %}
+                            {% thumbnail image "390x150" crop="center" as thumb %}
+                            <a href={{ad.link_url}}>
+                            <img class="thumbnail" src="{{ thumb.url }}" alt=""/>
+                            </a>
+                            {% endthumbnail %}
+                            {% endwith %}
+                    {% if forloop.first %}
+                    <div class="fresh">
+                        <img src="{%static 'images/new.png' %}"/>
+                    </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            </div>
+        </div>
+<div class="container">
+	<div class="plate">
+		<!--口碑甄选 start-->
+			<div class="plate-koubei-title fix">
+				<img src="{% static 'images/koubei.png' %}" />
+			</div>
+			<div class="row fix">
+				{% for product in reputation_list%}
+				{% if forloop.counter == 2 %}
+				<div class="adBig">
+				 {% with image=koubei_ad_list.image %}
+                            {% thumbnail image "399x290" crop="center" as thumb %}
+                            <a href={{koubei_ad_list.link_url}}>
+                            <img class="thumbnail" src="{{ thumb.url }}" alt=""/>
+                            </a>
+                            {% endthumbnail %}
+                 {% endwith %}
+                </div>
+				{% else %}
+				<div class="plate-box">
+				{% with image=product.primary_image %}
+                {% thumbnail image.original "180x180" crop="center" as thumb %}
+                   <a href="{{ product.get_absolute_url }}">
+                   <img class="thumbnail" src="{{ thumb.url }}" alt="{{ product.get_title }}"/>
+                   </a>
+                {% endthumbnail %}
+                {% endwith %}
+					<div class="plate-box-des">
+						<a href="{{ product.get_absolute_url }}">{{product}}</a>
+					</div>
+					<div class="plate-box-p">
+						<span>￥{{ product.buy_price }}</span>
+						<del>￥{{ product.stockrecords.first.price_retail }}</del>
+					</div>
+				</div>
+				{% endif %}
+				{% endfor %}
+			</div>
+		</div>
+
+		<div class="plate plate-one fix">
+			<div class="plate-title fix">
+				<h2>
+					<span>1F</span>新品上市
+				</h2>
+			</div>
+			<div class="row fix">
+				<div class="plate-db-box">
+					{% if ad_product %} 
+					{% with image=ad_product.advertising_long_image %}
+                            {% thumbnail image "275x610" crop="center" as thumb %}
+                            <a href="{{ad_product.get_absolute_url}}">
+                            <img class="thumbnail" src="{{ thumb.url }}" alt=""/>
+                            </a>
+                            {% endthumbnail %}
+                            {% endwith %}
+					{% endif %}
+				</div>
+				{% for product in new_product_list%}
+				<div class="plate-box">
+				{% with image=product.primary_image %}
+                {% thumbnail image.original "180x180" crop="center" as thumb %}
+                   <a href="{{ product.get_absolute_url }}">
+                   <img class="thumbnail" src="{{ thumb.url }}" alt="{{ product.get_title }}"/>
+                   </a>
+                {% endthumbnail %}
+                {% endwith %}
+					<div class="plate-box-des">
+						<a href="{{ product.get_absolute_url }}">{{product}}</a>
+					</div>
+					<div class="plate-box-p">
+						<span>￥{{ product.buy_price }}</span>
+						<del>￥{{ product.stockrecords.first.price_retail }}</del>
+					</div>
+				</div>
+				{% endfor %}
+			</div>
+		</div>
+  <!--广告展示start-->
+            <div class="nav-ad">
+                {% with image=zhutui_ad_list.image %}
+                            {% thumbnail image "1200x90" crop="center" as thumb %}
+                            <a href={{koubei_ad_list.link_url}}>
+                            <img class="thumbnail" src="{{ thumb.url }}" alt=""/>
+                            </a>
+                            {% endthumbnail %}
+                 {% endwith %}
+            </div>
+  <!--广告展示end-->
+		<div class="plate plate-one fix">
+			<div class="plate-title fix">
+				<h2>
+					<span>2F</span>主推热卖
+				</h2>
+			</div>
+			<div class="row fix">
+				<div class="plate-db-box">
+					{% if highly_recommended_product_first %}
+					{% with image=highly_recommended_product_first.advertising_long_image %}
+                            {% thumbnail image "275x610" crop="center" as thumb %}
+                            <a href={{highly_recommended_product_first.get_absolute_url}}>
+                            <img class="thumbnail" src="{{ thumb.url }}" alt=""/>
+                            </a>
+                            {% endthumbnail %}
+                            {% endwith %}
+					{% endif %}
+				</div>
+
+				{% for product in highly_recommended_product_list%}
+				<div class="plate-box">
+				{% with image=product.primary_image %}
+                {% thumbnail image.original "180x180" crop="center" as thumb %}
+                   <a href="{{ product.get_absolute_url }}">
+                   <img class="thumbnail" src="{{ thumb.url }}" alt="{{ product.get_title }}"/>
+                   </a>
+                {% endthumbnail %}
+                {% endwith %}
+					<div class="plate-box-des">
+						<a href="{{ product.get_absolute_url }}">{{product}}</a>
+					</div>
+					<div class="plate-box-p">
+						<span>￥{{ product.buy_price }}</span>
+						<del>￥{{ product.stockrecords.first.price_retail }}</del>
+					</div>
+				</div>
+				{% endfor %}
+			</div>
+		</div>
+  <!--广告展示start-->
+            <div class="nav-ad">
+                {% with image=huore_ad_list.image %}
+                            {% thumbnail image "1200x90" crop="center" as thumb %}
+                            <a href={{koubei_ad_list.link_url}}>
+                            <img class="thumbnail" src="{{ thumb.url }}" alt=""/>
+                            </a>
+                            {% endthumbnail %}
+                 {% endwith %}
+            </div>
+  <!--广告展示end-->
+		<div class="plate plate-one fix">
+			<div class="plate-title fix">
+				<h2>
+					<span>3F</span>火热促销
+				</h2>
+			</div>
+			<div class="row fix">
+				<div class="plate-db-box">
+					{% if hotdeals_product %}
+					{% with image=hotdeals_product.advertising_long_image %}
+                            {% thumbnail image "275x610" crop="center" as thumb %}
+                            <a href={{hotdeals_product.get_absolute_url}}>
+                            <img class="thumbnail" src="{{ thumb.url }}" alt=""/>
+                            </a>
+                            {% endthumbnail %}
+                            {% endwith %}
+					{% endif %}
+				</div>
+
+				{% for product in hotdeals_product_list%}
+				<div class="plate-box">
+				{% with image=product.primary_image %}
+                {% thumbnail image.original "180x180" crop="center" as thumb %}
+                   <a href="{{ product.get_absolute_url }}">
+                   <img class="thumbnail" src="{{ thumb.url }}" alt="{{ product.get_title }}"/>
+                   </a>
+                {% endthumbnail %}
+                {% endwith %}
+
+					<div class="plate-box-des">
+						<a href="{{ product.get_absolute_url }}">{{product}}</a>
+					</div>
+					<div class="plate-box-p">
+						<span>￥{{ product.buy_price }}</span>
+						<del>￥{{ product.stockrecords.first.price_retail }}</del>
+					</div>
+				</div>
+				{% endfor %}
+			</div>
+		</div>
+    </div>
+
+	{% endblock %}
+
+{% block footer_script %}
+    {{ block.super }}
+    <script type="text/javascript">
+        $(function() {
+            var bannerSlider = new Slider($('#banner_tabs'), {
+                time: 5000,
+                delay: 400,
+                event: 'hover',
+                auto: true,
+                mode: 'fade',
+                controller: $('#bannerCtrl'),
+                activeControllerCls: 'active'
+            });
+            $('#banner_tabs .flex-prev').click(function() {
+                bannerSlider.prev()
+            });
+            $('#banner_tabs .flex-next').click(function() {
+                bannerSlider.next()
+            });
+        })
+    </script>
+{% endblock footer_script %}

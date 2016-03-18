@@ -1,0 +1,858 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <link rel="stylesheet" href="css/public.css" type="text/css">
+    <link rel="stylesheet" href="css/account.css" type="text/css">
+    <link rel="stylesheet" href="css/account2.css" type="text/css">
+    <script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+    <script src="datePicker/WdatePicker.js"></script>
+    <title>蓝图百货--交易信息--提货明细</title>
+</head>
+<body class="account-body">
+    <!--顶层状态、登录条-->
+    <div class="login login1">
+        <div class="container zhanghu-top fix">
+            <div class="l login-left">
+                <a href="#">返回XX首页</a>
+            </div>
+            <ul class="r login-right">
+                <li>
+                    <a href="#">yuzhiwei</a>
+                    <a href="#">退出</a>
+                </li>
+                <li>
+                    <a href="#">我的账户<span class="jt"></span></a>
+                    <ul>
+                        <li><a href="#">我的账户<span class="jt"></span></a></li>
+                        <li><a href="#">账户资产</a></li>
+                        <li><a href="#">订单管理</a></li>
+                        <li><a href="#">账户设置</a></li>
+                    </ul>
+                </li>
+                <li><a href="#">我的订单</a></li>
+                <li><a href="#">充值</a></li>
+                <li><a href="#">我要开店</a></li>
+                <li>
+                    <a href="#">帮助中心<span class="jt"></span></a>
+                    <ul>
+                        <li><a href="#">帮助中心<span class="jt"></span></a></li>
+                        <li><a href="#">帮助中心</a></li>
+                        <li><a href="#">帮助中心</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <!--顶部 end-->
+    <!--登录-顶层logo条-->
+    <div class="account-topbar">
+        <div class="container fix">
+            <div class="account-topbar-left l">
+                <img src="images/logo.png"/>
+            </div>
+        </div>
+    </div>
+    <!--账户安全body start-->
+    <div class="account-cont-body container fix">
+        <div class="account-cont-left account-cont-left2 l">
+            <div class="account-nav">
+                <h4>我的账户</h4>
+                <ul>
+                    <li><a>账户资产</a></li>
+                    <li><a>我的存货</a></li>
+                    <li><a>银行卡</a></li>
+                </ul>
+            </div>
+            <div class="account-nav">
+                <h4>交易信息</h4>
+                <ul>
+                    <li><a>交易记录</a></li>
+                    <li><a>当天成交</a></li>
+                    <li><a>当天未成交</a></li>
+                    <li><a>撤单查询</a></li>
+                    <li class="active"><a>提货明细</a></li>
+                </ul>
+            </div>
+            <div class="account-nav account-nav1">
+                <h4>账户设置</h4>
+                <ul>
+                    <li><a>个人信息</a></li>
+                    <li><a>账户安全</a></li>
+                    <li><a>实名认证</a></li>
+                    <li><a>我的关注</a></li>
+                    <li><a>收货地址</a></li>
+                    <li><a>自提点</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="account-cont-right account-cont-right1 l">
+            <div class="details" id="detailMy">
+                <div class="title-acct title-acct2 fix">
+                    <span class="l">提货明细</span>
+                </div>
+                <ul class="accTitle">
+                	<li style="width:180px;">关键字：<input type="text" class="keyWords" value="输入商品编号或名称"/></li>
+                    <li style="width:230px;">时间：<input type="text" class="time" onClick="WdatePicker()">&nbsp;-&nbsp;<input type="text" class="time" onClick="WdatePicker()"/></li>
+                    <li style="width:235px;">
+                    	<p style="float:left; height:23px; line-height:23px;">成交方式：</p>
+                    	<div id="barWrap">
+                    		<input type="button" value="" class="bargin">
+                        	<ul class="bargin_box">
+                        		<li><input type="checkbox"  style="vertical-align:middle; margin-right:5px;" />自提</li>
+                            	<li><input type="checkbox"  style="vertical-align:middle; margin-right:5px"/>货运</li>
+                        	</ul>
+                    	</div>
+                        <input type="submit" value="搜索" style="width:42px; height:23px; line-height:21px; text-align:center; background-color:#c00000; border:0; color:#fff; cursor:pointer; margin-left:5px;"/>	
+                    	
+                    </li>
+                    <li style="width:280px">排序：<a href="javascript:void(0);" class="down">提货日期</a>&nbsp;<a href="javascript:void(0);" class="up">商品名称</a>&nbsp;<a href="javascript:void(0);">提货编号</a></li>
+                </ul>
+                <div style="text-align:right; color:#999; margin-bottom:10px;">每页20条&nbsp;共<span style="color:#c00000;">60</span>条信息</div>
+                <table class="myBox" cellpadding="0"  cellspacing="0">
+                	<tr style="background-color:#eee;">
+                    	<th width="50"><input type="checkbox" id="selectAll" style=" vertical-align:middle; margin-right:3px;"/>选择</th>
+                        <th width="65">提货日期</th>
+                        <th width="100">提货编号</th>
+                        <th width="55">商品代码</th>
+                        <th width="100">商品名称</th>
+                        <th width="60">提货方式</th>
+                        <th width="55">提货数量</th>
+                        <th width="60">提货价值</th>
+                        <th width="60">提货仓库</th>
+                        <th width="60">提货费用</th>
+                        <th width="70">办理日期</th>
+                        <th width="60">状态</th>
+                        <th width="100">驳回原因</th>
+                        <th width="100">操作</th>
+                    </tr>
+                    <tr>
+                    	<td class="firstTd"><input type="checkbox" style=" vertical-align:middle; margin-right:6px;"/>1</td>
+                        <td>YZW2015</td>
+                        <td>自提</td>
+                        <td>购买</td>
+                        <td>30</td>
+                        <td>自提</td>
+                        <td>购买</td>
+                        <td>-</td>
+                        <td>30</td>
+                        <td>30</td>
+                        <td>-</td>
+                        <td>用户撤单</td>
+                        <td>用户撤单</td>
+                        <td class="lastTd"><a href="#">查看</a><a href="#">修改</a></td>
+                    </tr>
+                    <tr>
+                    	<td class="firstTd"><input type="checkbox" style=" vertical-align:middle; margin-right:6px;"/>2</td>
+                        <td>YZW2015</td>
+                        <td>蓝图百货浓香</td>
+                        <td>购买</td>
+                        <td>30</td>
+                        <td>货运</td>
+                        <td>77</td>
+                        <td>-</td>
+                        <td>30</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>市场撤单</td>
+                        <td></td>
+                        <td class="lastTd"><a href="#">查看</a><a href="#">修改</a></td>
+                    </tr>
+                    <tr>
+                    	<td class="firstTd"><input type="checkbox" style=" vertical-align:middle; margin-right:6px;"/>3</td>
+                        <td>YZW2015</td>
+                        <td>蓝图百货浓香</td>
+                        <td>购买</td>
+                        <td>30</td>
+                        <td>自提</td>
+                        <td>77</td>
+                        <td>-</td>
+                        <td>30</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>系统闭市</td>
+                        <td></td>
+                        <td class="lastTd"><a href="#">查看</a><a href="#">修改</a></td>
+                    </tr>
+                    <tr>
+                    	<td class="firstTd"><input type="checkbox" style=" vertical-align:middle; margin-right:6px;"/>4</td>
+                        <td>YZW2015</td>
+                        <td>蓝图百货浓香</td>
+                        <td>购买</td>
+                        <td>30</td>
+                        <td>自提</td>
+                        <td>77</td>
+                        <td>-</td>
+                        <td>30</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>收货成功</td>
+                        <td></td>
+                        <td class="lastTd"><a href="#">查看</a><a href="javascript:void(0);" class="pingJia">评价</a></td>
+                    </tr>
+                    <tr>
+                    	<td class="firstTd"><input type="checkbox" style=" vertical-align:middle; margin-right:6px;"/>5</td>
+                        <td>YZW2015</td>
+                        <td>蓝图百货浓香</td>
+                        <td>购买</td>
+                        <td>30</td>
+                        <td>自提</td>
+                        <td>77</td>
+                        <td>-</td>
+                        <td>30</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>300</td>
+                        <td></td>
+                        <td class="lastTd"><a href="#">查看</a><a href="#">修改</a></td>
+                    </tr>
+                    <tr>
+                    	<td class="firstTd"><input type="checkbox" style=" vertical-align:middle; margin-right:6px;"/>6</td>
+                        <td>YZW2015</td>
+                        <td>蓝图百货浓香</td>
+                        <td>购买</td>
+                        <td>30</td>
+                        <td>自提</td>
+                        <td>77</td>
+                        <td>-</td>
+                        <td>30</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>收货成功</td>
+                        <td></td>
+                        <td class="lastTd"><a href="#">查看</a><a href="javascript:void(0);" class="pingJia">评价</a></td> 
+                    </tr>
+                    <tr>
+                    	<td class="firstTd"><input type="checkbox" style=" vertical-align:middle; margin-right:6px;"/>7</td>
+                        <td>YZW2015</td>
+                        <td>蓝图百货浓香</td>
+                        <td>购买</td>
+                        <td>30</td>
+                        <td>自提</td>
+                        <td>77</td>
+                        <td>-</td>
+                        <td>30</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>300</td>
+                        <td></td>
+                        <td class="lastTd"><a href="#">查看</a><a href="#">修改</a></td> 
+                    </tr>
+                    <tr>
+                    	<td class="firstTd"><input type="checkbox" style=" vertical-align:middle; margin-right:6px;"/>8</td>
+                        <td>YZW2015</td>
+                        <td>蓝图百货浓香</td>
+                        <td>购买</td>
+                        <td>30</td>
+                        <td>自提</td>
+                        <td>77</td>
+                        <td>-</td>
+                        <td>30</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>300</td>
+                        <td></td>
+                        <td class="lastTd"><a href="#">查看</a><a href="#">修改</a></td>
+                    </tr>
+                    <tr>
+                    	<td class="firstTd"><input type="checkbox" style=" vertical-align:middle; margin-right:6px;"/>9</td>
+                        <td>YZW2015</td>
+                        <td>蓝图百货浓香</td>
+                        <td>购买</td>
+                        <td>30</td>
+                        <td>自提</td>
+                        <td>77</td>
+                        <td>-</td>
+                        <td>30</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>300</td>
+                        <td></td>
+                        <td class="lastTd"><a href="#">查看</a><a href="#">修改</a></td> 
+                    </tr>
+                    <tr>
+                    	<td class="firstTd"><input type="checkbox" style=" vertical-align:middle; margin-right:6px;"/>10</td>
+                        <td>YZW2015</td>
+                        <td>蓝图百货浓香</td>
+                        <td>购买</td>
+                        <td>30</td>
+                        <td>自提</td>
+                        <td>77</td>
+                        <td>-</td>
+                        <td>30</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>300</td>
+                        <td></td>
+                        <td class="lastTd"><a href="#">查看</a><a href="#">修改</a></td>
+                    </tr>
+                    <tr>
+                    	<td class="firstTd"><input type="checkbox" style=" vertical-align:middle; margin-right:6px;"/>11</td>
+                        <td>YZW2015</td>
+                        <td>蓝图百货浓香</td>
+                        <td>购买</td>
+                        <td>30</td>
+                        <td>自提</td>
+                        <td>77</td>
+                        <td>-</td>
+                        <td>30</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>300</td>
+                        <td></td>
+                        <td class="lastTd"><a href="#">查看</a><a href="#">修改</a></td> 
+                    </tr>
+                    <tr>
+                    	<td class="firstTd"><input type="checkbox" style=" vertical-align:middle; margin-right:6px;"/>12</td>
+                        <td>YZW2015</td>
+                        <td>蓝图百货浓香</td>
+                        <td>购买</td>
+                        <td>30</td>
+                        <td>自提</td>
+                        <td>77</td>
+                        <td>-</td>
+                        <td>30</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>300</td>
+                        <td></td>
+                        <td class="lastTd"><a href="#">查看</a><a href="#">修改</a></td>
+                    </tr>
+                    <tr>
+                    	<td class="firstTd"><input type="checkbox" style=" vertical-align:middle; margin-right:6px;"/>13</td>
+                        <td>YZW2015</td>
+                        <td>蓝图百货浓香</td>
+                        <td>购买</td>
+                        <td>30</td>
+                        <td>自提</td>
+                        <td>77</td>
+                        <td>-</td>
+                        <td>30</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>300</td>
+                        <td></td>
+                        <td class="lastTd"><a href="#">查看</a><a href="#">修改</a></td>
+                    </tr>
+                    <tr>
+                    	<td class="firstTd"><input type="checkbox" style=" vertical-align:middle; margin-right:6px;"/>14</td>
+                        <td>YZW2015</td>
+                        <td>蓝图百货浓香</td>
+                        <td>购买</td>
+                        <td>30</td>
+                        <td>自提</td>
+                        <td>77</td>
+                        <td>-</td>
+                        <td>30</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>收货成功</td>
+                        <td></td>
+                        <td class="lastTd"><a href="#" class="examin">查看</a><a href="javascript:void(0);" class="pingJia">评价</a></td>
+                    </tr>
+                    <tr>
+                    	<td></td>
+                        <td>合计</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>30</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </table>
+                <div class="selectAll2"><span class="firstSpan"><input type="checkbox" id="seAll" style="vertical-align:middle; margin-right:3px;"/>全选</span><span>撤单（批量）</span></div>
+                <!--翻页-->
+				<div class="page-public center" id="pageList">
+                    <a class="txt" id="first">首页</a>
+                    <a class="txt" id="prev">上一页</a>
+                    <a class="num" style="display: none;" id="firstpage">1</a>
+                    <a class="num">2</a>
+                    <a class="num active">3</a>
+                    <a class="num">4</a>
+                    <a class="num">5</a>
+                    <a class="num">6</a>
+                    <span>……</span>
+                    <a class="num" id="lastpage">21</a>
+                    <a class="txt" id="next">下一页</a>
+                    <a class="txt" id="last">尾页</a>共<span>21</span>页
+                    <span>到第<input type="text" value="9"/>页</span>
+                    <a class="txt">确认</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--账户安全body end-->
+    <!--弹框 star-->
+    <div id="fullbg"></div>
+    <!--评价 star-->
+        	<div class="p-dialog pingjia">
+            	<div class="p-title">评价<span class="p-close">×</span></div>
+                <div class="p-content">
+                	<dl>
+                    	<dt><a href="#"><img src="images/pingjia1.jpg"/></a></dt>
+                        <dd><a href="#">长城特酿3年解百纳干红葡萄酒整箱装 750ml*6瓶</a></dd>
+                    </dl>
+                    <table cellpadding="0" cellspacing="0" class="p-act">
+                    	<tr>
+                        	<td class="gray"><span class="red">*</span>评分：</td>
+                            <td style="position:relative;">
+                            	<div style="overflow:hidden;">
+                                	<ul class="star"><li></li><li></li><li></li><li></li><li></li></ul>
+                                	<p id="score"></p>
+                                </div>
+                                <div id="selectScore">
+                                	<div class="reply"></div>
+                                    <div class="btn-score"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                        	<td class="gray"><span class="red">*</span>心得：</td>
+                            <td>
+                            	<textarea id="p-pro">评价商品~！</textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                        	<td></td>
+                            <td><input type="submit" value="发表评论" class="p-sub"/></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+    <!--评价 end-->  
+    <!--查看 star-->
+    		<div class="p-dialog examWrap" id="examWrap">
+            	<div class="p-title">查看<span class="p-close">×</span></div>
+                <div style="width:1218px; border:1px solid #cad9ea;">
+                    <div style="width:1218px;">
+                        <table border="1" class="tab_css_1">
+                            <tr>
+                                <th width="80">提货单ID</th>
+                                <th width="70">提货验证码</th>
+                                <th width="60">提货类型</th>
+                                <th width="200">提货点</th>
+                                <th width="180">商品名称</th>
+                                <th width="50">数量</th>
+                                <th width="240">收货地址</th>
+                                <th width="70">办理日期</th>
+                                <th width="70">状态</th>
+                                <th width="180">驳回原因</th>
+                            </tr>
+                        </table>
+                    </div>
+                    <div style="overflow-y:scroll; height:468px;">
+                        <table border="1" class="tab_css_1">
+                            <tr class="tr_css" align="center">
+                                <td width="80">010000000</td>
+                                <td width="70">010222</td>
+                                <td width="60">自提</td>
+                                <td width="200">濮阳市华龙区精正福源堂</td>
+                                <td width="180">蓝图百货浓香酒02123333332222222222</td>
+                                <td width="50">10</td>
+                                <td width="240">北京市海淀区善缘街1号立方庭大厦2段103222</td>
+                                <td width="70">20150603</td>
+                                <td width="70">系统闭市</td>
+                                <td width="180">系统闭市无法提22222货111111111111</td>
+                            </tr>
+                            <tr class="tr_css" align="center">
+                                <td>010000001</td>
+                                <td>010222</td>
+                                <td>自提</td>
+                                <td>濮阳市华龙区精正福源堂</td>
+                                <td>蓝图百货浓香酒</td>
+                                <td>10</td>
+                                <td>北京市海淀区善缘街1号立方庭大厦2段103</td>
+                                <td>20150603</td>
+                                <td>系统闭市</td>
+                                <td>系统闭市无法提货</td>
+                            </tr>
+                            <tr class="tr_css" align="center">
+                                <td>010000002</td>
+                                <td>010222</td>
+                                <td>自提</td>
+                                <td>濮阳市华龙区精正福源堂</td>
+                                <td>蓝图百货浓香酒</td>
+                                <td>10</td>
+                                <td>北京市海淀区善缘街1号立方庭大厦2段103</td>
+                                <td>20150603</td>
+                                <td>系统闭市</td>
+                                <td>系统闭市无法提货</td>
+                            </tr>
+                            <tr class="tr_css" align="center">
+                                <td>010000003</td>
+                                <td>010222</td>
+                                <td>自提</td>
+                                <td>濮阳市华龙区精正福源堂</td>
+                                <td>蓝图百货浓香酒</td>
+                                <td>10</td>
+                                <td>北京市海淀区善缘街1号立方庭大厦2段103</td>
+                                <td>20150603</td>
+                                <td>系统闭市</td>
+                                <td>系统闭市无法提货</td>
+                            </tr>
+                            <tr class="tr_css" align="center">
+                                <td>010000004</td>
+                                <td>010222</td>
+                                <td>自提</td>
+                                <td>濮阳市华龙区精正福源堂</td>
+                                <td>蓝图百货浓香酒</td>
+                                <td>10</td>
+                                <td>北京市海淀区善缘街1号立方庭大厦2段103</td>
+                                <td>20150603</td>
+                                <td>系统闭市</td>
+                                <td>系统闭市无法提货</td>
+                            </tr>
+                            <tr class="tr_css" align="center">
+                                <td>010000005</td>
+                                <td>010222</td>
+                                <td>自提</td>
+                                <td>濮阳市华龙区精正福源堂</td>
+                                <td>蓝图百货浓香酒</td>
+                                <td>10</td>
+                                <td>北京市海淀区善缘街1号立方庭大厦2段103</td>
+                                <td>20150603</td>
+                                <td>系统闭市</td>
+                                <td>系统闭市无法提货</td>
+                            </tr>
+                            <tr class="tr_css" align="center">
+                                <td>010000006</td>
+                                <td>010222</td>
+                                <td>自提</td>
+                                <td>濮阳市华龙区精正福源堂</td>
+                                <td>蓝图百货浓香酒</td>
+                                <td>10</td>
+                                <td>北京市海淀区善缘街1号立方庭大厦2段103</td>
+                                <td>20150603</td>
+                                <td>系统闭市</td>
+                                <td>系统闭市无法提货</td>
+                            </tr>
+                            <tr class="tr_css" align="center">
+                                <td>010000007</td>
+                                <td>010222</td>
+                                <td>自提</td>
+                                <td>濮阳市华龙区精正福源堂</td>
+                                <td>蓝图百货浓香酒</td>
+                                <td>10</td>
+                                <td>北京市海淀区善缘街1号立方庭大厦2段103</td>
+                                <td>20150603</td>
+                                <td>系统闭市</td>
+                                <td>系统闭市无法提货</td>
+                            </tr>
+                            <tr class="tr_css" align="center">
+                                <td>010000008</td>
+                                <td>010222</td>
+                                <td>自提</td>
+                                <td>濮阳市华龙区精正福源堂</td>
+                                <td>蓝图百货浓香酒</td>
+                                <td>10</td>
+                                <td>北京市海淀区善缘街1号立方庭大厦2段103</td>
+                                <td>20150603</td>
+                                <td>系统闭市</td>
+                                <td>系统闭市无法提货</td>
+                            </tr>
+                            <tr class="tr_css" align="center">
+                                <td>010000009</td>
+                                <td>010222</td>
+                                <td>自提</td>
+                                <td>濮阳市华龙区精正福源堂</td>
+                                <td>蓝图百货浓香酒</td>
+                                <td>10</td>
+                                <td>北京市海淀区善缘街1号立方庭大厦2段103</td>
+                                <td>20150603</td>
+                                <td>系统闭市</td>
+                                <td>系统闭市无法提货</td>
+                            </tr>
+                            <tr class="tr_css" align="center">
+                                <td>010000010</td>
+                                <td>010222</td>
+                                <td>自提</td>
+                                <td>濮阳市华龙区精正福源堂</td>
+                                <td>蓝图百货浓香酒</td>
+                                <td>10</td>
+                                <td>北京市海淀区善缘街1号立方庭大厦2段103</td>
+                                <td>20150603</td>
+                                <td>系统闭市</td>
+                                <td>系统闭市无法提货</td>
+                            </tr>
+                            <tr class="tr_css" align="center">
+                                <td>010000011</td>
+                                <td>010222</td>
+                                <td>自提</td>
+                                <td>濮阳市华龙区精正福源堂</td>
+                                <td>蓝图百货浓香酒</td>
+                                <td>10</td>
+                                <td>北京市海淀区善缘街1号立方庭大厦2段103</td>
+                                <td>20150603</td>
+                                <td>系统闭市</td>
+                                <td>系统闭市无法提货</td>
+                            </tr>
+                            <tr class="tr_css" align="center">
+                                <td>010000012</td>
+                                <td>010222</td>
+                                <td>自提</td>
+                                <td>濮阳市华龙区精正福源堂</td>
+                                <td>蓝图百货浓香酒</td>
+                                <td>10</td>
+                                <td>北京市海淀区善缘街1号立方庭大厦2段103</td>
+                                <td>20150603</td>
+                                <td>系统闭市</td>
+                                <td>系统闭市无法提货</td>
+                            </tr>
+                            <tr class="tr_css" align="center">
+                                <td>010000013</td>
+                                <td>010222</td>
+                                <td>自提</td>
+                                <td>濮阳市华龙区精正福源堂</td>
+                                <td>蓝图百货浓香酒</td>
+                                <td>10</td>
+                                <td>北京市海淀区善缘街1号立方庭大厦2段103</td>
+                                <td>20150603</td>
+                                <td>系统闭市</td>
+                                <td>系统闭市无法提货</td>
+                            </tr>
+                            <tr class="tr_css" align="center">
+                                <td>010000012</td>
+                                <td>010222</td>
+                                <td>自提</td>
+                                <td>濮阳市华龙区精正福源堂</td>
+                                <td>蓝图百货浓香酒</td>
+                                <td>10</td>
+                                <td>北京市海淀区善缘街1号立方庭大厦2段103</td>
+                                <td>20150603</td>
+                                <td>系统闭市</td>
+                                <td>系统闭市无法提货</td>
+                            </tr>
+                            <tr class="tr_css" align="center">
+                                <td>010000013</td>
+                                <td>010222</td>
+                                <td>自提</td>
+                                <td>濮阳市华龙区精正福源堂</td>
+                                <td>蓝图百货浓香酒</td>
+                                <td>10</td>
+                                <td>北京市海淀区善缘街1号立方庭大厦2段103</td>
+                                <td>20150603</td>
+                                <td>系统闭市</td>
+                                <td>系统闭市无法提货</td>
+                            </tr>
+                            
+                        </table>
+                    </div>
+                </div>
+            </div>
+    <!--查看 end-->
+ <script type="text/javascript">
+		 var chuHeight=$(window).height()/2-355;
+		 var eHeight=$(window).height()/2-275;
+		 $(".p-dialog").css("top",chuHeight);
+		 $(".examWrap").css("top",eHeight);
+		 $(window).scroll(function(){
+			 	var chuHeight=$(window).height()/2-355;
+				var eHeight=$(window).height()/2-275;
+			 	var curHeight=chuHeight+$(document).scrollTop()+"px";
+				var eHeight=eHeight+$(document).scrollTop()+"px";
+				$(".p-dialog").css("top",curHeight);
+				$(".examWrap").css("top",eHeight);
+		 })
+         	$(function(){
+				$(".pingJia,.examin").click(function(){
+					$("#fullbg").height($("body").height());
+            		$("#fullbg").width($("body").width);
+					$("#fullbg").show();
+				   //弹出层出现后，窗口滚动条隐藏
+					$("body").css("overflow","hidden");
+				});
+				$(".examin").click(function(){
+					$(".examWrap").show();
+				});
+				$(".pingJia").click(function(){
+                    $("#score").html("");
+					//$("#fullbg").height($("body").height());
+            		//$("#fullbg").width($("body").width);
+					//$("#fullbg").show();
+					$(".pingjia").show();
+					
+				});
+				$(".p-close,.p-sub").click(function(){
+					$("#fullbg").hide();
+					$(".p-dialog").hide();
+					//启用滚动条
+					$("body").css("overflow","auto");
+				});
+				//评价得分
+				var selectScore=0;//保存click事件点击的分数
+                var scoreCode=0;//保存mouseover鼠标所在的分数
+				$(".star li").mouseover(function () {
+					$(this).addClass("starCheck").prevAll().addClass("starCheck");
+					$(this).nextAll().removeClass("starCheck");
+					scoreCode=parseInt($(this).index(".star li"))+1;
+					$("#selectScore").show();
+					var index=$(this).index();
+					$("#selectScore").css("marginLeft",25*index+'px');
+   					$(".btn-score").html(scoreCode+"分");
+ 				});
+				$(".star li").mouseout(function (){
+					$("#selectScore").hide();
+					$(this).removeClass("starCheck").prevAll().removeClass("starCheck");
+   					if(0==selectScore)$("#score").html("");//如果没有点击事件，置为空
+                    else{
+                    	$("#score").html(selectScore+"分");//如果点击过某个分数，显示相应的分数
+                    	$(".star li").eq(selectScore-1).addClass("starCheck").prevAll().addClass("starCheck");
+                    }
+ 				});
+				//最终得分是
+				$(".star li").click(function () {
+                    selectScore=scoreCode;//保存点击的分数
+   					$("#score").html(selectScore+"分");
+					$(".star li").removeClass("starCheck");
+   					$(this).addClass("starCheck").prevAll().addClass("starCheck");
+ 				});
+				//textbox文字为默认的时候字体颜色是灰色
+				$("#p-pro").val("评价商品~！");
+				$("#p-pro").focus(function(){
+					if($(this).val()=="评价商品~！"){
+						$(this).val("");
+						$("#p-pro").css("color","#333");
+					}
+				});
+				$("#p-pro").blur(function(){
+					if($(this).val()==""){
+						$(this).val("评价商品~！");
+						$("#p-pro").css("color","#c6c6c6");
+					}
+				});
+			})
+			
+         </script>
+    <!--评价弹框 end-->
+    <!--footer start-->
+    <div class="footer">
+        <div class="container">
+            <ul class="footer-menu fix">
+                <li><a href="#">帮助中心</a><span>|</span></li>
+                <li><a href="#">新手指导</a><span>|</span></li>
+                <li><a href="#">视频教程</a><span>|</span></li>
+                <li><a href="#">常见问题</a><span>|</span></li>
+                <li><a href="#">视频教程</a><span>|</span></li>
+                <li><a href="#">意见建议</a><span>|</span></li>
+                <li><a href="#">问题反馈</a><span>|</span></li>
+                <li><a href="#">关于我们</a><span>|</span></li>
+                <li><a href="#">联系我们</a><span>|</span></li>
+                <li><a href="#">加入我们</a><span>|</span></li>
+            </ul>
+            <p>
+                <span>增值电信业务经营许可证：浙B2-20110446</span>
+                <span>网络文化经营许可证：浙网文[2015]0295-065号</span>
+                <span>互联网医疗保健信息服务审核同意书 浙卫网审【2014】6号</span>
+            </p>
+            <p>互联网药品信息服务资质证书编号：浙-（经营性）-2012-0005</p>
+            <p>© 2014-2015 YZW.COM 版权所有</p>
+            <div class="footer-web">
+                <span class="di-1"></span>
+                <span class="di-2"></span>
+                <span class="di-3"></span>
+                <span class="di-4"></span>
+                <span class="di-5"></span>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+		
+        window.onload = function(){
+            $(".footer-menu").find("li").eq(-1).children("span").css("display","none");
+        };
+        $(function(){
+			
+			//关键字focus时默认文字消失
+			$(".keyWords").focus(function(){
+				if($(this).val()=="输入商品编号或名称"){
+					$(this).val("");
+					$(".keyWords").css("color","#333");
+					}
+				});
+			$(".keyWords").blur(function(){
+				if($(this).val()==""){
+					$(this).val("输入商品编号或名称");
+					$(".keyWords").css("color","#999");
+				}
+				});
+                
+				
+			//全选
+			$("#selectAll").click(function(){
+				if($(this).prop("checked")){//如果选中
+				$(".myBox tr td input").prop("checked",true)	
+				}else{// 如果取消
+				$(".myBox tr td input").prop("checked",false)	
+				}
+				});
+						
+			$(".bargin_box li input").prop("checked",false);
+			//成交方式
+			//点击button的时候，显示ul
+			$(".bargin").click(function(){
+					$(".bargin_box").show();
+				});
+				//选中改变值，将选中的值添加给button按钮进行显示
+				$(".bargin_box input").click(function(){
+					var val="";//用于记录选中的值
+					var isAll=true;//默认是全选中
+					$(".bargin_box li input").each(function(){//便利每一个checkbox
+						if($(this).prop("checked")){
+							val=val+$(this).parent("li").text()+",";//拼接所有的值
+						}else{
+							isAll=false;//如果有任何一个checkbox没有选中，那么就不是全部
+						}
+						});
+						if(val.length>0) val=val.substring(0,val.length-1);//如果有选择的值，去掉最后一个逗号
+						if(isAll){
+							$(".bargin").val("全部");
+							}else{
+								$(".bargin").val(val);}
+				});
+				//需要保留的代码
+			    document.onclick = function (event)  
+            {     
+                var e = event || window.event;  
+                var elem = e.srcElement||e.target;  
+                      
+                while(elem)  
+                {   
+                    if(elem.id == "barWrap")  
+                    {  
+                            return;  
+                    }  
+                    elem = elem.parentNode;       
+                }  
+                //隐藏div的方法  
+                $(".bargin_box").hide(); 
+            } 
+			//翻页
+			//$("ul.pageList li.page-item a").click(function(){
+//				$(this).addClass("current").parent(".page-item").siblings(".page-item").find("a").removeClass("current");
+//				}); 
+//			
+		//改变页码
+        $(".page-public>.num").click(function(){
+            $(this).addClass("active");
+            $(this).siblings().removeClass("active");
+        });
+        $("#first").click(function(){
+
+		})
+		
+		})	
+			
+				
+    </script>
+</body>
+</html>

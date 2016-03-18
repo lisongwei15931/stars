@@ -1,0 +1,964 @@
+{% extends "base_stars.html" %}
+{% block title %}
+域之为--{{ product.title }}
+{% endblock %}
+{% load staticfiles %}
+{% load history_tags %}
+{% load i18n %}
+{% load purchase_info_tags %}
+{% load reviews_tags %}
+{% load product_tags %}
+{% load currency_filters %}
+{% load display_tags %}
+{% load attention_tags %}
+{% load public_tags %}
+
+{% block custom_css %}
+{{block.super}}
+<style type="text/css">
+.breadcrumb {
+  margin-bottom: 20px;
+  list-style: none;
+  border-radius: 4px;
+}
+.breadcrumb > li {
+  display: inline-block;
+}
+.breadcrumb > li + li:before {
+  content: ">";
+  padding: 0 5px;
+  color: #cccccc;
+}
+.breadcrumb > .active {
+  color: #777777;
+}
+.small-product-img{
+  height:60px;
+  width:60px;
+}
+#commission_table{
+  border-collapse: collapse;
+  width: 239px;
+  line-height: 20px;
+  color: #676767;
+  margin-top: 30px;
+}
+#commission_table td{
+  border:1px solid #EEEEEE
+}
+</style>
+{% endblock %}
+{% block jquery %}
+{{ block.super }}
+{% endblock %}
+{% block content %}
+<!--产品详细-content-body-start-->
+<div class="container fix">
+<div class="shopclass l" id="shopclass">
+                <ul>
+                    <li>
+                        <h3><a href="#">全部商品分类</a></h3>
+                        <ul>
+                        {% for c in category_list %}
+                            <li class="shopclass-item">
+                                <a class="first-lei" href = "{% url 'catalogue:allproducts' %}?category={{c.name}} ">{{c.name}}</a>
+                                <ul>
+                                {% for cc in c.get_children %}
+                                    <li>
+                                        
+                                        <div class="menu-row fix">
+                                            <div class="menu-left l"><a href = "{% url 'catalogue:allproducts' %}?category={{cc.name}} " style ="color:#000;">{{cc.name}}</a></div>
+                                            <ul class="menu-ul l fix">
+                                            {% for ccc in cc.get_children %}
+                                                <li><a href="{% url 'catalogue:allproducts' %}?category={{ccc.name}} ">{{ccc.name}}</a><span><img src="{% static 'images/shuxian.png' %}"></span></li>
+                                            {% endfor %}
+                                            </ul>
+                                        </div>
+                                    </li>
+                                 {% endfor %}
+                                    <img src="{%static 'images/ad1-nav.jpg' %}" class="menu-img">
+                                </ul>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+    <ul class="banner-top l">
+        <li>
+            <a href="#">品牌汇</a>
+        </li>
+        <li>
+            <a href="{% url 'tradingcenter:trading_center_index' %}" target="_blank">交易大厅</a>
+        </li>
+        <li style="float:left;background-image: none;font-size:16px;border-right:none">
+            <a href="#">蓝图学堂</a>
+        </li>
+    </ul>
+</div>
+<!-- 目录 -->
+<div class="container fix">
+    <div class="product-nav-ul">
+        <ul class="breadcrumb">
+		    <li>
+		        <a href="{{ homepage_url }}">{% trans "Home" %}</a>
+		    </li>
+		    {% with category=product.categories.all.0 %}
+		        {% for c in category.get_ancestors_and_self %}
+		        <li>
+		            <a href="{% url 'catalogue:allproducts' %}?category={{c.name}}">{{ c.name }}</a>
+		        </li>
+		        {% endfor %}
+		        <li class="active">{{ product.title }}</li>
+		        {% get_back_button as backbutton %}
+		        {% if backbutton %}
+		            <li class="pull-right">
+		                <a href="{{ backbutton.url }}">
+		                    <i class="icon-arrow-left"></i> {{ backbutton.title }}
+		                </a>
+		            </li>
+		        {% endif %}
+		    {% endwith %}
+		</ul>
+    </div>
+</div>
+<div class="container fix">
+    <div class="product-des fix">
+        <div class="product-des-left fix l">
+            <div class="row l">
+				<!-- 图片展示 -->
+				<div class="preview">
+                    <div id="vertical" class="bigImg">
+                        <img src="/media/{{product.primary_image.original}}" width="360" height="360" alt="" id="midimg" />
+                        <div style="display:none;" id="winSelector"></div>
+                    </div>
+                    <!--bigImg end-->
+                    <div class="smallImg">
+                        <div class="scrollbutton smallImgUp disabled"></div>
+                        <div id="imageMenu">
+                            <ul>
+                                {% with all_images=product.images.all %}
+			                    {% if all_images|length > 0 %}
+			                    {% for image in all_images %}
+			                    <li><img src="/media/{{image.original}}" width="50" height="50" alt="红酒"/></li>
+			                    {% endfor %}
+			                    {% endif %}
+			                    {% endwith %}
+                            </ul>
+                        </div>
+                        {% if product.images.all|length < 6 %}
+                            <div class="scrollbutton smallImgDown disabled"></div>
+                        {% else %}
+                            <div class="scrollbutton smallImgDown" ></div>
+                        {% endif %}
+                    </div><!--smallImg end-->
+                    <div id="bigView" style="display:none;"><img width="800" height="800" alt="" src="" /></div>
+                    <!--图片轮播preview end-->
+	                <div class="detail fix">
+	                    <div class="l">
+	                        <span>商品编号：{{ product.upc }}</span>
+	                    </div>
+	                    <div class="r">
+                            {% if product|has_focused_by:user %}
+	                            <a href="#none/">已关注</a>
+                            {% else %}
+                                <a href="{% url 'customer:myfav-add-product'  product_pk=product.pk %}">关注商品</a>
+                            {% endif %}
+                            <form style="float:right" id="add_to_basket_form" action="/basket/add/{{ product.id }}/" method="post" class="add-to-basket">
+                                {% csrf_token %}
+                                <input id="id_quantity" name="quantity" type="hidden" value="1">
+                                <a class="addtocar l add_to_basket" id="add_to_basket_button">
+                                    加入购物车
+                                </a>
+                            </form>
+	                    </div>
+	                </div>
+                </div>
+            </div>
+            <!-- 商品信息-->
+            <div class="product-des-con l">
+                <h2>{{ product.get_title }} </h2>
+                <div class="color-red">
+                {% for av in product.attribute_values.all %}
+		            {% if av.attribute.code == "feature" %}
+		                {{ av.value_as_html }}
+		            {% endif %}
+		        {% endfor %}
+                </div>
+                <div class="product-des-price fix">
+                        <div class="product-item price-now">
+                            <span class="now">当前价格：</span>
+	                        <span class="money color-red">￥</span>
+	                        <span class="num color-red">{{ product.product_price }}</span>
+                        </div>
+                        <div class="product-item price-market">
+                            <span>市场价：</span>
+                            <del>￥{{product.stockrecords.first.price_retail}}</del>
+                        </div>
+                        <div class="product-item Volume">
+                            <span>成交量：</span>
+                            <span class="color-red">{{product.volume}}</span>
+                        </div>
+                </div>
+                <div class="explicit">
+                    <div class="pro-explicit fix">
+                        <div class="pro-explicit-l right l seat">
+                            所在地区
+                        </div>
+                        <div class="pro-explicit-r l">
+                            <div class="ui-city l">
+                                <span class="ui-city-toggle">
+                                    <div class="address-placement">
+                                        <samp>北京市</samp>
+                                        <samp>北京</samp>
+                                        <samp>海淀区</samp>
+                                    </div>
+                                    <b class="arr"></b>
+                                </span>
+                                <div class="ui-city-group">
+                                    <div class="ui-city-close">×</div>
+                                    <ul class="ui-city-tit">
+                                        <li class="curr"><samp>宁夏</samp><b class="arr"></b></li>
+                                        <li><samp>请选择市</samp><b class="arr"></b></li>
+                                        <li><samp>请选择县区</samp><b class="arr"></b></li>
+                                    </ul>
+                                    <ul class="ui-city-province">
+                                        <li><a>北京</a></li>
+                                        <li><a>河北省</a></li>
+                                        <li><a class="checked">宁夏</a></li>
+                                        <li><a>河南省</a></li>
+                                        <li><a>内蒙古</a></li>
+                                        <li><a>北京</a></li>
+                                        <li><a>河北省</a></li>
+                                        <li><a>天津</a></li>
+                                        <li><a>河南省</a></li>
+                                        <li><a>内蒙古</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="world l"><span class="style">有货</span>当日完成下单，预计<span class="tab-tit">（11月28日）</span>送达或自提</div>
+                        </div>
+                    </div>
+                    <div class="pro-explicit fix">
+                        <div class="pro-explicit-l right l">
+                            门店服务
+                        </div>
+                        <div class="pro-explicit-r l">
+                            <ul class="serve">
+                                <li><img src="{%static 'images/kuaidi.png' %}"/><span class="color-s">快递送达</span><span>下单后24小时内送达，点击查看您所在地址是否支持</span></li>
+                                <li><img src="{%static 'images/mendian.png' %}"/><span class="color-s">门店提货</span><span>选择有现货的门店下单，可立即提货</span></li>
+                                <li class="last-li"><img src="{%static 'images/mendian1.png' %}"/><span class="color-s">门店样品</span><span>门店提供样品，可现场咨询与试用</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="pro-explicit fix">
+                        <div class="pro-explicit-l right l">
+                            服务
+                        </div>
+                        <div class="pro-explicit-r l">
+                            <p>由<a>蓝图商品</a>销售和发货，并享受售后服务</p>
+                            <ul class="serve1 fix">
+                                <li><img src="{%static 'images/mian.png' %}"/>&nbsp;免运费</li>
+                                <li><img src="{%static 'images/ziti01.png' %}"/>&nbsp;自提</li>
+                            </ul>
+                        </div>
+                    </div>
+                    {% if first_attr.name %}
+                    <div class="pro-explicit fix" id="attr_area">
+                        <div class="pro-explicit-l right l seat">
+                            {{first_attr.name}}
+                        </div>
+                        <div class="pro-explicit-r l">
+                            <ul class="checkBox guiGe">
+                            {% for first_attr_value in first_attr_value_list %}
+                            {% if first_attr_value.text == cur_first_attr_value %}
+                            <li class="moren current">{{ first_attr_value.text }}</li>
+                            {% else %}
+                            <li class="moren"><a href="{{ first_attr_value.href }}">{{ first_attr_value.text }}</a></li>
+                            {% endif %}
+                            {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if second_attr.name %}
+                    <div class="pro-explicit fix" id="attr_area">
+                        <div class="pro-explicit-l right l seat">
+                            {{second_attr.name}}
+                        </div>
+                        <div class="pro-explicit-r l">
+                            <ul class="checkBox guiGe">
+                            {% for second_attr_value in second_attr_value_list %}
+                            {% if second_attr_value.text == cur_second_attr_value%}
+                            <li class="moren current">{{ second_attr_value.text }}{{second_attr_value.has}}</li>
+                            {% else %}
+                            {% if second_attr_value.has %}
+                            <li class="moren"><a href="{{second_attr_value.href}}">{{ second_attr_value.text }}</a></li>
+                            {% else %}
+                            <li class="out-of-check">{{ second_attr_value.text }}</li>
+                            {% endif %}
+                            {% endif %}
+                            {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <!--  {% for at in attr %}
+	                    <div class="pro-explicit fix" id="attr_area">
+	                        <div class="pro-explicit-l right l seat">
+	                            {{at.name}}
+	                        </div>
+	                        <div class="pro-explicit-r l">
+	                            <ul class="checkBox guiGe">
+	                            {% for ss in at.value %}
+	                            <a href="{{ss.href}}"><li id="{{at.code}}_{{at.id}}_{{ss.id}}">{{ ss.value_text }}{{ss.has}}</li></a>
+	                            {% endfor %}
+	                            </ul>
+	                        </div>
+	                    </div>
+                    {% endfor %}
+                    -->
+                <form id="add_to_basket_form" action="{% url 'basket:buy' pk=product.pk  %}" method="post" class="add-to-basket">
+                    {% csrf_token %}
+                    <div class="pro-explicit fix">
+                        <div class="pro-explicit-l right l seat">
+                            数量
+                        </div>
+                        <div class="pro-explicit-r l">
+                            <div class="explicit-num l fix">
+                                <img src="{%static 'images/num--.png' %}" class="jiaoyiSubtractnum l"/>
+                                <input id="id_quantity" name="quantity" type="text" class="l" value="1" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                                <img src="{%static 'images/num++.png' %}" class="jiaoyiAddnum l"/>
+                            </div>
+                            <div class="unit l">
+                                <span>件</span><span>库存<span>{{product.stockrecords.first.num_in_stock}}</span>件</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-des-con-btn">
+			        <button type="submit" class="btn btn-lg btn-primary btn-add-to-basket" value="{% trans "Add to basket" %}" data-loading-text="{% trans 'Adding...' %}">立即购买</button>
+                    <a href="{% url 'tradingcenter:trading_center_index' %}" target="_blank"><span class="in">进货</span></a>
+                    <a href="{% url 'tradingcenter:trading_center_index' %}" target="_blank"><span class="sale">出售</span></a>
+                </div>
+			    </form>
+            </div>
+        </div>
+        <!-- 趋势图 -->
+        <div class="product-des-right r">
+            <!--  <div id="price_tend_container" style="width: 239px; height: 169px; margin: 0 auto"></div> -->
+            <div id="trade_complete_container" style="width: 239px; height: 169px; margin: 0 auto"></div>
+            <div>
+	            <table id="commission_table">
+	               <tr><td style="width: 30px;text-align: center;color:#209100;">卖单</td><td> <span id="sale_price"> </span> 元</td><td> <span id="sale_num"></span> 单</td></tr>
+	               <tr><td style="width: 30px;text-align: center;color:#FF7B12;">买单</td><td> <span id="buy_price"> </span> 元</td><td> <span id="buy_num"></span> 单</td></tr>
+	               <tr><td style="text-align: center;" colspan=3>最高价:￥<span id="high_price"></span> 最低价:￥<span id="low_price"></span></td></tr>
+	            </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container fix">
+    <div class="buy-des-left l">
+		<!-- 推荐商品 -->
+		{% with recommended_products=product.recommended_products.all %}
+		{% if recommended_products %}
+        <div class="buydb">
+            <div class="buydb-title">
+                {% trans "Recommended items" %}
+            </div>
+            <div class="buydb-show fix">
+                <ul class="l">
+                    {% for product in recommended_products|order_by:'-browse_num' %}
+		            <li>
+                        <div class="l">
+                            <a href="{{ product.get_absolute_url }}"><img class="small-product-img" src="/media/{{product.primary_image.original}}" /></a>
+                        </div>
+                        <div class="r">
+                            <div class="p-infor">
+                                <a href="{{ product.get_absolute_url }}">{{ product.get_title }}</a>
+                            </div>
+                            <div class="p-price color-red">
+                                <span>￥{{ product.product_price }}</span>
+                                <del class="color-h">
+                                {%if product.stockrecords.first.price_retail%}
+                                ￥{{product.stockrecords.first.price_retail}}
+                                {% else %}
+                                {% endif %}
+                                </del>
+                            </div>
+                            <div class="p-sold">
+                                已售 {{product.volume}}
+                            </div>
+                        </div>
+                    </li>
+		            {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% else %}
+        <div class="buydb">
+        <div class="buydb-title">
+            {% trans "Recommended items" %}
+        </div>
+        </div>
+		{% endif %}
+		{% endwith %}
+		<!-- 浏览历史 -->
+		{% with history_products=history_products|slice:":7" %}
+        {% if history_products %}
+		<div class="buydb browsedb">
+            <div class="buydb-title">
+            {% trans 'Products you recently viewed' %}
+            </div>
+            <div class="buydb-show fix">
+                <ul class="l">
+                    {% for product in history_products %}
+                    <li>
+                        <div class="l">
+                            <a href="{{ product.get_absolute_url }}"><img class="small-product-img" src="/media/{{product.primary_image.original}}" /></a>
+                        </div>
+                        <div class="r">
+                            <div class="p-infor">
+                                <a href="{{ product.get_absolute_url }}">{{ product.get_title }}</a>
+                            </div>
+                            <div class="p-price color-red">
+                                <span>￥{{ product.product_price }}</span>
+                                <del class="color-h">
+                                {% if product.stockrecords.first.price_retail %}
+                                ￥{{ product.stockrecords.first.price_retail }}
+                                {% else %}
+                                {% endif %}
+                                </del>
+                            </div>
+                            <div class="p-sold">
+                                已售 {{product.volume}}
+                            </div>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% else %}
+        <div class="buydb browsedb">
+        <div class="buydb-title">
+        {% trans 'Products you recently viewed' %}
+        </div>
+        </div>
+        {% endif %}
+        {% endwith %}
+    </div>
+    <!-- 商品详情 -->
+    <div class="buy-des-right r">
+        <div class="title">
+            <ul class="fix">
+                <li class="active">商品介绍</li>
+                <!-- 
+                <li>用户评价</li>
+                <li>近期售出<span>100</span></li>
+                -->
+            </ul>
+        </div>
+        <div class="content-con-list content-con-list1 fix">
+            <div class="content-con fix">
+                <ul>
+                    <li>商品名称：{{ product.title }}</li>
+                    <li>商品编号：{{ product.upc }}</li>
+                    <li>类型：{{ product.get_product_class.name }}</li>
+                    {% with 'capacity degree flavor license_number' as list %}
+                    {% for av in product.attribute_values.all %}
+                        {% if av.attribute.code in list %}
+                        <li>
+                            {{ av.attribute.name }}：{{ av.value_as_html }}
+                        </li>
+                        {% endif%}
+                    {% endfor %}
+                    {% endwith %}
+                </ul>
+            </div>
+
+            <div class="infor-show">
+                {% if product.description %}
+                <div class="infor-show-img">
+                    {{ product.description|safe }}
+                </div>
+		        {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block custom_js %}
+<script type="text/javascript" src="{% static "js/jquery-1.8.3.min.js" %}"></script>
+<script type="text/javascript" src="{% static "js/highcharts.js" %}"></script>
+<script type="text/javascript">
+window.onload = function(){
+    $(".product-nav-ul").find("li").eq(-1).children("span").css("display","none");
+};
+$(document).ready(function(){
+	$('#add_to_basket_button').click(function() {
+        $('#add_to_basket_form').submit();
+    })
+	//请求商品价格趋势数据，并生成趋势图
+	$.ajax({
+	    type: 'get',
+	    url: '/tend-view/{{product.id}}/',
+	    success: function(data){
+	    	var chartdata = data.chartdata;
+	    	var jsondata = data.jsondata;
+	    	var tradedata = data.tradedata;
+	    	var commission_data = data.commission_data;
+	    	$('#buy_price').html(commission_data.commission_buy_price?commission_data.commission_buy_price:"-");
+	    	$('#buy_num').html(commission_data.commission_buy_num?commission_data.commission_buy_num:"-");
+	    	$('#sale_price').html(commission_data.commission_sale_price?commission_data.commission_sale_price:"-");
+	    	$('#sale_num').html(commission_data.commission_sale_num?commission_data.commission_sale_num:"-");
+	    	$('#high_price').html(commission_data.high_price?commission_data.high_price:"-");
+	    	$('#low_price').html(commission_data.low_price?commission_data.low_price:"-");
+	    	$(function () {
+	    		trade_complete_container
+	    		$('#trade_complete_container').highcharts({
+	    			title :{
+                        text:'最近两周成交趋势',
+                        verticalAlign: 'bottom',
+                        y:10,
+                        style: {
+                            'font-size':'12px'
+                        }
+                    },
+                    lang: {
+                        noData: "没有近期数据"
+                    },
+                    noData: {
+                        style: {
+                            fontWeight: 'bold',
+                            fontSize: '15px',
+                            color: '#303030'
+                        }
+                    },
+                    chart: {
+                        type: 'line',
+                        marginBottom: 30
+                    },
+                    legend: {
+                        enabled: false
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    xAxis: {
+                        type: 'category', 
+                        labels:{
+                            enabled:false
+                        },
+                        title: {
+                            text: null
+                            //align: 'center'
+                        }
+                    },
+                    yAxis: {
+                        title: {
+                            text: null
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }]
+                    },
+                    tooltip: {
+                        xDateFormat: '<b>%Y-%m-%d</b>',
+                        headerFormat: 'sd',
+                        formatter: function() {
+                            return '<b>'+this.point.name+'</b><br/>成交量:'+this.point.y;
+                        }
+                    },
+                    series: [{
+                        name: 'Tokyo',
+                        data:tradedata
+                    }]
+	    		})
+	    		/*
+	            $('#price_tend_container').highcharts({
+	                title :{
+	                    text:'最近两周价格趋势',
+	                    verticalAlign: 'bottom',
+	                    y:10,
+	                    style: {
+	                    	'font-size':'12px'
+	                    }
+	                },
+	                lang: {
+	                    noData: "没有近期数据"
+	                },
+	                noData: {
+	                    style: {
+	                        fontWeight: 'bold',
+	                        fontSize: '15px',
+	                        color: '#303030'
+	                    }
+	                },
+	                chart: {
+	                    type: 'line',
+	                    marginBottom: 30
+	                },
+	                legend: {
+	                    enabled: false
+	                },
+	                credits: {
+	                    enabled: false
+	                },
+	                xAxis: {
+	                    type: 'category', 
+	                    labels:{
+	                        enabled:false
+	                    },
+	                    title: {
+	                        text: null
+	                        //align: 'center'
+	                    }
+	                },
+	                yAxis: {
+	                    title: {
+	                        text: null
+	                    },
+	                    plotLines: [{
+	                        value: 0,
+	                        width: 1,
+	                        color: '#808080'
+	                    }]
+	                },
+	                tooltip: {
+	                    xDateFormat: '<b>%Y-%m-%d</b>',
+	                    headerFormat: 'sd',
+	                    formatter: function() {
+	                        return '<b>'+this.point.name+'</b><br/>最高价:'+jsondata[this.point.name].max
+	                               +'<br/>成交价:'+this.point.y+'<br/>最低价:'+jsondata[this.point.name].min;
+	                    }
+	                },
+	                series: [{
+	                    name: 'Tokyo',
+	                    data:chartdata
+	                }]
+	            });
+	    		*/
+	        });
+	    },
+	    dataType: 'json',
+	    error : function(e) {    
+	        console.log(e);   
+	     }    
+	});
+	
+    // 图片上下滚动
+    var count = $("#imageMenu li").length - 5; /* 显示 6 个 li标签内容 */
+    var interval = $("#imageMenu li:first").width();
+    var curIndex = 0;
+
+    $('.scrollbutton').click(function(){
+        if( $(this).hasClass('disabled') ) return false;
+
+        if ($(this).hasClass('smallImgUp'))
+            --curIndex;
+        else
+            ++curIndex;
+
+        //$('.scrollbutton').removeClass('disabled');
+        if (curIndex == 0)
+            $('.smallImgUp').addClass('disabled').css("background","url('/static/images/item-jtl.png') no-repeat");
+        if (curIndex != 0)
+            $('.smallImgUp').removeClass('disabled').css("background","url('/static/images/item-jtlh.png') no-repeat");
+        if (curIndex >= count)
+            $('.smallImgDown').addClass('disabled').css("background","url('/static/images/item-jtr.png') no-repeat");
+        if (curIndex < count)
+            $('.smallImgDown').removeClass('disabled').css("background","url('/static/images/item-jtrh.png') no-repeat");
+
+
+        $("#imageMenu ul").stop(false, true).animate({"marginLeft" : -curIndex*interval + "px"}, 600);
+    });
+    // 解决 ie6 select框 问题
+    $.fn.decorateIframe = function(options) {
+        if ($.browser.msie && $.browser.version < 7) {
+            var opts = $.extend({}, $.fn.decorateIframe.defaults, options);
+            $(this).each(function() {
+                var $myThis = $(this);
+                //创建一个IFRAME
+                var divIframe = $("<iframe />");
+                divIframe.attr("id", opts.iframeId);
+                divIframe.css("position", "absolute");
+                divIframe.css("display", "none");
+                divIframe.css("display", "block");
+                divIframe.css("z-index", opts.iframeZIndex);
+                divIframe.css("border");
+                divIframe.css("top", "0");
+                divIframe.css("left", "0");
+                if (opts.width == 0) {
+                    divIframe.css("width", $myThis.width() + parseInt($myThis.css("padding")) * 2 + "px");
+                }
+                if (opts.height == 0) {
+                    divIframe.css("height", $myThis.height() + parseInt($myThis.css("padding")) * 2 + "px");
+                }
+                divIframe.css("filter", "mask(color=#fff)");
+                $myThis.append(divIframe);
+            });
+        }
+    }
+    $.fn.decorateIframe.defaults = {
+        iframeId: "decorateIframe1",
+        iframeZIndex: -1,
+        width: 0,
+        height: 0
+    }
+    //放大镜视窗
+    $("#bigView").decorateIframe();
+    //点击到中图
+    var midChangeHandler = null;
+
+    $("#imageMenu li img").hover(function(){
+        if ($(this).attr("id") != "onlickImg") {
+            midChange($(this).attr("src").replace("small", "mid"));
+            $("#imageMenu li").removeAttr("id");
+            $(this).parent().attr("id", "onlickImg");
+        }
+    }).bind("mouseover", function(){
+        if ($(this).attr("id") != "onlickImg") {
+            window.clearTimeout(midChangeHandler);
+            midChange($(this).attr("src").replace("small", "mid"));
+            $(this).css({ "border": "2px solid #c00000" });
+        }
+    }).bind("mouseout", function(){
+        if($(this).attr("id") != "onlickImg"){
+            $(this).removeAttr("style");
+            midChangeHandler = window.setTimeout(function(){
+                midChange($("#onlickImg img").attr("src").replace("small", "mid"));
+            }, 1000);
+        }
+    });
+    function midChange(src) {
+        $("#midimg").attr("src", src).load(function() {
+            changeViewImg();
+        });
+    }
+    //大视窗看图
+    function mouseover(e) {
+        if ($("#winSelector").css("display") == "none") {
+            $("#winSelector,#bigView").show();
+        }
+        $("#winSelector").css(fixedPosition(e));
+        e.stopPropagation();
+    }
+    function mouseOut(e) {
+        if ($("#winSelector").css("display") != "none") {
+            $("#winSelector,#bigView").hide();
+        }
+        e.stopPropagation();
+    }
+    $("#midimg").mouseover(mouseover); //中图事件
+    $("#midimg,#winSelector").mousemove(mouseover).mouseout(mouseOut); //选择器事件
+
+    var $divWidth = $("#winSelector").width(); //选择器宽度
+    var $divHeight = $("#winSelector").height(); //选择器高度
+    var $imgWidth = $("#midimg").width(); //中图宽度
+    var $imgHeight = $("#midimg").height(); //中图高度
+    var $viewImgWidth = $viewImgHeight = $height = null; //IE加载后才能得到 大图宽度 大图高度 大图视窗高度
+
+    function changeViewImg() {
+        $("#bigView img").attr("src", $("#midimg").attr("src").replace("mid", "big"));
+    }
+    changeViewImg();
+    $("#bigView").scrollLeft(0).scrollTop(0);
+    function fixedPosition(e) {
+        if (e == null) {
+            return;
+        }
+        var $imgLeft = $("#midimg").offset().left; //中图左边距
+        var $imgTop = $("#midimg").offset().top; //中图上边距
+        X = e.pageX - $imgLeft - $divWidth / 2; //selector顶点坐标 X
+        Y = e.pageY - $imgTop - $divHeight / 2; //selector顶点坐标 Y
+        X = X < 0 ? 0 : X;
+        Y = Y < 0 ? 0 : Y;
+        X = X + $divWidth > $imgWidth ? $imgWidth - $divWidth : X;
+        Y = Y + $divHeight > $imgHeight ? $imgHeight - $divHeight : Y;
+
+        if ($viewImgWidth == null) {
+            $viewImgWidth = $("#bigView img").outerWidth();
+            $viewImgHeight = $("#bigView img").height();
+            if ($viewImgWidth < 200 || $viewImgHeight < 200) {
+                $viewImgWidth = $viewImgHeight = 800;
+            }
+            $height = $divHeight * $viewImgHeight / $imgHeight;
+            $("#bigView").width($divWidth * $viewImgWidth / $imgWidth);
+            $("#bigView").height($height);
+        }
+        var scrollX = X * $viewImgWidth / $imgWidth;
+        var scrollY = Y * $viewImgHeight / $imgHeight;
+        $("#bigView img").css({ "left": scrollX * -1, "top": scrollY * -1 });
+        //$("#bigView").css({ "top": 0, "left": $(".preview").offset().left + $(".preview").width() + 15 });
+
+        return { left: X, top: Y };
+    };
+    
+ // 购物车显示
+    $("#shopcar-li").hover(function(){
+        $(".shopcar-products",this).show().css({
+
+        });
+        $("#shopcar-li>a").css({
+            "background-color":"#fff",
+            "box-shadow":"0 0 3px #666",
+            "color":"#c00000"
+        });
+        var totalprices = $(".total-price") ;
+        var totalprice = 0.00;
+        totalprices.each(function(){
+        	totalprice += $(this).html()*1; 	
+        });
+        if (totalprice > 1000000){
+        	totalprice = totalprice.toExponential(2)
+        };
+        $(".bottom-total-item #total-price").html(totalprice);
+        $(".border-type").show();
+    },function(){
+        $(".shopcar-products").hide();
+        $("#shopcar-li>a").css({
+            "background-color":"#ededed",
+            "box-shadow":"none",
+            "color":"#333"
+        });
+        $(".border-type").hide();
+    });
+   // 购物车删除
+    $(".del_basket").click(function(){
+    	if (confirm("确定要删除该商品吗？")){
+    	var line_id = $(this).attr("id").split("del_")[1];
+    	$.ajax({
+    		type:"GET",
+    		url :'/basket/delete-line/'+line_id,
+    		//data :{"pk":line_id},
+    		async:false,  
+    		success: function(){
+    			$(".shopcar-products-content[id="+line_id+"]").remove();
+    			location.reload();
+    		}
+    		
+    	});
+    	
+    	}else {}
+     });
+    //收益显示
+    $.get("{% url 'customer:getuserincome' %}",function(result,status){
+    	if(result.yesterday_icome>=0){
+        	$("#add").html("+" + result.yesterday_icome);
+        	$("#add1").html("+" + result.yesterday_icome);
+        	}else{
+        		$("#add").html(result.yesterday_icome);
+            	$("#add1").html(result.yesterday_icome);	
+        	}
+    });
+    //我的收益
+    $("#shouyi-li").hover(function () {
+    	  $.ajax({
+              dataType: "json",
+              url: "{% url 'customer:getuserincome' %}",
+              data: {},
+              success: function (result) {
+              	var zrsy = result.yesterday_icome ;
+              	var ljsy = result.total_icome;
+              	var zhye = result.user_balance;
+                  $("#zrsy").html('￥ '+ zrsy);
+                  $("#ljsy").html('￥ '+ ljsy);
+                  $("#zhye").html('￥ '+ zhye);
+              },
+          });
+      	
+      	
+        $(".shopcar-products",this).show();
+
+        $("#shouyi-li>a").css({
+            "background-color": "#fff",
+            "box-shadow": "0 0 3px #666",
+            "color": "#c00000"
+        });
+        $("#border-type1").show();
+    }, function () {
+        $(".shopcar-products").hide();
+        $("#shouyi-li>a").css({
+            "background-color": "#ededed",
+            "box-shadow": "none",
+            "color": "#333"
+        });
+        $("#border-type1").hide();
+    });
+    // NAV
+    //全部商品分类
+    $(".shopclass-item").hover(function () {
+                $(this).next().css("display", "block");
+                $(".shopclass-item").css("background-color", "#c00000");
+                $(this).css({"background-color": "#fafafa", "color": "#333"});
+                $(".first-lei", this).css("color", "#333");
+            },
+            function () {
+                $(".shopclass-item>a").css("color", "#fff");
+                $(this).css({"background-color": "#c00000", "color": "#fff"});
+            });
+    
+  //所在区域，配货地址
+    $(".ui-city-toggle").mouseover(function(){
+        $(this).addClass("press");
+        $(".ui-city-toggle .arr").addClass("clk");
+        $(".ui-city-group").show();
+    });
+    $(".ui-city").mouseleave(function(){
+        $(".ui-city-toggle").removeClass("press");
+        $(".ui-city-toggle .arr").removeClass("clk");
+        $(".ui-city-group").hide();
+    });
+    //ui-city-close绑定关闭按钮事件
+    $(".ui-city-close").click(function(){
+        $(".ui-city-toggle").removeClass("press");
+        $(".arr").removeClass("clk");
+        $(".ui-city-group").hide();
+        $(".ui-city-tit li:first b").addClass("clk");//省的默认背景图标是黄色向上的箭头
+        $(".ui-city-tit li:first").addClass("curr").siblings().removeClass("curr");//一开始第一个li添加class，其他的去掉
+    });
+    $(".ui-city-tit li:first b").addClass("clk");//省的默认背景图标是红色向上的箭头
+    $(".ui-city-tit li").click(function(){//给每一个li标签绑定点击事件
+        $(this).addClass("curr").siblings().removeClass("curr");//当前的li标签添加curr的class，其他的去掉class
+        $(this).children("b").addClass("clk").parent().siblings().children().removeClass("clk");    //
+    });
+    $(".ui-city-province li a").click(function(){
+        $(this).addClass("checked").parent("li").siblings().children("a").removeClass("checked");
+    });
+    //选择商品分类（颜色，尺寸）
+    $(".guiGe li.moren,.clor li.moren").click(function(){
+        $(this).addClass("current").siblings().removeClass("current");
+    });
+    $("ul.checkBox li.out-of-check").click(function(){
+        $(this).removeClass("current");
+    });
+    //数量加减
+    $(".jiaoyiSubtractnum").click(function(){
+        var inputVal = $(this).next().val();
+        inputVal--;
+        if(inputVal > 0){
+            $(this).next().val(inputVal);
+        }
+    });
+    $(".jiaoyiAddnum").click(function(){
+        var inputVal = $(this).prev().val();
+        inputVal++;
+        if(inputVal > 0){
+            $(this).prev().val(inputVal);
+        }
+    });
+    var cur_product_attr_list = "{{cur_attr|safe}}".split(",");;
+    $('#attr_area li').each(function(){
+        if(cur_product_attr_list.indexOf($(this).attr('id'))>=0){
+        	console.log($(this).attr('id'));
+        	$(this).addClass("current")
+        }
+    })
+});
+</script>
+{% endblock %}

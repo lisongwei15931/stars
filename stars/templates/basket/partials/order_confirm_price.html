@@ -1,0 +1,7 @@
+            <p><span class="red">{{ product_num }}</span>件商品，商品总金额：   ￥{{ total_product_price|floatformat:2}}</p>
+            <p>杂费合计：   ￥ {{ total_pickup_price|floatformat:2}}</p>
+            <p>快递费合计：   ￥ {{ total_express_price|floatformat:2}}</p>
+            <p class="sub">
+                实付总额：<span class="red">￥</span><span id="total_price" class="red">{{ total_price|floatformat:2}}</span>
+                <input id="submit_order" type="submit" value="提交订单"/>
+            </p>

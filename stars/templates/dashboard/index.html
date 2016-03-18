@@ -1,0 +1,61 @@
+{% extends 'dashboard/layout.html' %}
+{% load currency_filters %}
+{% load i18n %}
+
+{% block body_class %}{{ block.super }} orders home{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <meta http-equiv="refresh" content="300">
+{% endblock %}
+
+{% block breadcrumbs %}
+{% endblock %}
+
+{% block headertext %}
+{% trans "Dashboard" %}
+{% endblock %}
+
+{% block dashboard_content %}
+
+<div class="table-header">
+    <i class="icon-signal icon-large"></i>平台统计
+</div>
+
+<div class="content-block">
+    <div class="row">
+        <aside class="col-md-3 order-graph-details">
+            <label><span><i class="icon-shopping-cart"></i>{{ total_orders_last_day }}</span>总成交量</label>
+            <label><span><i class="icon-hand-right"></i>{{ total_customers_last_day }}</span>新用户</label>
+            <label><span><i class="icon-group"></i>{{ total_customers }}</span>{% trans "Total Customers" %}</label>
+            <label><span><i class="icon-briefcase"></i>{{ total_products }}</span>{% trans "Total Products" %}</label>
+        </aside>
+        <div class="col-md-9">
+            <div id="order_graph">
+                <div class="bar-caption"><h1>总成交量</h1></div>
+                <div class="bar-y-axis">
+                    <ul>
+                    {% for y_value in hourly_report_dict.y_range %}
+                        <li><span>{{ y_value|currency }}</span></li>
+                    {% endfor %}
+                    </ul>
+                </div>
+                <dl class="bar-chart">
+                    {% for item in hourly_report_dict.order_total_hourly %}
+                        <dd class="bar-layer">
+                            <em>{{ item.end_time|time }}</em>
+                            <span style="height: {{ item.percentage }}%;" >
+                                <p{% if item.percentage == 0 %} style="display: none;"{% endif %}>{{ item.total_incl_tax|currency }}</p>
+                            </span>
+                        </dd>
+                    {% endfor %}
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+{% endblock %}

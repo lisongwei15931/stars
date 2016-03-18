@@ -1,0 +1,1708 @@
+<!DOCTYPE html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <title>Pusher Test</title>
+    <link rel="stylesheet" href="jqGrid/css/ui.jqgrid.css">
+    <link rel="stylesheet" href="jqGrid/css/ui.multiselect.css">
+    <link rel="stylesheet" href="jquery-ui/jquery-ui.min.css">
+    <link rel="stylesheet" href="css/trading.css" type="text/css">
+    <style type="text/css">
+        .ui-tabs .ui-tabs-panel {
+            padding: 2px 0;
+        }
+    </style>
+    <script type="text/javascript" src="js/pusher.min.js"></script>
+    <script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="jquery-ui/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="jqGrid/js/ui.multiselect.js"></script>
+    <script type="text/javascript" src="jqGrid/js/jquery.jqGrid.min.js"></script>
+    <script type="text/javascript" src="jqGrid/js/grid.locale-cn.js"></script>
+    <script type="text/javascript" src="jqGrid/js/jquery.contextmenu.js"></script>
+    
+    <script>
+        Pusher.log = function(message) {
+          if (window.console && window.console.log) {
+            window.console.log(message);
+          }
+        };
+    </script>
+
+    <script>  
+        current_row_id = '';
+        $(document).ready(function () {
+            <!-- 初始化jqueryui的tabs,button.dialog -->
+            $( "#tabs" ).tabs();
+            $( ".button" ).button();
+            $( "#dialog" ).dialog({
+                autoOpen: false,
+                width: 400,
+                buttons: [
+                    {
+                        text: "Ok",
+                        click: function() {
+                            commitdata();
+                            $( this ).dialog( "close" );
+                        }
+                    },
+                    {
+                        text: "Cancel",
+                        click: function() {
+                            $( this ).dialog( "close" );
+                        }
+                    }
+                ]
+            });
+
+            $( "#buy-dialog" ).dialog({
+                autoOpen: false,
+                width: 1000,
+                modal: true
+//                buttons: [
+//                    {
+//                        text: "Ok",
+//                        click: function() {
+//                            commission_buy();
+//                            $( this ).dialog( "close" );
+//                        }
+//                    },
+//                    {
+//                        text: "Cancel",
+//                        click: function() {
+//                            $( this ).dialog( "close" );
+//                        }
+//                    }
+//                ]
+            });
+            $( "#stock-dialog" ).dialog({
+                autoOpen: false,
+                width: 1000,
+                modal: true
+//                buttons: [
+//                    {
+//                        text: "Ok",
+//                        click: function() {
+//                            commission_buy();
+//                            $( this ).dialog( "close" );
+//                        }
+//                    },
+//                    {
+//                        text: "Cancel",
+//                        click: function() {
+//                            $( this ).dialog( "close" );
+//                        }
+//                    }
+//                ]
+            });
+            $( "#sale-dialog" ).dialog({
+                autoOpen: false,
+                width: 1000,
+                modal: true
+//                buttons: [
+//                    {
+//                        text: "Ok",
+//                        click: function() {
+//                            commission_sale();
+//                            $( this ).dialog( "close" );
+//                        }
+//                    },
+//                    {
+//                        text: "Cancel",
+//                        click: function() {
+//                            $( this ).dialog( "close" );
+//                        }
+//                    }
+//                ]
+            });
+            $( "#dialog-link" ).click(function( event ) {
+                $( "#dialog" ).dialog( "open" );
+                event.preventDefault();
+            });
+            $( "#column-chooser-link" ).click(function( event ) {
+                $("#jqGrid").jqGrid('columnChooser');
+                event.preventDefault();
+            });
+            $( "#buy-link" ).click(function( event ) {
+                $( "#buy-dialog" ).dialog( "open" );
+                event.preventDefault();
+            });
+            $( "#stock-link" ).click(function( event ) {
+                $( "#stock-dialog" ).dialog( "open" );
+                event.preventDefault();
+            });
+            $( "#sale-link" ).click(function( event ) {
+                $( "#sale-dialog" ).dialog( "open" );
+                event.preventDefault();
+            });
+
+            <!-- 连接pusher并绑定相关频道事件 -->
+            function updategrid(id,colname,newdata){
+                $("#jqGrid").jqGrid('setCell',id,colname,newdata,{background:'red'});
+                setTimeout("$('#jqGrid').jqGrid('setCell',"+id+",'"+colname+"','',{background:''});",500);
+            }
+            var pusher = new Pusher('e666e112da02614bfea7', {
+                encrypted: true
+            });
+            var random_channel = pusher.subscribe('random_channel');
+            random_channel.bind('randomupdate', function(data) {
+                updategrid(data.message.id,data.message.name,data.message.value);
+            });
+            var push_channel = pusher.subscribe('push_channel');
+            push_channel.bind('pushupdate', function(data) {
+            	for(var i =0;i<data.length;i++){
+            		updategrid(data[i][0],data[i][1],data[i][2])
+            	}
+            });
+            push_channel.bind('pushadd', function(data) {
+            	$("#jqGrid").jqGrid('addRowData',data.id,data)
+            });
+            <!-- 生成表格 -->
+            function emptyformater(cellValue, options, rowdata, action) {
+                if (cellValue == "")
+                    return "-";
+                if (cellValue == null || cellValue == 'null')
+                    return "-";
+                return cellValue;
+            }
+            var data = [{"volume": 6, "high": 6.0, "total": 29.0, "strike_price": 6.0, "bid_vol": null, "opening_price": 3.0, "market_capitalization": 1000.0, "product_name": "\u8305\u53f0\u9171\u999942\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "XKJ53", "average_cost": "0", "closing_price": 0.0, "low": 3.0, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": 6.0, "id": 47, "net_change": 6.0}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u8305\u53f0\u9547\u6d53\u999960\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "XKJ60", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 46, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u8305\u53f0\u9547\u6d53\u999958\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "XKJ58", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 45, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u8305\u53f0\u9547\u6d53\u999956\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "XKJ56", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 44, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u8305\u53f0\u9547\u6d53\u999954\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "XKJ54", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 43, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u8305\u53f0\u9547\u6d53\u999952\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "XKJ52", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 42, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u8305\u53f0\u9547\u6d53\u999950\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "XKJ50", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 41, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u8305\u53f0\u9547\u6d53\u999948\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "XKJ48", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 40, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u8305\u53f0\u9547\u6d53\u999944\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "XKJ44", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 38, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u8305\u53f0\u9547\u6d53\u999942\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "XKJ42", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 37, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u5730\u7687\u6d53\u999960\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "DH60", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 36, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u5730\u7687\u6d53\u999958\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "DH58", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 35, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u5730\u7687\u6d53\u999956\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "DH56", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 34, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u5730\u7687\u6d53\u999952\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "DH52", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 33, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u5730\u7687\u6d53\u999950\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "DH50", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 32, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u5730\u7687\u6d53\u999948\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "DH48", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 30, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u5730\u7687\u6d53\u999946\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "DH46", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 29, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u5730\u7687\u6d53\u999942\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "DH42", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 28, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u5c06\u519b\u7389\u6d53\u999960\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "JJY60", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 27, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u5c06\u519b\u7389\u6d53\u999958\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "JJY58", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 26, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u5c06\u519b\u7389\u6d53\u999956\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "JJY56", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 25, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u5c06\u519b\u7389\u6d53\u999954\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "JJY54", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 24, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u5c06\u519b\u7389\u6d53\u999952\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "JJY52", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 23, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u5c06\u519b\u7389\u6d53\u999950\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "JJY50", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 22, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u5c06\u519b\u7389\u6d53\u999948\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "JJY48", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 21, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u5c06\u519b\u7389\u6d53\u999946\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "JJY46", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 20, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u5c06\u519b\u7389\u6d53\u999944\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "JJY44", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 19, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u5c06\u519b\u7389\u6d53\u999942\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "JJY42", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 18, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u57df\u4e4b\u4e3a\u6d53\u999960\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "YZW60", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 17, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u57df\u4e4b\u4e3a\u6d53\u999958\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "YZW58", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 16, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u57df\u4e4b\u4e3a\u6d53\u999956\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "YZW56", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 15, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u57df\u4e4b\u4e3a\u6d53\u999952\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "YZW52", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 14, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u57df\u4e4b\u4e3a\u6d53\u999950\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "YZW50", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 13, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u57df\u4e4b\u4e3a\u6d53\u999948\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "YZW48", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 12, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u57df\u4e4b\u4e3a\u6d53\u999946\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "YZW46", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 11, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u57df\u4e4b\u4e3a\u6d53\u999942\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "YZW42", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 10, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u90b1\u5e9c\u6d53\u999960\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "QF60", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 9, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u90b1\u5e9c\u6d53\u999958\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "QF58", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 8, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u90b1\u5e9c\u6d53\u999956\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "QF56", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 7, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u90b1\u5e9c\u6d53\u999952\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "QF52", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 6, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u90b1\u5e9c\u6d53\u999950\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "QF50", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 5, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u90b1\u5e9c\u6d53\u999948\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "QF48", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 4, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u90b1\u5e9c\u6d53\u999946\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "QF46", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 3, "net_change": null}, {"volume": 0, "high": null, "total": null, "strike_price": null, "bid_vol": null, "opening_price": null, "market_capitalization": 1000.0, "product_name": "\u90b1\u5e9c\u6d53\u999942\u5ea6", "ask_price": null, "holdings": "0", "product_symbol": "QF42", "average_cost": "0", "closing_price": 0.0, "low": null, "stock_right": "0", "ask_vol": null, "bid_price": null, "net_change_rise": null, "id": 1, "net_change": null}];
+            
+            $("#jqGrid").jqGrid({
+                data: data,
+                datatype: "local",
+                colModel: [
+                    { label: '序号', name: 'id', width: 5 , sorttype:'int'},
+                    { label: '代码', name: 'product_symbol', width: 20 , sorttype:'string'},
+                    { label: '名称', name: 'product_name', width: 35 , sorttype:'string'},
+                    { label: '成交价', name: 'strike_price', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '涨跌', name: 'net_change', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '涨跌幅', name: 'net_change_rise', width: 10 , sorttype:"string",align:"center",formatter: emptyformater},
+                    { label: '买价', name: 'bid_price', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '卖价', name: 'ask_price', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '买量', name: 'bid_vol', width: 10 , sorttype:"int",align:"center",formatter: emptyformater},
+                    { label: '卖量', name: 'ask_vol', width: 10 , sorttype:"int",align:"center",formatter: emptyformater},
+                    { label: '开盘', name: 'opening_price', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '昨收', name: 'closing_price', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '最高价', name: 'high', width: 10, sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '最低价', name: 'low', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '成交量', name: 'volume', width: 10 , sorttype:"int",align:"center",formatter: emptyformater},
+                    { label: '成交额', name: 'total', width: 10 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '持有量', name: 'holdings', width: 10 , sorttype:"int",align:"center",formatter: emptyformater},
+                    { label: '平均成本', name: 'average_cost', width: 15 , sorttype:"float",align:"center",formatter: emptyformater},
+                    { label: '进货权', name: 'stock_right', width: 10 , sorttype:"int",align:"center",formatter: emptyformater},
+                    { label: '市值', name: 'market_capitalization', width: 10 , sorttype:"string",align:"center",formatter: emptyformater},
+                ],
+                autowidth:true,
+                height:'auto',
+                loadonce:true,
+                multiselect: true,
+                multiboxonly: true,
+                rowNum: 999999,
+            });
+            <!--给表格绑定右键菜单-->
+            function initContextMenu() {
+                $(".jqgrow", "#jqGrid").contextMenu('contextMenu', {
+                    bindings: {
+                        'clickme': function (t) {
+                            clickme();
+                        }
+                    },
+                    onContextMenu: function (event, menu) {
+                        return true;
+                    }
+                });
+
+                function clickme() {
+                    var grid = $("#jqGrid");
+                    var rowKey = grid.jqGrid('getGridParam','selarrrow');
+                    if (rowKey) {
+                        alert(rowKey);
+                        //grid.delGridRow(rowKey);
+                    }
+                    else {
+                        alert("No rows are selected");
+                    }
+                }
+            }
+
+
+            /*$("#grid").jqGrid({
+                datatype: "local",
+                height: 250,
+                   colNames:['Inv No','Date', 'Client', 'Amount','Tax','Total','Notes'],
+                   colModel:[
+                       {name:'id',index:'id', width:60},
+                       {name:'invdate',index:'invdate', width:90, sorttype:"date"},
+                       {name:'name',index:'name', width:100},
+                       {name:'amount',index:'amount', width:80, align:"right",sorttype:"float"},
+                       {name:'tax',index:'tax', width:80, align:"right",sorttype:"float"},        
+                       {name:'total',index:'total', width:80,align:"right",sorttype:"float"},        
+                       {name:'note',index:'note', width:150, sortable:false}        
+                   ],
+                   multiselect: true,
+                   gridview: true,
+                   caption: "Manipulating Array Data"
+            });
+            var mydata = [
+                    {id:"1",invdate:"2007-10-01",name:"test",note:"note",amount:"200.00",tax:"10.00",total:"210.00"},
+                    {id:"2",invdate:"2007-10-02",name:"test2",note:"note2",amount:"300.00",tax:"20.00",total:"320.00"},
+                    {id:"3",invdate:"2007-09-01",name:"test3",note:"note3",amount:"400.00",tax:"30.00",total:"430.00"},
+                    {id:"4",invdate:"2007-10-04",name:"test",note:"note",amount:"200.00",tax:"10.00",total:"210.00"},
+                    {id:"5",invdate:"2007-10-05",name:"test2",note:"note2",amount:"300.00",tax:"20.00",total:"320.00"},
+                    {id:"6",invdate:"2007-09-06",name:"test3",note:"note3",amount:"400.00",tax:"30.00",total:"430.00"},
+                    {id:"7",invdate:"2007-10-04",name:"test",note:"note",amount:"200.00",tax:"10.00",total:"210.00"},
+                    {id:"8",invdate:"2007-10-03",name:"test2",note:"note2",amount:"300.00",tax:"20.00",total:"320.00"},
+                    {id:"9",invdate:"2007-09-01",name:"test3",note:"note3",amount:"400.00",tax:"30.00",total:"430.00"}
+                    ];
+            for(var i=0;i<=mydata.length;i++)
+                $("#grid").jqGrid('addRowData',i+1,mydata[i]);*/
+        });
+    </script>
+    <script>
+        //获取浏览器页面可见高度和宽度
+        var _PageHeight = document.documentElement.clientHeight,
+                _PageWidth = document.documentElement.clientWidth;
+        //计算loading框距离顶部和左部的距离（loading框的宽度为215px，高度为61px）
+        var _LoadingTop = _PageHeight > 61 ? (_PageHeight - 61) / 2 : 0,
+                _LoadingLeft = _PageWidth > 215 ? (_PageWidth - 215) / 2 : 0;
+        //在页面未加载完毕之前显示的loading Html自定义内容
+        var _LoadingHtml = '<div id="loadingDiv" style="position:absolute;left:0;width:100%;height:' + _PageHeight + 'px;top:0;background:#000;z-index:10000;"><div style="position: absolute; cursor1: wait; left: ' + _LoadingLeft + 'px; top:' + _LoadingTop + 'px; width: auto; height: 120px; line-height: 120px; padding-left: 50px; padding-right: 50px; background: url(images/loading.gif) no-repeat scroll left center;color: #696969;font-size: 16px; font-family:\'Microsoft YaHei\';">...</div></div>';
+        //呈现loading效果
+        document.write(_LoadingHtml);
+
+        //window.onload = function () {
+        //    var loadingMask = document.getElementById('loadingDiv');
+        //    loadingMask.parentNode.removeChild(loadingMask);
+        //};
+
+        //监听加载状态改变
+        document.onreadystatechange = completeLoading;
+
+        //加载状态为complete时移除loading效果
+        function completeLoading() {
+            if (document.readyState == "complete") {
+                var loadingMask = document.getElementById('loadingDiv');
+                loadingMask.parentNode.removeChild(loadingMask);
+            }
+        }
+    </script>
+</head>
+<body>
+<div >
+    <div class="tradinghall-top fix">
+        <div class="trading-logobar fix">
+            <div class="trading-logobar-left l fix">
+                <div class="logobar-img l">
+                    <a href="#">
+                        <img src="images/logo3交易大厅.png"/>
+                    </a>
+                </div>
+                <div class="logobar-notice l">
+                    <a href="#">
+                        返回首页
+                    </a>
+                    <div>
+                        开市(09:00-18:00)
+                    </div>
+                </div>
+            </div>
+            <div class="trading-logobar-right r">
+                <ul class="fix">
+                    <li><a href="#">我的存货</a></li>
+                    <li><a href="#">我的资产</a></li>
+                    <li>可用金额：<span>162.00</span>元</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div id="tabs">
+        <ul>
+            <li><a href="#tabs-1">所有板块</a></li>
+            <li><a href="#tabs-2">自选板块</a></li>
+            <li><a href="#tabs-3">有进货权商品</a></li>
+            <li><a href="#tabs-4">有出售权商品</a></li>
+            <span style="line-height: 40px;">当前登录用户:{{user}}</span>
+            <button id="column-chooser-link" class="button" style="float:right">栏目设置</button>
+            <!--<button id="dialog-link" class="button" style="float:right">弹出框</button>-->
+            <button id="sale-link" class="button" style="float:right">出售</button>
+            <button id="stock-link" class="button" style="float:right">进货</button>
+            <button id="buy-link" class="button" style="float:right">购买</button>
+            <div class="titlebar-right r fix">
+                <div class="titlebar-searchbox l">
+                    <input type="text" value="商品编号/商品名称" class="sousuo" onfocus="OnfocusFun(this,'商品编号/商品名称')" onblur="OnBlurFun(this,'商品编号/商品名称')"/>
+                    <input type="button" class="sousuo-btn"/>
+                </div>
+            </div>
+        </ul>
+        <div id="tabs-1">
+            <table id="jqGrid"></table>
+            <div id="pager"></div>
+        </div>
+        <div id="tabs-2">
+            <table id="grid"></table>
+        </div>
+        <div id="tabs-3">
+            <p></p>
+        </div>
+        <div id="tabs-4">
+            <p></p>
+        </div>
+    </div>
+    <div class="tradinghall-bottom right">
+        <span>成交总量</span>&nbsp;&nbsp;
+        <span>3436</span>&nbsp;&nbsp;&nbsp;&nbsp;
+        <span>成交总额</span>&nbsp;&nbsp;
+        <span>4.42</span>万
+    </div>
+</div>
+<!--<div id="dialog" title="Dialog Title">-->
+    <!--<form id="dialogForm">-->
+      <!--{% csrf_token %}-->
+      <!--<div>名称:<input type="text" name="name" value="1" id="a" /></div>-->
+      <!--<div>数量:<input type="text" name="num" value="2" id="b" /></div>-->
+    <!--</form>-->
+<!--</div>-->
+<div id="buy-dialog" class="pop-layer fix" title="购买">
+    <!--<div class="dialog-pupzz"></div>-->
+    <div class="jiaoyi-up l">
+        <div class="trading-table" style="padding-top: 30px;">
+            <table style="position: absolute;top: 0;left: 0;width: 680px; text-align: center;z-index: 20;">
+                <thead>
+                <tr>
+                    <td width="53">商品编号</td>
+                    <td width="136">商品名称</td>
+                    <td width="73">最新价(元)</td>
+                    <td width="81">可买量(pcs)</td>
+                    <td width="78">买入价(元)</td>
+                    <td width="78">数量(pcs)</td>
+                    <td width="58">金额(元)</td>
+                    <td width="65">可获进货权</td>
+                    <td width="75">操作</td>
+                </tr>
+                </thead>
+            </table>
+            <table id="jinhuo-table">
+                <tbody>
+                <tr>
+                    <td width="53">qiufu2015</td>
+                    <td width="136" class="pp">
+                        <a>域之为域之为</a>
+                        <div class="trend">
+                            <h4>邱府酱香50度</h4>
+                            <ul class="fix">
+                                <li>卖家：<span>1.26</span></li>
+                                <li>卖价：<span>1.26</span></li>
+                                <li>涨跌：<span>0.05</span></li>
+                                <li>涨幅：<span>1.01%</span></li>
+                                <li>昨收：<span>1.20</span></li>
+                                <li>最新：<span>1.26</span></li>
+                                <li>持有：<span>100</span></li>
+                                <li>均价：<span>1.16</span></li>
+                                <li>增值：<span>10</span></li>
+                                <li>配额比：<span>1.30</span></li>
+                                <li>持有进货权：<span>12600</span></li>
+                            </ul>
+                            <div class="tendency-chart">
+                                <img src="images/zoushi.jpg"/>
+                            </div>
+                        </div>
+                    </td>
+                    <td width="73">23.00</td>
+                    <td width="81">23</td>
+                    <td width="78" class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtract l"/>
+                        <input type="text" class="l" value="23.00" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAdd l"/>
+                    </td>
+                    <td width="78" class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtractnum l"/>
+                        <input type="text" class="l" value="23" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAddnum l"/>
+                    </td>
+                    <td width="58">300</td>
+                    <td width="65">30</td>
+                    <td width="75"><a>删除</a></td>
+                </tr>
+                <tr>
+                    <td>qiufu2015</td>
+                    <td class="pp">
+                        <a>域之为域之为</a>
+                    </td>
+                    <td>23.00</td>
+                    <td>23</td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtract l"/>
+                        <input type="text" class="l" value="23.00" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAdd l"/>
+                    </td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtractnum l"/>
+                        <input type="text" class="l" value="23" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAddnum l"/>
+                    </td>
+                    <td>300</td>
+                    <td>30</td>
+                    <td><a>删除</a></td>
+                </tr>
+                <tr>
+                    <td>yzw2015</td>
+                    <td class="pp">
+                        <a>域之为域之为</a>
+                    </td>
+                    <td>23.00</td>
+                    <td>23</td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtract l"/>
+                        <input type="text" class="l" value="23.00" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAdd l"/>
+                    </td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtractnum l"/>
+                        <input type="text" class="l" value="23" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAddnum l"/>
+                    </td>
+                    <td>300</td>
+                    <td>30</td>
+                    <td><a>删除</a></td>
+                </tr>
+                <tr>
+                    <td>yzw2015</td>
+                    <td class="pp">
+                        <a>域之为域之为</a>
+                    </td>
+                    <td>23.00</td>
+                    <td>23</td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtract l"/>
+                        <input type="text" class="l" value="23.00" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAdd l"/>
+                    </td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtractnum l"/>
+                        <input type="text" class="l" value="23" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAddnum l"/>
+                    </td>
+                    <td>300</td>
+                    <td>30</td>
+                    <td><a>删除</a></td>
+                </tr>
+                <tr>
+                    <td>yzw2015</td>
+                    <td class="pp">
+                        <a>域之为域之为</a>
+                    </td>
+                    <td>23.00</td>
+                    <td>23</td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtract l"/>
+                        <input type="text" class="l" value="23.00" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAdd l"/>
+                    </td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtractnum l"/>
+                        <input type="text" class="l" value="23" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAddnum l"/>
+                    </td>
+                    <td>300</td>
+                    <td>30</td>
+                    <td><a>删除</a></td>
+                </tr>
+                <tr>
+                    <td>yzw2015</td>
+                    <td class="pp">
+                        <a>域之为域之为</a>
+                    </td>
+                    <td>23.00</td>
+                    <td>23</td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtract l"/>
+                        <input type="text" class="l" value="23.00" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAdd l"/>
+                    </td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtractnum l"/>
+                        <input type="text" class="l" value="23" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAddnum l"/>
+                    </td>
+                    <td>300</td>
+                    <td>30</td>
+                    <td><a>删除</a></td>
+                </tr>
+                <tr>
+                    <td>yzw2015</td>
+                    <td class="pp">
+                        <a>域之为域之为</a>
+                    </td>
+                    <td>23.00</td>
+                    <td>23</td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtract l"/>
+                        <input type="text" class="l" value="23.00" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAdd l"/>
+                    </td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtractnum l"/>
+                        <input type="text" class="l" value="23" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAddnum l"/>
+                    </td>
+                    <td>300</td>
+                    <td>30</td>
+                    <td><a>删除</a></td>
+                </tr>
+                <tr>
+                    <td>yzw2015</td>
+                    <td class="pp">
+                        <a>域之为域之为</a>
+                    </td>
+                    <td>23.00</td>
+                    <td>23</td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtract l"/>
+                        <input type="text" class="l" value="23.00" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAdd l"/>
+                    </td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtractnum l"/>
+                        <input type="text" class="l" value="23" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAddnum l"/>
+                    </td>
+                    <td>300</td>
+                    <td>30</td>
+                    <td><a>删除</a></td>
+                </tr>
+                <tr>
+                    <td>yzw2015</td>
+                    <td class="pp">
+                        <a>域之为域之为</a>
+                    </td>
+                    <td>23.00</td>
+                    <td>23</td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtract l"/>
+                        <input type="text" class="l" value="23.00" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAdd l"/>
+                    </td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtractnum l"/>
+                        <input type="text" class="l" value="23" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAddnum l"/>
+                    </td>
+                    <td>300</td>
+                    <td>30</td>
+                    <td><a>删除</a></td>
+                </tr>
+                <tr>
+                    <td>yzw2015</td>
+                    <td class="pp">
+                        <a>域之为域之为</a>
+                    </td>
+                    <td>23.00</td>
+                    <td>23</td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtract l"/>
+                        <input type="text" class="l" value="23.00" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAdd l"/>
+                    </td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtractnum l"/>
+                        <input type="text" class="l" value="23" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAddnum l"/>
+                    </td>
+                    <td>300</td>
+                    <td>30</td>
+                    <td><a>删除</a></td>
+                </tr>
+                <tr>
+                    <td>yzw2015</td>
+                    <td class="pp">
+                        <a>域之为域之为</a>
+                    </td>
+                    <td>23.00</td>
+                    <td>23</td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtract l"/>
+                        <input type="text" class="l" value="23.00" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAdd l"/>
+                    </td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtractnum l"/>
+                        <input type="text" class="l" value="23" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAddnum l"/>
+                    </td>
+                    <td>300</td>
+                    <td>30</td>
+                    <td><a>删除</a></td>
+                </tr>
+                <tr>
+                    <td>yzw2015</td>
+                    <td class="pp">
+                        <a>域之为域之为</a>
+                    </td>
+                    <td>23.00</td>
+                    <td>23</td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtract l"/>
+                        <input type="text" class="l" value="23.00" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAdd l"/>
+                    </td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtractnum l"/>
+                        <input type="text" class="l" value="23" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAddnum l"/>
+                    </td>
+                    <td>300</td>
+                    <td>30</td>
+                    <td><a>删除</a></td>
+                </tr>
+                <tr>
+                    <td>yzw2015</td>
+                    <td class="pp">
+                        <a>域之为域之为</a>
+                    </td>
+                    <td>23.00</td>
+                    <td>23</td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtract l"/>
+                        <input type="text" class="l" value="23.00" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAdd l"/>
+                    </td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtractnum l"/>
+                        <input type="text" class="l" value="23" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAddnum l"/>
+                    </td>
+                    <td>300</td>
+                    <td>30</td>
+                    <td><a>删除</a></td>
+                </tr>
+                <tr>
+                    <td>yzw2015</td>
+                    <td class="pp">
+                        <a>域之为域之为</a>
+                    </td>
+                    <td>23.00</td>
+                    <td>23</td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtract l"/>
+                        <input type="text" class="l" value="23.00" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAdd l"/>
+                    </td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtractnum l"/>
+                        <input type="text" class="l" value="23" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAddnum l"/>
+                    </td>
+                    <td>300</td>
+                    <td>30</td>
+                    <td><a>删除</a></td>
+                </tr>
+                <tr>
+                    <td>yzw2015</td>
+                    <td class="pp">
+                        <a>域之为域之为</a>
+                    </td>
+                    <td>23.00</td>
+                    <td>23</td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtract l"/>
+                        <input type="text" class="l" value="23.00" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAdd l"/>
+                    </td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtractnum l"/>
+                        <input type="text" class="l" value="23" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAddnum l"/>
+                    </td>
+                    <td>300</td>
+                    <td>30</td>
+                    <td><a>删除</a></td>
+                </tr>
+                <tr>
+                    <td>yzw2015</td>
+                    <td class="pp">
+                        <a>域之为域之为</a>
+                    </td>
+                    <td>23.00</td>
+                    <td>23</td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtract l"/>
+                        <input type="text" class="l" value="23.00" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAdd l"/>
+                    </td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtractnum l"/>
+                        <input type="text" class="l" value="23" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAddnum l"/>
+                    </td>
+                    <td>300</td>
+                    <td>30</td>
+                    <td><a>删除</a></td>
+                </tr>
+                <tr>
+                    <td>yzw2015</td>
+                    <td class="pp">
+                        <a>域之为域之为</a>
+                    </td>
+                    <td>23.00</td>
+                    <td>23</td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtract l"/>
+                        <input type="text" class="l" value="23.00" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAdd l"/>
+                    </td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtractnum l"/>
+                        <input type="text" class="l" value="23" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAddnum l"/>
+                    </td>
+                    <td>300</td>
+                    <td>30</td>
+                    <td><a>删除</a></td>
+                </tr>
+                <tr>
+                    <td>yzw2015</td>
+                    <td class="pp">
+                        <a>域之为域之为</a>
+                    </td>
+                    <td>23.00</td>
+                    <td>23</td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtract l"/>
+                        <input type="text" class="l" value="23.00" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAdd l"/>
+                    </td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtractnum l"/>
+                        <input type="text" class="l" value="23" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAddnum l"/>
+                    </td>
+                    <td>300</td>
+                    <td>30</td>
+                    <td><a>删除</a></td>
+                </tr>
+                <tr>
+                    <td>yzw2015</td>
+                    <td class="pp">
+                        <a>域之为域之为</a>
+                    </td>
+                    <td>23.00</td>
+                    <td>23</td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtract l"/>
+                        <input type="text" class="l" value="23.00" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAdd l"/>
+                    </td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtractnum l"/>
+                        <input type="text" class="l" value="23" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAddnum l"/>
+                    </td>
+                    <td>300</td>
+                    <td>30</td>
+                    <td><a>删除</a></td>
+                </tr>
+                <tr>
+                    <td>yzw2015</td>
+                    <td class="pp">
+                        <a>域之为域之为</a>
+                    </td>
+                    <td>23.00</td>
+                    <td>23</td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtract l"/>
+                        <input type="text" class="l" value="23.00" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAdd l"/>
+                    </td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtractnum l"/>
+                        <input type="text" class="l" value="23" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAddnum l"/>
+                    </td>
+                    <td>300</td>
+                    <td>30</td>
+                    <td><a>删除</a></td>
+                </tr>
+                <tr>
+                    <td>yzw2015</td>
+                    <td class="pp">
+                        <a>域之为域之为</a>
+                    </td>
+                    <td>23.00</td>
+                    <td>23</td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtract l"/>
+                        <input type="text" class="l" value="23.00" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAdd l"/>
+                    </td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtractnum l"/>
+                        <input type="text" class="l" value="23" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAddnum l"/>
+                    </td>
+                    <td>300</td>
+                    <td>30</td>
+                    <td><a>删除</a></td>
+                </tr>
+                <tr>
+                    <td>yzw2015</td>
+                    <td class="pp">
+                        <a>域之为域之为</a>
+                    </td>
+                    <td>23.00</td>
+                    <td>23</td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtract l"/>
+                        <input type="text" class="l" value="23.00" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAdd l"/>
+                    </td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtractnum l"/>
+                        <input type="text" class="l" value="23" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAddnum l"/>
+                    </td>
+                    <td>300</td>
+                    <td>30</td>
+                    <td><a>删除</a></td>
+                </tr>
+                <tr>
+                    <td>yzw2015</td>
+                    <td class="pp">
+                        <a>域之为域之为</a>
+                    </td>
+                    <td>23.00</td>
+                    <td>23</td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtract l"/>
+                        <input type="text" class="l" value="23.00" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAdd l"/>
+                    </td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtractnum l"/>
+                        <input type="text" class="l" value="23" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAddnum l"/>
+                    </td>
+                    <td>300</td>
+                    <td>30</td>
+                    <td><a>删除</a></td>
+                </tr>
+                <tr>
+                    <td>yzw2015</td>
+                    <td class="pp">
+                        <a>域之为域之为</a>
+                    </td>
+                    <td>23.00</td>
+                    <td>23</td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtract l"/>
+                        <input type="text" class="l" value="23.00" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAdd l"/>
+                    </td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtractnum l"/>
+                        <input type="text" class="l" value="23" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAddnum l"/>
+                    </td>
+                    <td>300</td>
+                    <td>30</td>
+                    <td><a>删除</a></td>
+                </tr>
+                <tr>
+                    <td>yzw2015</td>
+                    <td class="pp">
+                        <a>域之为域之为</a>
+                    </td>
+                    <td>23.00</td>
+                    <td>23</td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtract l"/>
+                        <input type="text" class="l" value="23.00" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAdd l"/>
+                    </td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtractnum l"/>
+                        <input type="text" class="l" value="23" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAddnum l"/>
+                    </td>
+                    <td>300</td>
+                    <td>30</td>
+                    <td><a>删除</a></td>
+                </tr>
+                <tr>
+                    <td>yzw2015</td>
+                    <td class="pp">
+                        <a>域之为域之为</a>
+                    </td>
+                    <td>23.00</td>
+                    <td>23</td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtract l"/>
+                        <input type="text" class="l" value="23.00" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAdd l"/>
+                    </td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtractnum l"/>
+                        <input type="text" class="l" value="23" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAddnum l"/>
+                    </td>
+                    <td>300</td>
+                    <td>30</td>
+                    <td><a>删除</a></td>
+                </tr>
+                <tr>
+                    <td>qiufu2015</td>
+                    <td class="pp">
+                        <a>域之为域之为</a>
+                    </td>
+                    <td>23.00</td>
+                    <td>23</td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtract l"/>
+                        <input type="text" class="l" value="23.00" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAdd l"/>
+                    </td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtractnum l"/>
+                        <input type="text" class="l" value="23" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAddnum l"/>
+                    </td>
+                    <td>300</td>
+                    <td>30</td>
+                    <td><a>删除</a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="settlement fix">
+            <div class="settlement-infor fix">
+                <div class="r">
+                    总价（不含运费包装费）：<span>￥600</span>&nbsp;&nbsp;&nbsp;元
+                </div>
+                <div class="r">
+                    已选择<span>6</span>件商品&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                </div>
+            </div>
+            <div class="settlement-mima fix">
+                <div class="r">
+                    <a class="tender">提交</a>
+                    <a class="cancel">取消</a>
+                </div>
+                <div class="ii r">
+                    <input type="text" class="ii-input" onfocus="OnfocusFun1(this,'')" onblur="OnBlurFun1(this,'')"/>
+                </div>
+                <div class="r">
+                    请输入支付密码：
+                </div>
+            </div>
+            <div class="trading-notice">
+                <img src="images/jiaoyi-notice.png"/>
+                <span>余额不足，请</span>
+                <a>充值</a>
+            </div>
+        </div>
+        <div class="trend jinhuo-div">
+            <h4>ghg</h4>
+            <ul class="fix">
+                <li>卖家：<span>1.26</span></li>
+                <li>卖价：<span>1.26</span></li>
+                <li>涨跌：<span>0.05</span></li>
+                <li>涨幅：<span>1.01%</span></li>
+                <li>昨收：<span>1.20</span></li>
+                <li>最新：<span>1.26</span></li>
+                <li>持有：<span>100</span></li>
+                <li>均价：<span>1.16</span></li>
+                <li>增值：<span>10</span></li>
+                <li>配额比：<span>1.30</span></li>
+                <li>持有进货权：<span>12600</span></li>
+            </ul>
+            <div class="tendency-chart">
+                <img src="images/zoushi.jpg"/>
+            </div>
+        </div>
+        <div class="trend jinhuo-div">
+            <h4>676</h4>
+            <ul class="fix">
+                <li>卖家：<span>1.26</span></li>
+                <li>卖价：<span>1.26</span></li>
+                <li>涨跌：<span>0.05</span></li>
+                <li>涨幅：<span>1.01%</span></li>
+                <li>昨收：<span>1.20</span></li>
+                <li>最新：<span>1.26</span></li>
+                <li>持有：<span>100</span></li>
+                <li>均价：<span>1.16</span></li>
+                <li>增值：<span>10</span></li>
+                <li>配额比：<span>1.30</span></li>
+                <li>持有进货权：<span>12600</span></li>
+            </ul>
+            <div class="tendency-chart">
+                <img src="images/zoushi.jpg"/>
+            </div>
+        </div>
+        <div class="trend jinhuo-div">
+            <h4>dsf</h4>
+            <ul class="fix">
+                <li>卖家：<span>1.26</span></li>
+                <li>卖价：<span>1.26</span></li>
+                <li>涨跌：<span>0.05</span></li>
+                <li>涨幅：<span>1.01%</span></li>
+                <li>昨收：<span>1.20</span></li>
+                <li>最新：<span>1.26</span></li>
+                <li>持有：<span>100</span></li>
+                <li>均价：<span>1.16</span></li>
+                <li>增值：<span>10</span></li>
+                <li>配额比：<span>1.30</span></li>
+                <li>持有进货权：<span>12600</span></li>
+            </ul>
+            <div class="tendency-chart">
+                <img src="images/zoushi.jpg"/>
+            </div>
+        </div>
+        <div class="trend jinhuo-div">
+            <h4>6786</h4>
+            <ul class="fix">
+                <li>卖家：<span>1.26</span></li>
+                <li>卖价：<span>1.26</span></li>
+                <li>涨跌：<span>0.05</span></li>
+                <li>涨幅：<span>1.01%</span></li>
+                <li>昨收：<span>1.20</span></li>
+                <li>最新：<span>1.26</span></li>
+                <li>持有：<span>100</span></li>
+                <li>均价：<span>1.16</span></li>
+                <li>增值：<span>10</span></li>
+                <li>配额比：<span>1.30</span></li>
+                <li>持有进货权：<span>12600</span></li>
+            </ul>
+            <div class="tendency-chart">
+                <img src="images/zoushi.jpg"/>
+            </div>
+        </div>
+        <div class="trend jinhuo-div">
+            <h4>456</h4>
+            <ul class="fix">
+                <li>卖家：<span>1.26</span></li>
+                <li>卖价：<span>1.26</span></li>
+                <li>涨跌：<span>0.05</span></li>
+                <li>涨幅：<span>1.01%</span></li>
+                <li>昨收：<span>1.20</span></li>
+                <li>最新：<span>1.26</span></li>
+                <li>持有：<span>100</span></li>
+                <li>均价：<span>1.16</span></li>
+                <li>增值：<span>10</span></li>
+                <li>配额比：<span>1.30</span></li>
+                <li>持有进货权：<span>12600</span></li>
+            </ul>
+            <div class="tendency-chart">
+                <img src="images/zoushi.jpg"/>
+            </div>
+        </div>
+        <div class="trend jinhuo-div">
+            <h4>gj</h4>
+            <ul class="fix">
+                <li>卖家：<span>1.26</span></li>
+                <li>卖价：<span>1.26</span></li>
+                <li>涨跌：<span>0.05</span></li>
+                <li>涨幅：<span>1.01%</span></li>
+                <li>昨收：<span>1.20</span></li>
+                <li>最新：<span>1.26</span></li>
+                <li>持有：<span>100</span></li>
+                <li>均价：<span>1.16</span></li>
+                <li>增值：<span>10</span></li>
+                <li>配额比：<span>1.30</span></li>
+                <li>持有进货权：<span>12600</span></li>
+            </ul>
+            <div class="tendency-chart">
+                <img src="images/zoushi.jpg"/>
+            </div>
+        </div>
+        <div class="trend jinhuo-div">
+            <h4>fdg</h4>
+            <ul class="fix">
+                <li>卖家：<span>1.26</span></li>
+                <li>卖价：<span>1.26</span></li>
+                <li>涨跌：<span>0.05</span></li>
+                <li>涨幅：<span>1.01%</span></li>
+                <li>昨收：<span>1.20</span></li>
+                <li>最新：<span>1.26</span></li>
+                <li>持有：<span>100</span></li>
+                <li>均价：<span>1.16</span></li>
+                <li>增值：<span>10</span></li>
+                <li>配额比：<span>1.30</span></li>
+                <li>持有进货权：<span>12600</span></li>
+            </ul>
+            <div class="tendency-chart">
+                <img src="images/zoushi.jpg"/>
+            </div>
+        </div>
+        <div class="trend jinhuo-div">
+            <h4>346343</h4>
+            <ul class="fix">
+                <li>卖家：<span>1.26</span></li>
+                <li>卖价：<span>1.26</span></li>
+                <li>涨跌：<span>0.05</span></li>
+                <li>涨幅：<span>1.01%</span></li>
+                <li>昨收：<span>1.20</span></li>
+                <li>最新：<span>1.26</span></li>
+                <li>持有：<span>100</span></li>
+                <li>均价：<span>1.16</span></li>
+                <li>增值：<span>10</span></li>
+                <li>配额比：<span>1.30</span></li>
+                <li>持有进货权：<span>12600</span></li>
+            </ul>
+            <div class="tendency-chart">
+                <img src="images/zoushi.jpg"/>
+            </div>
+        </div>
+        <div class="trend jinhuo-div">
+            <h4>sdfgd</h4>
+            <ul class="fix">
+                <li>卖家：<span>1.26</span></li>
+                <li>卖价：<span>1.26</span></li>
+                <li>涨跌：<span>0.05</span></li>
+                <li>涨幅：<span>1.01%</span></li>
+                <li>昨收：<span>1.20</span></li>
+                <li>最新：<span>1.26</span></li>
+                <li>持有：<span>100</span></li>
+                <li>均价：<span>1.16</span></li>
+                <li>增值：<span>10</span></li>
+                <li>配额比：<span>1.30</span></li>
+                <li>持有进货权：<span>12600</span></li>
+            </ul>
+            <div class="tendency-chart">
+                <img src="images/zoushi.jpg"/>
+            </div>
+        </div>
+        <div class="trend jinhuo-div">
+            <h4>1234</h4>
+            <ul class="fix">
+                <li>卖家：<span>1.26</span></li>
+                <li>卖价：<span>1.26</span></li>
+                <li>涨跌：<span>0.05</span></li>
+                <li>涨幅：<span>1.01%</span></li>
+                <li>昨收：<span>1.20</span></li>
+                <li>最新：<span>1.26</span></li>
+                <li>持有：<span>100</span></li>
+                <li>均价：<span>1.16</span></li>
+                <li>增值：<span>10</span></li>
+                <li>配额比：<span>1.30</span></li>
+                <li>持有进货权：<span>12600</span></li>
+            </ul>
+            <div class="tendency-chart">
+                <img src="images/zoushi.jpg"/>
+            </div>
+        </div>
+        <div class="trend jinhuo-div">
+            <h4>fgdds</h4>
+            <ul class="fix">
+                <li>卖家：<span>1.26</span></li>
+                <li>卖价：<span>1.26</span></li>
+                <li>涨跌：<span>0.05</span></li>
+                <li>涨幅：<span>1.01%</span></li>
+                <li>昨收：<span>1.20</span></li>
+                <li>最新：<span>1.26</span></li>
+                <li>持有：<span>100</span></li>
+                <li>均价：<span>1.16</span></li>
+                <li>增值：<span>10</span></li>
+                <li>配额比：<span>1.30</span></li>
+                <li>持有进货权：<span>12600</span></li>
+            </ul>
+            <div class="tendency-chart">
+                <img src="images/zoushi.jpg"/>
+            </div>
+        </div>
+        <div class="trend jinhuo-div">
+            <h4>345</h4>
+            <ul class="fix">
+                <li>卖家：<span>1.26</span></li>
+                <li>卖价：<span>1.26</span></li>
+                <li>涨跌：<span>0.05</span></li>
+                <li>涨幅：<span>1.01%</span></li>
+                <li>昨收：<span>1.20</span></li>
+                <li>最新：<span>1.26</span></li>
+                <li>持有：<span>100</span></li>
+                <li>均价：<span>1.16</span></li>
+                <li>增值：<span>10</span></li>
+                <li>配额比：<span>1.30</span></li>
+                <li>持有进货权：<span>12600</span></li>
+            </ul>
+            <div class="tendency-chart">
+                <img src="images/zoushi.jpg"/>
+            </div>
+        </div>
+        <div class="trend jinhuo-div">
+            <h4>dstf</h4>
+            <ul class="fix">
+                <li>卖家：<span>1.26</span></li>
+                <li>卖价：<span>1.26</span></li>
+                <li>涨跌：<span>0.05</span></li>
+                <li>涨幅：<span>1.01%</span></li>
+                <li>昨收：<span>1.20</span></li>
+                <li>最新：<span>1.26</span></li>
+                <li>持有：<span>100</span></li>
+                <li>均价：<span>1.16</span></li>
+                <li>增值：<span>10</span></li>
+                <li>配额比：<span>1.30</span></li>
+                <li>持有进货权：<span>12600</span></li>
+            </ul>
+            <div class="tendency-chart">
+                <img src="images/zoushi.jpg"/>
+            </div>
+        </div>
+        <div class="trend jinhuo-div">
+            <h4>234</h4>
+            <ul class="fix">
+                <li>卖家：<span>1.26</span></li>
+                <li>卖价：<span>1.26</span></li>
+                <li>涨跌：<span>0.05</span></li>
+                <li>涨幅：<span>1.01%</span></li>
+                <li>昨收：<span>1.20</span></li>
+                <li>最新：<span>1.26</span></li>
+                <li>持有：<span>100</span></li>
+                <li>均价：<span>1.16</span></li>
+                <li>增值：<span>10</span></li>
+                <li>配额比：<span>1.30</span></li>
+                <li>持有进货权：<span>12600</span></li>
+            </ul>
+            <div class="tendency-chart">
+                <img src="images/zoushi.jpg"/>
+            </div>
+        </div>
+        <div class="trend jinhuo-div">
+            <h4>邱府酱香5g度</h4>
+            <ul class="fix">
+                <li>卖家：<span>1.26</span></li>
+                <li>卖价：<span>1.26</span></li>
+                <li>涨跌：<span>0.05</span></li>
+                <li>涨幅：<span>1.01%</span></li>
+                <li>昨收：<span>1.20</span></li>
+                <li>最新：<span>1.26</span></li>
+                <li>持有：<span>100</span></li>
+                <li>均价：<span>1.16</span></li>
+                <li>增值：<span>10</span></li>
+                <li>配额比：<span>1.30</span></li>
+                <li>持有进货权：<span>12600</span></li>
+            </ul>
+            <div class="tendency-chart">
+                <img src="images/zoushi.jpg"/>
+            </div>
+        </div>
+        <div class="trend jinhuo-div">
+            <h4>邱府酱香51度</h4>
+            <ul class="fix">
+                <li>卖家：<span>1.26</span></li>
+                <li>卖价：<span>1.26</span></li>
+                <li>涨跌：<span>0.05</span></li>
+                <li>涨幅：<span>1.01%</span></li>
+                <li>昨收：<span>1.20</span></li>
+                <li>最新：<span>1.26</span></li>
+                <li>持有：<span>100</span></li>
+                <li>均价：<span>1.16</span></li>
+                <li>增值：<span>10</span></li>
+                <li>配额比：<span>1.30</span></li>
+                <li>持有进货权：<span>12600</span></li>
+            </ul>
+            <div class="tendency-chart">
+                <img src="images/zoushi.jpg"/>
+            </div>
+        </div>
+        <div class="trend jinhuo-div">
+            <h4>邱府酱香58度</h4>
+            <ul class="fix">
+                <li>卖家：<span>1.26</span></li>
+                <li>卖价：<span>1.26</span></li>
+                <li>涨跌：<span>0.05</span></li>
+                <li>涨幅：<span>1.01%</span></li>
+                <li>昨收：<span>1.20</span></li>
+                <li>最新：<span>1.26</span></li>
+                <li>持有：<span>100</span></li>
+                <li>均价：<span>1.16</span></li>
+                <li>增值：<span>10</span></li>
+                <li>配额比：<span>1.30</span></li>
+                <li>持有进货权：<span>12600</span></li>
+            </ul>
+            <div class="tendency-chart">
+                <img src="images/zoushi.jpg"/>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="stock-dialog" title="进货">
+    <div class="jiaoyi-up l">
+        <div class="trading-table">
+            <table>
+                <thead>
+                <tr>
+                    <td>商品编号</td>
+                    <td>商品名称</td>
+                    <td>最新价(元)</td>
+                    <td>买入价(元)</td>
+                    <td>进货权</td>
+                    <td>数量(pcs)</td>
+                    <td>金额(元)</td>
+                    <td>操作</td>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>xcv2014</td>
+                    <td>
+                        <a>白酒</a>
+                        <div class="trend">
+                            <h4>邱府酱香50度</h4>
+                            <ul class="fix">
+                                <li>卖家：<span>1.26</span></li>
+                                <li>卖价：<span>1.26</span></li>
+                                <li>涨跌：<span>0.05</span></li>
+                                <li>涨幅：<span>1.01%</span></li>
+                                <li>昨收：<span>1.20</span></li>
+                                <li>最新：<span>1.26</span></li>
+                                <li>持有：<span>100</span></li>
+                                <li>均价：<span>1.16</span></li>
+                                <li>增值：<span>10</span></li>
+                                <li>配额比：<span>1.30</span></li>
+                                <li>持有进货权：<span>12600</span></li>
+                            </ul>
+                            <div class="tendency-chart">
+                                <img src="images/zoushi.jpg"/>
+                            </div>
+                        </div>
+                    </td>
+                    <td>20.13</td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtract l"/>
+                        <input type="text" class="l" value="23.00" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAdd l"/>
+                    </td>
+                    <td>10</td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtractnum l"/>
+                        <input type="text" class="l" value="23" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAddnum l"/>
+                    </td>
+                    <td>50</td>
+                    <td><a>删除</a></td>
+                </tr>
+                <tr>
+                    <td>xcv2014</td>
+                    <td>
+                        <a>白酒</a>
+                        <div class="trend"style="display: none;">
+                            <h4>邱府酱香51度</h4>
+                            <ul class="fix">
+                                <li>卖家：<span>1.26</span></li>
+                                <li>卖价：<span>1.26</span></li>
+                                <li>涨跌：<span>0.05</span></li>
+                                <li>涨幅：<span>1.01%</span></li>
+                                <li>昨收：<span>1.20</span></li>
+                                <li>最新：<span>1.26</span></li>
+                                <li>持有：<span>100</span></li>
+                                <li>均价：<span>1.16</span></li>
+                                <li>增值：<span>10</span></li>
+                                <li>配额比：<span>1.30</span></li>
+                                <li>持有进货权：<span>12600</span></li>
+                            </ul>
+                            <div class="tendency-chart">
+                                <img src="images/zoushi.jpg"/>
+                            </div>
+                        </div>
+                    </td>
+                    <td>20.13</td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtract l"/>
+                        <input type="text" class="l" value="23.00" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAdd l"/>
+                    </td>
+                    <td>10</td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtractnum l"/>
+                        <input type="text" class="l" value="23" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAddnum l"/>
+                    </td>
+                    <td>50</td>
+                    <td><a>删除</a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="settlement fix">
+            <div class="settlement-infor fix">
+                <div class="r">
+                    总价（不含运费包装费）：<span>￥600</span>&nbsp;&nbsp;&nbsp;元
+                </div>
+                <div class="r">
+                    已选择<span>6</span>件商品&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                </div>
+            </div>
+            <div class="settlement-mima fix">
+                <div class="r">
+                    <a class="tender">提交</a>
+                    <a class="cancel">取消</a>
+                </div>
+                <div class="ii r">
+                    <input type="text" class="ii-input" onfocus="OnfocusFun1(this,'')" onblur="OnBlurFun1(this,'')"/>
+                </div>
+                <div class="r">
+                    请输入支付密码：
+                </div>
+            </div>
+            <div class="trading-notice">
+                <img src="images/jiaoyi-notice.png"/>
+                <span>余额不足，请</span>
+                <a>充值</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="sale-dialog" title="出售">
+    <div class="jiaoyi-up l">
+        <div class="trading-table">
+            <table>
+                <thead>
+                <tr>
+                    <td>商品编号</td>
+                    <td>商品名称</td>
+                    <td>最新价(元)</td>
+                    <td>可卖量(pcs)</td>
+                    <td>出售价(元)</td>
+                    <td>数量(pcs)</td>
+                    <td>金额(元)</td>
+                    <td>操作</td>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>xcv2014</td>
+                    <td>
+                        <a>白酒</a>
+                        <div class="trend">
+                            <h4>邱府酱香50度</h4>
+                            <ul class="fix">
+                                <li>卖家：<span>1.26</span></li>
+                                <li>卖价：<span>1.26</span></li>
+                                <li>涨跌：<span>0.05</span></li>
+                                <li>涨幅：<span>1.01%</span></li>
+                                <li>昨收：<span>1.20</span></li>
+                                <li>最新：<span>1.26</span></li>
+                                <li>持有：<span>100</span></li>
+                                <li>均价：<span>1.16</span></li>
+                                <li>增值：<span>10</span></li>
+                                <li>配额比：<span>1.30</span></li>
+                                <li>持有进货权：<span>12600</span></li>
+                            </ul>
+                            <div class="tendency-chart">
+                                <img src="images/zoushi.jpg"/>
+                            </div>
+                        </div>
+                    </td>
+                    <td>20.13</td>
+                    <td>10</td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtract l"/>
+                        <input type="text" class="l" value="23.00" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAdd l"/>
+                    </td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtractnum l"/>
+                        <input type="text" class="l" value="23" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAddnum l"/>
+                    </td>
+                    <td>50</td>
+                    <td><a>删除</a></td>
+                </tr>
+                <tr>
+                    <td>xcv2014</td>
+                    <td>
+                        <a>白酒</a>
+                        <div class="trend" style="display: none;">
+                            <h4>邱府酱香51度</h4>
+                            <ul class="fix">
+                                <li>卖家：<span>1.26</span></li>
+                                <li>卖价：<span>1.26</span></li>
+                                <li>涨跌：<span>0.05</span></li>
+                                <li>涨幅：<span>1.01%</span></li>
+                                <li>昨收：<span>1.20</span></li>
+                                <li>最新：<span>1.26</span></li>
+                                <li>持有：<span>100</span></li>
+                                <li>均价：<span>1.16</span></li>
+                                <li>增值：<span>10</span></li>
+                                <li>配额比：<span>1.30</span></li>
+                                <li>持有进货权：<span>12600</span></li>
+                            </ul>
+                            <div class="tendency-chart">
+                                <img src="images/zoushi.jpg"/>
+                            </div>
+                        </div>
+                    </td>
+                    <td>20.13</td>
+                    <td>10</td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtract l"/>
+                        <input type="text" class="l" value="23.00" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAdd l"/>
+                    </td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtractnum l"/>
+                        <input type="text" class="l" value="23" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAddnum l"/>
+                    </td>
+                    <td>50</td>
+                    <td><a>删除</a></td>
+                </tr>
+                <tr>
+                    <td>xcv2014</td>
+                    <td>
+                        <a>白酒</a>
+                        <div class="trend" style="display: none;">
+                            <h4>邱府酱香52度</h4>
+                            <ul class="fix">
+                                <li>卖家：<span>1.26</span></li>
+                                <li>卖价：<span>1.26</span></li>
+                                <li>涨跌：<span>0.05</span></li>
+                                <li>涨幅：<span>1.01%</span></li>
+                                <li>昨收：<span>1.20</span></li>
+                                <li>最新：<span>1.26</span></li>
+                                <li>持有：<span>100</span></li>
+                                <li>均价：<span>1.16</span></li>
+                                <li>增值：<span>10</span></li>
+                                <li>配额比：<span>1.30</span></li>
+                                <li>持有进货权：<span>12600</span></li>
+                            </ul>
+                            <div class="tendency-chart">
+                                <img src="images/zoushi.jpg"/>
+                            </div>
+                        </div>
+                    </td>
+                    <td>20.13</td>
+                    <td>10</td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtract l"/>
+                        <input type="text" class="l" value="23.00" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAdd l"/>
+                    </td>
+                    <td class="repledge">
+                        <img src="images/jiaoyi-.png" class="jiaoyiSubtractnum l"/>
+                        <input type="text" class="l" value="23" onkeyup="value=value.replace(/[^\d.]/g,'')"/>
+                        <img src="images/jiaoyi+.png" class="jiaoyiAddnum l"/>
+                    </td>
+                    <td>50</td>
+                    <td><a>删除</a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="settlement fix">
+            <div class="settlement-infor fix">
+                <div class="r">
+                    总出售价：<span>￥600</span>&nbsp;&nbsp;&nbsp;元
+                </div>
+                <div class="r">
+                    已选择<span>6</span>件商品&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                </div>
+            </div>
+            <div class="settlement-mima fix">
+                <div class="r">
+                    <a class="tender">提交</a>
+                    <a class="cancel">取消</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="contextMenu" id="contextMenu" style="display:none; width:400px;">
+        <ul style="width: 400px; font-size: 65%;">
+            <li id="clickme">
+                <span class="ui-icon ui-icon-plus" style="float:left"></span>
+                <span style="font-size:130%; font-family:Verdana">点我</span>
+            </li>
+        </ul>
+    </div>
+</body>
+<script type="text/javascript">
+    //得到焦点触发事件
+    function OnfocusFun(element,elementvalue)
+    {
+        if(element.value==elementvalue)
+        {
+            element.value="";
+            element.style.color="#fff";
+        }
+    }
+    //离开输入框触发事件
+    function OnBlurFun(element,elementvalue)
+    {
+        if(element.value=="" || element.value.replace(/\s/g,"")=="")
+        {
+            element.value=elementvalue;
+            element.style.color="#666";
+        }
+    }
+    //得到焦点触发事件
+    function OnfocusFun1(element,elementvalue)
+    {
+        if(element.value==elementvalue)
+        {
+            element.value="";
+            element.type="password";
+            element.style.color="#999";
+        }
+    }
+    //离开输入框触发事件
+    function OnBlurFun1(element,elementvalue)
+    {
+        if(element.value=="" || element.value.replace(/\s/g,"")=="")
+        {
+            element.value=elementvalue;
+            element.type="text";
+            element.style.color="#999";
+        }
+    }
+//    function Money() {
+//        var test = "23";
+//        if (test.indexOf(".") < 0) {
+//            test = test + ".00";
+//        }
+//    }
+    $(function(){
+//        $(".trading-table>table tbody tr").hover(function(){
+//            $(".trend").hide();
+//            $(".trend",this).show();
+//        });
+       
+        $("#jinhuo-table tr").each(function(index){
+            $(this).mouseover(function(){
+                $(".trend").hide();
+                $(".jinhuo-div:eq("+index+")").show();
+            })
+        });
+
+//        价格、数量
+        $(".jiaoyiSubtract").click(function(){
+            var inputVal = $(this).next().val();
+            var inputVal = inputVal - 0.01;
+            var inputVal = Math.round(inputVal*100)/100;
+            if(inputVal > 0){
+                $(this).next().val(inputVal.toFixed(2));
+            }
+        });
+        $(".jiaoyiAdd").click(function(){
+            var inputVal = parseFloat($(this).prev().val());
+            var inputVal = inputVal + 0.01;
+            var inputVal = Math.round(inputVal*100)/100;
+            if(inputVal > 0){
+                $(this).prev().val(inputVal.toFixed(2));
+            }
+        });
+        $(".jiaoyiSubtractnum").click(function(){
+            var inputVal = $(this).next().val();
+            inputVal--;
+            if(inputVal > 0){
+                $(this).next().val(inputVal);
+            }
+        });
+        $(".jiaoyiAddnum").click(function(){
+            var inputVal = $(this).prev().val();
+            inputVal++;
+            if(inputVal > 0){
+                $(this).prev().val(inputVal);
+            }
+        });
+    });
+</script>

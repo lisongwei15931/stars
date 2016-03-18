@@ -1,0 +1,42 @@
+{% extends "customer/account_base.html" %}
+{% load staticfiles %}
+{% load compress %}
+
+{% block custom_css %}
+<link rel="stylesheet" href="{% static "css/account2.css" %}" type="text/css">
+{% endblock %}
+
+{% block title %}蓝图百货--提货明细--提货详情{% endblock title %}
+
+{% block oncontentload %}
+    {{ block.super }}
+ <div class="account-cont-right l">
+    <div class="details" id="detailMy">
+{#    <div class="details" id="detailMy">#}
+        <div class="title-acct title-acct2 fix">
+            <span class="l">提货详情</span>
+        </div>
+        <div class="tzxx-table tzxx-table1 l fix ">
+            <table class="myBox" cellpadding="0"  cellspacing="0">
+                <tr style="background-color:#eee;">
+                    <td >商品编号</td>
+                    <td >商品名称</td>
+                    <td >数量</td>
+                    <td >单价</td>
+                    <td>提货费</td>
+                </tr>
+                {% for ele in pickup_detail_list %}
+                    <tr>
+                        <td>{{ ele.product.upc }}</td>
+                        <td>{{ ele.product.title }}</td>
+                        <td>{{ ele.quantity | default:""}}</td>
+                        <td>{{ ele.unit_price|floatformat:2|default:""}}</td>
+                        <td>{{ ele.pickup_fee|floatformat:2|default:""}}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

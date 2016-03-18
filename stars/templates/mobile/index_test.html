@@ -1,0 +1,511 @@
+{% load staticfiles %}
+{% load i18n %}
+{% load thumbnail %}
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;">
+
+{% block public_css %}
+<link type="text/css" href="{% static 'css/mobile/phonelt-home.css' %}" rel="stylesheet" />
+{#<link type="text/css" href="{% static 'css/mobile/reset.css' %}" rel="stylesheet" />#}
+{% endblock %}
+
+{% block jquery %}
+{#<script type="text/javascript" src="{% static 'js/jquery-1.11.1.min.js' %}"></script>#}
+{% endblock %}
+
+{% block title %}
+<title> 蓝图百货-手机web </title>
+{% endblock %}
+
+</head>
+
+<body>
+<!--手机适配代码 start-->
+<div id="fixed" class="fixed" style="position: fixed;width: 100%;height: 100%;background: #fff;z-index:10000;text-align: center;"></div>
+<script type="text/javascript">
+    var Dpr = 1, uAgent = window.navigator.userAgent;
+    var isIOS = uAgent.match(/iphone/i);
+    var isYIXIN = uAgent.match(/yixin/i);
+    var is2345 = uAgent.match(/Mb2345/i);
+    var ishaosou = uAgent.match(/mso_app/i);
+    function resizeRoot(){
+        var wWidth = (screen.width > 0) ? (window.innerWidth >= screen.width || window.innerWidth == 0) ? screen.width : window.innerWidth : window.innerWidth, wDpr, wFsize;
+        var wHeight = (screen.height > 0) ? (window.innerHeight >= screen.height || window.innerHeight == 0) ? screen.height : window.innerHeight : window.innerHeight;
+        if (window.devicePixelRatio) {
+            wDpr = window.devicePixelRatio;
+        } else {
+            wDpr = isIOS ? wWidth > 818 ? 3 : wWidth > 480 ? 2 : 1 : 1;
+        }
+        if(isIOS) {
+            wWidth = screen.width;
+            wHeight = screen.height;
+        }
+
+        if(wWidth > wHeight){
+            wWidth = wHeight;
+        }
+        wFsize = wWidth > 1080 ? 144 : wWidth / 7.5;
+        wFsize = wFsize > 32 ? wFsize : 32;
+        window.screenWidth_ = wWidth;
+        if(isYIXIN || is2345 || ishaosou){//YIXIN 和 2345 这里有个刚调用系统浏览器时候的bug，需要一点延迟来获取
+            setTimeout(function(){
+                wWidth = (screen.width > 0) ? (window.innerWidth >= screen.width || window.innerWidth == 0) ? screen.width : window.innerWidth : window.innerWidth;
+                wHeight = (screen.height > 0) ? (window.innerHeight >= screen.height || window.innerHeight == 0) ? screen.height : window.innerHeight : window.innerHeight;
+                wFsize = wWidth > 1080 ? 144 : wWidth / 7.5;
+                wFsize = wFsize > 32 ? wFsize : 32;
+                document.getElementsByTagName('html')[0].dataset.dpr = wDpr;
+                document.getElementsByTagName('html')[0].style.fontSize = wFsize + 'px';
+                document.getElementById("fixed").style.display="none";
+            },500);
+        }else{
+            document.getElementsByTagName('html')[0].dataset.dpr = wDpr;
+            document.getElementsByTagName('html')[0].style.fontSize = wFsize + 'px';
+            document.getElementById("fixed").style.display="none";
+        }
+    }
+
+    resizeRoot();
+
+</script>
+<!--手机适配代码 end-->
+{% if device == '2' %}
+<div class="floor">
+    <h4>
+        口碑甄选
+        <img src="{% static 'images/mobile/icon_01.png' %}"/>
+    </h4>
+    <div class="row row1">
+        <span class="border-bottom"></span>
+        <div class="col col-4 border-top border-right">
+            <a href="#" onclick="window.interface.openDetail('217')">
+            <img src="{% static 'images/mobile/ad1.jpg' %}"/>
+            </a>
+        </div>
+        <div class="col col-3 border-top border-right">
+            <a href="#" onclick="window.interface.openDetail('129')">
+            <img src="{% static 'images/mobile/ad2.jpg' %}"/>
+            </a>
+        </div>
+        <div class="col col-3 border-top">
+            <a href="#" onclick="window.interface.openDetail('198')"><img src="{% static 'images/mobile/ad3.jpg' %}"/></a>
+        </div>
+        <div class="col col-4 border-top border-right">
+            <a href="#" onclick="window.interface.openDetail('143')"><img src="{% static 'images/mobile/ad4.jpg' %}"/></a>
+        </div>
+        <div class="col col-3 border-top border-right">
+            <a href="#" onclick="window.interface.openDetail('252')"><img src="{% static 'images/mobile/ad5.jpg' %}"/></a>
+        </div>
+        <div class="col col-3 border-top">
+            <a href="#" class="lastAd" onclick="window.interface.openDetail('102')"><img src="{% static 'images/mobile/ad6.jpg' %}"/></a>
+        </div>
+    </div>
+    <div class="line-ad">
+        <img src="{% static 'images/mobile/line-ad1.jpg' %}"/>
+    </div>
+</div>
+
+<div class="floor">
+    <h4>
+        新品上市
+        <img src="{% static 'images/mobile/icon_02.png' %}"/>
+    </h4>
+    <div class="row row2">
+        <span class="border-bottom"></span>
+        <div class="row5 fix">
+		    <div class="fl left-col border-top border-right">
+               <a href="#" onclick="window.interface.openDetail('136')"><img src="{% static 'images/mobile/ad7.jpg' %}"/></a>
+			</div>
+			<div class="fl right-col">
+                <div class="border-top">
+                    <a href="#" onclick="window.interface.openDetail('139')"><img src="{% static 'images/mobile/ad9.jpg' %}"/></a>
+                </div>
+                <div  class="border-top">
+                    <a href="#" onclick="window.interface.openDetail('128')"><img src="{% static 'images/mobile/ad10.jpg' %}"/></a>
+                </div>
+                <div  class="border-top">
+                    <a href="#" onclick="window.interface.openDetail('138')"><img src="{% static 'images/mobile/ad11.jpg' %}"/></a>
+                </div>
+            </div>
+        </div>
+        <div class="col col-5 col-5-2 border-top border-right">
+            <a href="#" onclick="window.interface.openDetail('116')"><img src="{% static 'images/mobile/ad12.jpg' %}"/></a>
+        </div>
+        <div class="col col-5 col-5-2 border-top">
+            <a href="#" onclick="window.interface.openDetail('129')"><img src="{% static 'images/mobile/ad13.jpg' %}"/></a>
+        </div>
+        <div class="col col-5 col-5-2 border-top border-right">
+            <a href="#" onclick="window.interface.openDetail('238')"><img src="{% static 'images/mobile/ad14.jpg' %}"/></a>
+        </div>
+        <div class="col col-5 col-5-2 border-top">
+            <a href="#" onclick="window.interface.openDetail('142')"><img src="{% static 'images/mobile/ad15.jpg' %}"/></a>
+        </div>
+    </div>
+    <div class="line-ad">
+        <img src="{% static 'images/mobile/line-ad2.jpg' %}"/>
+    </div>
+</div>
+<div class="floor">
+    <h4>
+        主推热卖
+        <img src="{% static 'images/mobile/icon_03.png' %}"/>
+    </h4>
+    <div class="row row3">
+        <span class="border-bottom"></span>
+        <div class="col col-5 border-top border-right">
+            <a href="#" onclick="window.interface.openDetail('129')"><img src="{% static 'images/mobile/ad16.jpg' %}"/></a>
+        </div>
+        <div class="col col-5 border-top">
+            <a href="#" onclick="window.interface.openDetail('198')"><img src="{% static 'images/mobile/ad17.jpg' %}"/></a>
+        </div>
+        <div class="col col-3 border-top border-right">
+            <a href="#" onclick="window.interface.openDetail('146')"><img src="{% static 'images/mobile/ad18.jpg' %}"/></a>
+        </div>
+        <div class="col col-3 border-top border-right">
+            <a href="#" onclick="window.interface.openDetail('252')"><img src="{% static 'images/mobile/ad19.jpg' %}"/></a>
+        </div>
+        <div class="col col-3 border-top">
+            <a href="#" onclick="window.interface.openDetail('126')"><img src="{% static 'images/mobile/ad20.jpg' %}"/></a>
+        </div>
+        <div class="col col-3 border-top border-right">
+            <a href="#" onclick="window.interface.openDetail('217')"><img src="{% static 'images/mobile/ad21.jpg' %}"/></a>
+        </div>
+        <div class="col col-3 border-top border-right">
+            <a href="#" onclick="window.interface.openDetail('195')"><img src="{% static 'images/mobile/ad22.jpg' %}"/></a>
+        </div>
+        <div class="col col-3 border-top">
+            <a href="#" onclick="window.interface.openDetail('116')"><img src="{% static 'images/mobile/ad23.jpg' %}"/></a>
+        </div>
+    </div>
+    <div class="line-ad">
+        <img src="{% static 'images/mobile/line-ad3.jpg' %}"/>
+    </div>
+</div>
+<div class="floor">
+    <h4>
+        火热促销
+        <img src="{% static 'images/mobile/icon_04.png' %}"/>
+    </h4>
+    <div class="row row3">
+        <span class="border-bottom"></span>
+        <div class="col col-5 border-top border-right">
+            <a href="#" onclick="window.interface.openDetail('129')"><img src="{% static 'images/mobile/ad16.jpg' %}"/></a>
+        </div>
+        <div class="col col-5 border-top">
+            <a href="#" onclick="window.interface.openDetail('198')"><img src="{% static 'images/mobile/ad17.jpg' %}"/></a>
+        </div>
+        <div class="col col-3 border-top border-right">
+            <a href="#" onclick="window.interface.openDetail('146')"><img src="{% static 'images/mobile/ad18.jpg' %}"/></a>
+        </div>
+        <div class="col col-3 border-top border-right">
+            <a href="#" onclick="window.interface.openDetail('252')"><img src="{% static 'images/mobile/ad19.jpg' %}"/></a>
+        </div>
+        <div class="col col-3 border-top">
+            <a href="#" onclick="window.interface.openDetail('126')"><img src="{% static 'images/mobile/ad20.jpg' %}"/></a>
+        </div>
+        <div class="col col-5 border-top border-right">
+            <a href="#" onclick="window.interface.openDetail('129')"><img src="{% static 'images/mobile/ad16.jpg' %}"/></a>
+        </div>
+        <div class="col col-5 border-top">
+            <a href="#" onclick="window.interface.openDetail('198')"><img src="{% static 'images/mobile/ad17.jpg' %}"/></a>
+        </div>
+    </div>
+    <div class="line-ad">
+        <img src="{% static 'images/mobile/line-ad4.jpg' %}"/>
+    </div>
+</div>
+{% elif device == '1' %}
+<div class="floor">
+    <h4>
+        口碑甄选
+        <img src="{% static 'images/mobile/icon_01.png' %}"/>
+    </h4>
+    <div class="row row1">
+        <span class="border-bottom"></span>
+        <div class="col col-4 border-top border-right">
+            <a href="product_detail:217" >
+            <img src="{% static 'images/mobile/ad1.jpg' %}"/>
+            </a>
+        </div>
+        <div class="col col-3 border-top border-right">
+            <a href="product_detail:129" >
+            <img src="{% static 'images/mobile/ad2.jpg' %}"/>
+            </a>
+        </div>
+        <div class="col col-3 border-top">
+            <a href="product_detail:198" ><img src="{% static 'images/mobile/ad3.jpg' %}"/></a>
+        </div>
+        <div class="col col-4 border-top border-right">
+            <a href="product_detail:143" ><img src="{% static 'images/mobile/ad4.jpg' %}"/></a>
+        </div>
+        <div class="col col-3 border-top border-right">
+            <a href="product_detail:252" ><img src="{% static 'images/mobile/ad5.jpg' %}"/></a>
+        </div>
+        <div class="col col-3 border-top">
+            <a href="product_detail:102" ><img src="{% static 'images/mobile/ad6.jpg' %}"/></a>
+        </div>
+    </div>
+    <div class="line-ad">
+        <img src="{% static 'images/mobile/line-ad1.jpg' %}"/>
+    </div>
+</div>
+
+<div class="floor">
+    <h4>
+        新品上市
+        <img src="{% static 'images/mobile/icon_02.png' %}"/>
+    </h4>
+    <div class="row row2">
+        <span class="border-bottom"></span>
+        <div class="row5 fix">
+		    <div class="fl left-col border-top border-right">
+                <a href="product_detail:136" ><img src="{% static 'images/mobile/ad7.jpg' %}"/></a>
+			</div>
+			<div class="fl right-col">
+                <div class="border-top">
+                    <a href="product_detail:139" ><img src="{% static 'images/mobile/ad9.jpg' %}"/></a>
+                </div>
+                <div  class="border-top">
+                    <a href="product_detail:128" ><img src="{% static 'images/mobile/ad10.jpg' %}"/></a>
+                </div>
+                <div  class="border-top">
+                    <a href="product_detail:138" ><img src="{% static 'images/mobile/ad11.jpg' %}"/></a>
+                </div>
+            </div>
+        </div>
+        <div class="col col-5 col-5-2 border-top border-right">
+            <a href="product_detail:116" ><img src="{% static 'images/mobile/ad12.jpg' %}"/></a>
+        </div>
+        <div class="col col-5 col-5-2 border-top">
+            <a href="product_detail:129" ><img src="{% static 'images/mobile/ad13.jpg' %}"/></a>
+        </div>
+        <div class="col col-5 col-5-2 border-top border-right">
+            <a href="product_detail:238" ><img src="{% static 'images/mobile/ad14.jpg' %}"/></a>
+        </div>
+        <div class="col col-5 col-5-2 border-top">
+            <a href="product_detail:142" ><img src="{% static 'images/mobile/ad15.jpg' %}"/></a>
+        </div>
+    </div>
+    <div class="line-ad">
+        <img src="{% static 'images/mobile/line-ad2.jpg' %}"/>
+    </div>
+</div>
+<div class="floor">
+    <h4>
+        主推热卖
+        <img src="{% static 'images/mobile/icon_03.png' %}"/>
+    </h4>
+    <div class="row row3">
+        <span class="border-bottom"></span>
+        <div class="col col-5 border-top border-right">
+            <a href="product_detail:129" ><img src="{% static 'images/mobile/ad16.jpg' %}"/></a>
+        </div>
+        <div class="col col-5 border-top">
+            <a href="product_detail:198" ><img src="{% static 'images/mobile/ad17.jpg' %}"/></a>
+        </div>
+        <div class="col col-3 border-top border-right">
+            <a href="product_detail:146" ><img src="{% static 'images/mobile/ad18.jpg' %}"/></a>
+        </div>
+        <div class="col col-3 border-top border-right">
+            <a href="product_detail:252" ><img src="{% static 'images/mobile/ad19.jpg' %}"/></a>
+        </div>
+        <div class="col col-3 border-top">
+            <a href="product_detail:126" ><img src="{% static 'images/mobile/ad20.jpg' %}"/></a>
+        </div>
+        <div class="col col-3 border-top border-right">
+            <a href="product_detail:217" ><img src="{% static 'images/mobile/ad21.jpg' %}"/></a>
+        </div>
+        <div class="col col-3 border-top border-right">
+            <a href="product_detail:195" ><img src="{% static 'images/mobile/ad22.jpg' %}"/></a>
+        </div>
+        <div class="col col-3 border-top">
+            <a href="product_detail:116" ><img src="{% static 'images/mobile/ad23.jpg' %}"/></a>
+        </div>
+    </div>
+    <div class="line-ad">
+        <img src="{% static 'images/mobile/line-ad3.jpg' %}"/>
+    </div>
+</div>
+<div class="floor">
+    <h4>
+        火热促销
+        <img src="{% static 'images/mobile/icon_04.png' %}"/>
+    </h4>
+    <div class="row row3">
+        <span class="border-bottom"></span>
+        <div class="col col-5 border-top border-right">
+            <a href="product_detail:129" ><img src="{% static 'images/mobile/ad16.jpg' %}"/></a>
+        </div>
+        <div class="col col-5 border-top">
+            <a href="product_detail:198" ><img src="{% static 'images/mobile/ad17.jpg' %}"/></a>
+        </div>
+        <div class="col col-3 border-top border-right">
+            <a href="product_detail:146" ><img src="{% static 'images/mobile/ad18.jpg' %}"/></a>
+        </div>
+        <div class="col col-3 border-top border-right">
+            <a href="product_detail:252" ><img src="{% static 'images/mobile/ad19.jpg' %}"/></a>
+        </div>
+        <div class="col col-3 border-top">
+            <a href="product_detail:126" ><img src="{% static 'images/mobile/ad20.jpg' %}"/></a>
+        </div>
+        <div class="col col-5 border-top border-right">
+            <a href="product_detail:129" ><img src="{% static 'images/mobile/ad16.jpg' %}"/></a>
+        </div>
+        <div class="col col-5 border-top">
+            <a href="product_detail:198" ><img src="{% static 'images/mobile/ad17.jpg' %}"/></a>
+        </div>
+    </div>
+    <div class="line-ad">
+        <img src="{% static 'images/mobile/line-ad4.jpg' %}"/>
+    </div>
+</div>
+{% else %}
+<div class="floor">
+    <h4>
+        口碑甄选
+        <img src="{% static 'images/mobile/icon_01.png' %}"/>
+    </h4>
+    <div class="row row1">
+        <span class="border-bottom"></span>
+        <div class="col col-4 border-top border-right">
+            <a href="#" onclick="window.interface.openDetail('217')">
+            <img src="{% static 'images/mobile/ad1.jpg' %}"/>
+            </a>
+        </div>
+        <div class="col col-3 border-top border-right">
+            <a href="#" onclick="window.interface.openDetail('129')">
+            <img src="{% static 'images/mobile/ad2.jpg' %}"/>
+            </a>
+        </div>
+        <div class="col col-3 border-top">
+            <a href="#" onclick="window.interface.openDetail('198')"><img src="{% static 'images/mobile/ad3.jpg' %}"/></a>
+        </div>
+        <div class="col col-4 border-top border-right">
+            <a href="#" onclick="window.interface.openDetail('143')"><img src="{% static 'images/mobile/ad4.jpg' %}"/></a>
+        </div>
+        <div class="col col-3 border-top border-right">
+            <a href="#" onclick="window.interface.openDetail('252')"><img src="{% static 'images/mobile/ad5.jpg' %}"/></a>
+        </div>
+        <div class="col col-3 border-top">
+            <a href="#" class="lastAd" onclick="window.interface.openDetail('102')"><img src="{% static 'images/mobile/ad6.jpg' %}"/></a>
+        </div>
+    </div>
+    <div class="line-ad">
+        <img src="{% static 'images/mobile/line-ad1.jpg' %}"/>
+    </div>
+</div>
+
+<div class="floor">
+    <h4>
+        新品上市
+        <img src="{% static 'images/mobile/icon_02.png' %}"/>
+    </h4>
+    <div class="row row2">
+        <span class="border-bottom"></span>
+        <div class="row5 fix">
+		    <div class="fl left-col border-top border-right">
+               <a href="#" onclick="window.interface.openDetail('136')"><img src="{% static 'images/mobile/ad7.jpg' %}"/></a>
+			</div>
+			<div class="fl right-col">
+                <div class="border-top">
+                    <a href="#" onclick="window.interface.openDetail('139')"><img src="{% static 'images/mobile/ad9.jpg' %}"/></a>
+                </div>
+                <div  class="border-top">
+                    <a href="#" onclick="window.interface.openDetail('128')"><img src="{% static 'images/mobile/ad10.jpg' %}"/></a>
+                </div>
+                <div  class="border-top">
+                    <a href="#" onclick="window.interface.openDetail('138')"><img src="{% static 'images/mobile/ad11.jpg' %}"/></a>
+                </div>
+            </div>
+        </div>
+        <div class="col col-5 col-5-2 border-top border-right">
+            <a href="#" onclick="window.interface.openDetail('116')"><img src="{% static 'images/mobile/ad12.jpg' %}"/></a>
+        </div>
+        <div class="col col-5 col-5-2 border-top">
+            <a href="#" onclick="window.interface.openDetail('129')"><img src="{% static 'images/mobile/ad13.jpg' %}"/></a>
+        </div>
+        <div class="col col-5 col-5-2 border-top border-right">
+            <a href="#" onclick="window.interface.openDetail('238')"><img src="{% static 'images/mobile/ad14.jpg' %}"/></a>
+        </div>
+        <div class="col col-5 col-5-2 border-top">
+            <a href="#" onclick="window.interface.openDetail('142')"><img src="{% static 'images/mobile/ad15.jpg' %}"/></a>
+        </div>
+    </div>
+    <div class="line-ad">
+        <img src="{% static 'images/mobile/line-ad2.jpg' %}"/>
+    </div>
+</div>
+<div class="floor">
+    <h4>
+        主推热卖
+        <img src="{% static 'images/mobile/icon_03.png' %}"/>
+    </h4>
+    <div class="row row3">
+        <span class="border-bottom"></span>
+        <div class="col col-5 border-top border-right">
+            <a href="#" onclick="window.interface.openDetail('129')"><img src="{% static 'images/mobile/ad16.jpg' %}"/></a>
+        </div>
+        <div class="col col-5 border-top">
+            <a href="#" onclick="window.interface.openDetail('198')"><img src="{% static 'images/mobile/ad17.jpg' %}"/></a>
+        </div>
+        <div class="col col-3 border-top border-right">
+            <a href="#" onclick="window.interface.openDetail('146')"><img src="{% static 'images/mobile/ad18.jpg' %}"/></a>
+        </div>
+        <div class="col col-3 border-top border-right">
+            <a href="#" onclick="window.interface.openDetail('252')"><img src="{% static 'images/mobile/ad19.jpg' %}"/></a>
+        </div>
+        <div class="col col-3 border-top">
+            <a href="#" onclick="window.interface.openDetail('126')"><img src="{% static 'images/mobile/ad20.jpg' %}"/></a>
+        </div>
+        <div class="col col-3 border-top border-right">
+            <a href="#" onclick="window.interface.openDetail('217')"><img src="{% static 'images/mobile/ad21.jpg' %}"/></a>
+        </div>
+        <div class="col col-3 border-top border-right">
+            <a href="#" onclick="window.interface.openDetail('195')"><img src="{% static 'images/mobile/ad22.jpg' %}"/></a>
+        </div>
+        <div class="col col-3 border-top">
+            <a href="#" onclick="window.interface.openDetail('116')"><img src="{% static 'images/mobile/ad23.jpg' %}"/></a>
+        </div>
+    </div>
+    <div class="line-ad">
+        <img src="{% static 'images/mobile/line-ad3.jpg' %}"/>
+    </div>
+</div>
+<div class="floor">
+    <h4>
+        火热促销
+        <img src="{% static 'images/mobile/icon_04.png' %}"/>
+    </h4>
+    <div class="row row3">
+        <span class="border-bottom"></span>
+        <div class="col col-5 border-top border-right">
+            <a href="#" onclick="window.interface.openDetail('129')"><img src="{% static 'images/mobile/ad16.jpg' %}"/></a>
+        </div>
+        <div class="col col-5 border-top">
+            <a href="#" onclick="window.interface.openDetail('198')"><img src="{% static 'images/mobile/ad17.jpg' %}"/></a>
+        </div>
+        <div class="col col-3 border-top border-right">
+            <a href="#" onclick="window.interface.openDetail('146')"><img src="{% static 'images/mobile/ad18.jpg' %}"/></a>
+        </div>
+        <div class="col col-3 border-top border-right">
+            <a href="#" onclick="window.interface.openDetail('252')"><img src="{% static 'images/mobile/ad19.jpg' %}"/></a>
+        </div>
+        <div class="col col-3 border-top">
+            <a href="#" onclick="window.interface.openDetail('126')"><img src="{% static 'images/mobile/ad20.jpg' %}"/></a>
+        </div>
+        <div class="col col-5 border-top border-right">
+            <a href="#" onclick="window.interface.openDetail('129')"><img src="{% static 'images/mobile/ad16.jpg' %}"/></a>
+        </div>
+        <div class="col col-5 border-top">
+            <a href="#" onclick="window.interface.openDetail('198')"><img src="{% static 'images/mobile/ad17.jpg' %}"/></a>
+        </div>
+    </div>
+    <div class="line-ad">
+        <img src="{% static 'images/mobile/line-ad4.jpg' %}"/>
+    </div>
+</div>
+{% endif %}
+</body>
+</html>

@@ -1,0 +1,62 @@
+@charset "utf-8";
+
+/*用户注册协议*/
+.user-agreement a:hover{
+    text-decoration: underline;
+}
+.user-agreement-pupzz{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=60);
+        filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=60);
+    opacity: .6;
+    z-index: 998;
+}
+.user-agreement-pupbody{
+    position: absolute;
+    height: 230px;
+    width: 600px;
+    top: 15%;
+    left: 65%;
+    margin-left: -480px;
+    background-color: #fff;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    z-index: 999;
+}
+.user-agreement-pupbody .pupbody-top{
+    height: 48px;
+    background-color: #eee;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    box-shadow: 0 1px 5px #999;
+}
+.user-agreement-pupbody .pupbody-top .pupbody-title{
+	float: left;
+    padding-left: 20px;
+    font-size: 14px;
+    color: #000;
+    line-height: 48px;
+}
+.user-agreement-pupbody .pupbody-top .pupbody-closebtn{
+	float: right;
+    padding: 10px;
+    font-size: 24px;
+    cursor: pointer;
+}
+.user-agreement-pupbody .pupbody-content{
+    height: 240px;
+    padding: 15px 30px;
+    line-height: 160%;
+    font-size: 14px;
+    color: #666;
+    overflow-y: auto;
+}
