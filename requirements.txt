@@ -7,7 +7,7 @@ Pillow==2.7.0
 Unidecode==0.04.18
 argparse==1.2.1
 cffi==1.2.1
-cryptography==1.0.2
+cryptography==3.2
 celery==3.1.19
 decorator==4.0.2
 django-appconf==1.0.1
